@@ -1,136 +1,184 @@
 # Google Gemini API Documentation
 
+> Official documentation sourced from [ai.google.dev](https://ai.google.dev/gemini-api/docs) and [googleapis/python-genai](https://github.com/googleapis/python-genai)
+
 ## Installation
 
-### Python (New Google GenAI SDK)
+### Python
 
 ```bash
 pip install google-genai
 ```
 
-### TypeScript/JavaScript (New SDK)
+### TypeScript/JavaScript
 
 ```bash
 npm install @google/genai
 ```
 
-### Legacy SDK (Still Supported)
+## Available Models
 
-```bash
-# Python
-pip install google-generativeai
+### Current Generation (Latest)
 
-# JavaScript
-npm install @google/generative-ai
-```
+| Model ID | Description | Context |
+|----------|-------------|---------|
+| `gemini-3-pro-preview` | Best model for multimodal understanding, most powerful agentic and coding model | 1M input / 65K output |
+| `gemini-3-pro-image-preview` | Image generation and understanding with thinking | 65K input / 32K output |
+| `gemini-2.5-pro` | State-of-the-art thinking model for complex reasoning (code, math, STEM) | 1M input / 65K output |
+| `gemini-2.5-flash` | Best price-performance, well-rounded capabilities | 1M input / 65K output |
+| `gemini-2.5-flash-lite` | Fastest flash model, optimized for cost-efficiency | 1M input / 65K output |
+| `gemini-2.5-flash-image` | Native image generation with text output | 1M input / 65K output |
+
+### Previous Generation
+
+| Model ID | Description | Context |
+|----------|-------------|---------|
+| `gemini-2.0-flash` | Second-generation workhorse | 1M input / 8K output |
+| `gemini-2.0-flash-001` | GA version of 2.0 Flash | 1M input / 8K output |
+| `gemini-2.0-flash-lite` | Cost-efficient 2.0 model | 1M input / 8K output |
+
+### Other Models
+
+| Model ID | Description |
+|----------|-------------|
+| `imagen-4.0-generate-001` | Image generation |
+| `veo-3.0-generate-preview` | Video generation with audio |
+| `gemini-embedding-001` | Text embeddings |
 
 ## Client Setup
 
-### Python (New SDK - Recommended)
+### Python (Gemini Developer API)
 
 ```python
 from google import genai
 
-# API key from environment or explicit
-client = genai.Client(api_key="YOUR_API_KEY")
-# Or set GEMINI_API_KEY environment variable
+# Using API key directly
+client = genai.Client(api_key='YOUR_GEMINI_API_KEY')
+
+# Or using environment variable (recommended)
+# Set GEMINI_API_KEY or GOOGLE_API_KEY env var
 client = genai.Client()
 ```
 
-### TypeScript (New SDK - Recommended)
-
-```typescript
-import { GoogleGenAI } from "@google/genai";
-
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-```
-
-### Legacy Python SDK
-
-```python
-import google.generativeai as genai
-
-genai.configure(api_key="YOUR_API_KEY")
-model = genai.GenerativeModel("gemini-2.5-flash")
-```
-
-## Available Models (Latest 2025)
-
-| Model | Description | Context Window |
-|-------|-------------|----------------|
-| `gemini-2.5-pro` | Most powerful, adaptive thinking | 1M tokens |
-| `gemini-2.5-flash` | Fast, balanced performance | 1M tokens |
-| `gemini-2.5-flash-lite` | Cost-effective, high performance | 1M tokens |
-| `gemini-2.0-flash-001` | GA model, fast responses | 1M tokens |
-| `gemini-2.0-flash-lite` | Optimized for speed & cost | 1M tokens |
-| `gemini-embedding-001` | Text embeddings | N/A |
-
-### Experimental/Preview Models
-
-```python
-# Latest preview models
-model = "gemini-2.5-pro-preview-06-05"      # Latest Pro preview
-model = "gemini-2.5-flash-preview-05-20"    # Flash with adaptive thinking
-model = "gemini-2.0-flash-thinking-exp"     # Thinking mode
-```
-
-## Basic Text Generation
-
-### Python (New SDK)
+### Python (Vertex AI)
 
 ```python
 from google import genai
 
-client = genai.Client()
-
-response = client.models.generate_content(
-    model="gemini-2.5-flash",
-    contents="Explain quantum computing in simple terms"
+client = genai.Client(
+    vertexai=True,
+    project='your-project-id',
+    location='us-central1'
 )
-print(response.text)
 ```
 
-### TypeScript (New SDK)
+### TypeScript (Gemini Developer API)
 
 ```typescript
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI } from '@google/genai';
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-
-const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
-    contents: "Explain quantum computing in simple terms"
-});
-console.log(response.text);
 ```
 
-## Streaming Responses
+### TypeScript (Vertex AI)
+
+```typescript
+import { GoogleGenAI } from '@google/genai';
+
+const ai = new GoogleGenAI({
+    vertexai: true,
+    project: 'your_project',
+    location: 'your_location',
+});
+```
+
+## Generate Content
 
 ### Python
 
 ```python
-from google import genai
-
-client = genai.Client()
-
-for chunk in client.models.generate_content_stream(
-    model="gemini-2.5-flash",
-    contents="Write a story about a robot"
-):
-    print(chunk.text, end="", flush=True)
+response = client.models.generate_content(
+    model='gemini-2.5-flash',
+    contents='Why is the sky blue?'
+)
+print(response.text)
 ```
 
 ### TypeScript
 
 ```typescript
-const stream = await ai.models.generateContentStream({
-    model: "gemini-2.5-flash",
-    contents: "Write a story about a robot"
+const response = await ai.models.generateContent({
+    model: 'gemini-2.5-flash',
+    contents: 'Why is the sky blue?',
 });
+console.log(response.text);
+```
 
-for await (const chunk of stream) {
-    process.stdout.write(chunk.text);
+## Streaming
+
+### Python
+
+```python
+for chunk in client.models.generate_content_stream(
+    model='gemini-2.5-flash',
+    contents='Tell me a story in 300 words.'
+):
+    print(chunk.text, end='')
+```
+
+### TypeScript
+
+```typescript
+const response = await ai.models.generateContentStream({
+    model: 'gemini-2.5-flash',
+    contents: 'Write a 100-word poem.',
+});
+for await (const chunk of response) {
+    console.log(chunk.text);
 }
+```
+
+## Async (Python)
+
+```python
+response = await client.aio.models.generate_content(
+    model='gemini-2.5-flash',
+    contents='Tell me a story in 300 words.'
+)
+print(response.text)
+
+# Async streaming
+async for chunk in await client.aio.models.generate_content_stream(
+    model='gemini-2.5-flash',
+    contents='Tell me a story in 300 words.'
+):
+    print(chunk.text, end='')
+```
+
+## System Instructions and Config
+
+### Python
+
+```python
+from google.genai import types
+
+response = client.models.generate_content(
+    model='gemini-2.5-flash',
+    contents='high',
+    config=types.GenerateContentConfig(
+        system_instruction='I say high, you say low',
+        max_output_tokens=100,
+        temperature=0.3,
+        top_p=0.95,
+        top_k=20,
+        candidate_count=1,
+        seed=5,
+        stop_sequences=['STOP!'],
+        presence_penalty=0.0,
+        frequency_penalty=0.0,
+    ),
+)
+print(response.text)
 ```
 
 ## Multi-turn Chat
@@ -138,404 +186,316 @@ for await (const chunk of stream) {
 ### Python
 
 ```python
-from google import genai
+chat = client.chats.create(model='gemini-2.5-flash')
 
-client = genai.Client()
-
-# Create a chat session
-chat = client.chats.create(model="gemini-2.5-flash")
-
-# Send messages
-response = chat.send_message("Hello! What's your name?")
+response = chat.send_message('Hello!')
 print(response.text)
 
-response = chat.send_message("Can you help me with Python?")
+response = chat.send_message('What did I just say?')
 print(response.text)
 
-# Get chat history
+# Get history
 history = chat.get_history()
 ```
 
 ### TypeScript
 
 ```typescript
-const chat = ai.chats.create({ model: "gemini-2.5-flash" });
+const chat = ai.chats.create({ model: 'gemini-2.5-flash' });
 
-const response1 = await chat.sendMessage("Hello!");
+const response1 = await chat.sendMessage('Hello!');
 console.log(response1.text);
 
-const response2 = await chat.sendMessage("Tell me more");
+const response2 = await chat.sendMessage('What did I just say?');
 console.log(response2.text);
 ```
 
-## System Instructions
+## Thinking Models
+
+For complex reasoning tasks, use thinking-capable models:
+
+### Python
 
 ```python
-from google import genai
 from google.genai import types
 
-client = genai.Client()
-
 response = client.models.generate_content(
-    model="gemini-2.5-flash",
-    contents="Good morning! How are you?",
+    model='gemini-2.5-pro',  # or gemini-2.5-flash with thinking
+    contents='Solve this step by step: If a train travels at 60mph for 2.5 hours, how far does it go?',
     config=types.GenerateContentConfig(
-        system_instruction="You are a friendly pirate. Speak like one."
+        thinking_config=types.ThinkingConfig(
+            thinking_budget=8192,  # Token budget for thinking
+        )
     )
 )
 print(response.text)
 ```
 
-## Thinking Mode (Gemini 2.5)
-
-Gemini 2.5 models support adaptive thinking for complex reasoning:
-
-### Python
-
-```python
-from google import genai
-from google.genai import types
-
-client = genai.Client()
-
-response = client.models.generate_content(
-    model="gemini-2.5-flash",
-    contents="Solve this step by step: What is 15% of 340?",
-    config=types.GenerateContentConfig(
-        thinking_config=types.ThinkingConfig(
-            thinking_budget=8192,  # Token budget for thinking
-            include_thoughts=True   # Include reasoning in response
-        )
-    )
-)
-
-# Access thinking and response
-print("Thinking:", response.candidates[0].thinking)
-print("Response:", response.text)
-```
-
-### TypeScript (AI SDK)
-
-```typescript
-import { google } from "@ai-sdk/google";
-import { generateText } from "ai";
-
-const { text, reasoning } = await generateText({
-    model: google("gemini-2.5-flash"),
-    prompt: "What is the sum of the first 10 prime numbers?",
-    providerOptions: {
-        google: {
-            thinkingConfig: {
-                thinkingBudget: 8192,
-                includeThoughts: true,
-            },
-        },
-    },
-});
-
-console.log("Response:", text);
-console.log("Reasoning:", reasoning);
-```
-
 ## JSON Mode (Structured Output)
 
+### With Pydantic Schema
+
 ```python
-from google import genai
+from pydantic import BaseModel
 from google.genai import types
 
-client = genai.Client()
+class CountryInfo(BaseModel):
+    name: str
+    population: int
+    capital: str
+    continent: str
 
 response = client.models.generate_content(
-    model="gemini-2.5-flash",
-    contents="Give me information for the United States.",
+    model='gemini-2.5-flash',
+    contents='Give me information for the United States.',
     config=types.GenerateContentConfig(
-        response_mime_type="application/json",
+        response_mime_type='application/json',
+        response_schema=CountryInfo,
+    ),
+)
+print(response.text)
+```
+
+### With Dict Schema
+
+```python
+from google.genai import types
+
+response = client.models.generate_content(
+    model='gemini-2.5-flash',
+    contents='Give me information for the United States.',
+    config=types.GenerateContentConfig(
+        response_mime_type='application/json',
         response_schema={
-            "type": "OBJECT",
-            "required": ["name", "population", "capital", "continent"],
-            "properties": {
-                "name": {"type": "STRING"},
-                "population": {"type": "INTEGER"},
-                "capital": {"type": "STRING"},
-                "continent": {"type": "STRING"},
-                "gdp": {"type": "INTEGER"},
-                "official_language": {"type": "STRING"},
+            'type': 'OBJECT',
+            'required': ['name', 'population', 'capital'],
+            'properties': {
+                'name': {'type': 'STRING'},
+                'population': {'type': 'INTEGER'},
+                'capital': {'type': 'STRING'},
             },
         },
     ),
 )
-print(response.text)  # Returns valid JSON
+print(response.text)
 ```
 
-## Function Calling (Tools)
+## Function Calling
 
-### Define and Use Tools
+### Automatic Function Calling (Python)
 
 ```python
-from google import genai
 from google.genai import types
 
-def get_weather(location: str, unit: str = "celsius") -> dict:
-    """Get current weather for a location."""
-    return {"temperature": 22, "condition": "sunny", "location": location}
+def get_current_weather(location: str) -> str:
+    """Returns the current weather.
 
-# Define the tool
-weather_tool = types.Tool(
-    function_declarations=[
-        types.FunctionDeclaration(
-            name="get_weather",
-            description="Get the current weather in a given location",
-            parameters={
-                "type": "object",
-                "properties": {
-                    "location": {
-                        "type": "string",
-                        "description": "The city and state"
-                    },
-                    "unit": {
-                        "type": "string",
-                        "enum": ["celsius", "fahrenheit"]
-                    }
-                },
-                "required": ["location"]
-            }
-        )
-    ]
-)
-
-client = genai.Client()
+    Args:
+      location: The city and state, e.g. San Francisco, CA
+    """
+    return 'sunny'
 
 response = client.models.generate_content(
-    model="gemini-2.5-flash",
-    contents="What's the weather in Tokyo?",
-    config=types.GenerateContentConfig(tools=[weather_tool])
+    model='gemini-2.5-flash',
+    contents='What is the weather like in Boston?',
+    config=types.GenerateContentConfig(tools=[get_current_weather]),
+)
+print(response.text)
+```
+
+### Manual Function Declaration
+
+```python
+from google.genai import types
+
+function = types.FunctionDeclaration(
+    name='get_current_weather',
+    description='Get the current weather in a given location',
+    parameters_json_schema={
+        'type': 'object',
+        'properties': {
+            'location': {
+                'type': 'string',
+                'description': 'The city and state, e.g. San Francisco, CA',
+            }
+        },
+        'required': ['location'],
+    },
+)
+
+tool = types.Tool(function_declarations=[function])
+
+response = client.models.generate_content(
+    model='gemini-2.5-flash',
+    contents='What is the weather like in Boston?',
+    config=types.GenerateContentConfig(tools=[tool]),
 )
 
 # Handle function call
 if response.function_calls:
-    function_call = response.function_calls[0]
-    result = get_weather(**function_call.args)
+    print(response.function_calls[0])
+```
 
-    # Send result back
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=[
-            types.Content(role="user", parts=[types.Part(text="What's the weather in Tokyo?")]),
-            response.candidates[0].content,
-            types.Content(role="tool", parts=[
-                types.Part.from_function_response(
-                    name=function_call.name,
-                    response={"result": result}
-                )
-            ])
-        ],
-        config=types.GenerateContentConfig(tools=[weather_tool])
-    )
-    print(response.text)
+### TypeScript Function Calling
+
+```typescript
+import { GoogleGenAI, FunctionCallingConfigMode } from '@google/genai';
+
+const controlLightDeclaration = {
+    name: 'controlLight',
+    parametersJsonSchema: {
+        type: 'object',
+        properties: {
+            brightness: { type: 'number' },
+            colorTemperature: { type: 'string' },
+        },
+        required: ['brightness', 'colorTemperature'],
+    },
+};
+
+const response = await ai.models.generateContent({
+    model: 'gemini-2.5-flash',
+    contents: 'Dim the lights so the room feels cozy and warm.',
+    config: {
+        toolConfig: {
+            functionCallingConfig: {
+                mode: FunctionCallingConfigMode.ANY,
+                allowedFunctionNames: ['controlLight'],
+            }
+        },
+        tools: [{ functionDeclarations: [controlLightDeclaration] }]
+    }
+});
+
+console.log(response.functionCalls);
 ```
 
 ## Grounding with Google Search
 
 ```python
-from google import genai
 from google.genai import types
 
-client = genai.Client()
-
 response = client.models.generate_content(
-    model="gemini-2.5-flash",
-    contents="What was the score of the latest Champions League final?",
+    model='gemini-2.5-flash',
+    contents='What happened in the news today?',
     config=types.GenerateContentConfig(
         tools=[types.Tool(google_search=types.GoogleSearch())]
     )
 )
-
 print(response.text)
+```
 
-# Access search metadata
-grounding = response.candidates[0].grounding_metadata
-print("Search queries:", grounding.web_search_queries)
-print("Sources:", [chunk.web.title for chunk in grounding.grounding_chunks])
+## Grounding with Google Maps
+
+```python
+from google.genai import types
+
+response = client.models.generate_content(
+    model='gemini-2.5-flash',
+    contents='Find coffee shops near Times Square',
+    config=types.GenerateContentConfig(
+        tools=[types.Tool(google_maps=types.GoogleMaps())]
+    )
+)
+print(response.text)
 ```
 
 ## Code Execution
 
 ```python
-from google import genai
 from google.genai import types
 
-client = genai.Client()
-
-code_tool = types.Tool(code_execution=types.ToolCodeExecution())
-
 response = client.models.generate_content(
-    model="gemini-2.5-flash",
-    contents="Calculate the sum of the first 50 prime numbers",
-    config=types.GenerateContentConfig(tools=[code_tool])
+    model='gemini-2.5-flash',
+    contents='Calculate the sum of the first 50 prime numbers',
+    config=types.GenerateContentConfig(
+        tools=[types.Tool(code_execution=types.ToolCodeExecution())]
+    )
 )
-
 print(response.text)
 ```
 
-## Vision (Image Analysis)
+## File Upload and Multimodal
 
-### From File
+### Upload File
 
 ```python
-from google import genai
+file = client.files.upload(file='document.pdf')
+
+response = client.models.generate_content(
+    model='gemini-2.5-flash',
+    contents=['Summarize this document', file]
+)
+print(response.text)
+```
+
+### Image Input
+
+```python
 from google.genai import types
-import base64
-
-client = genai.Client()
-
-# Read and encode image
-with open("image.jpg", "rb") as f:
-    image_data = base64.b64encode(f.read()).decode()
 
 response = client.models.generate_content(
-    model="gemini-2.5-flash",
+    model='gemini-2.5-flash',
     contents=[
-        types.Content(parts=[
-            types.Part(text="What's in this image?"),
-            types.Part(inline_data=types.Blob(
-                mime_type="image/jpeg",
-                data=image_data
-            ))
-        ])
+        'What is in this image?',
+        types.Part.from_uri(
+            file_uri='gs://bucket/image.jpg',
+            mime_type='image/jpeg',
+        )
     ]
 )
 print(response.text)
 ```
 
-### Using File API (Large Files)
+## Image Generation
 
 ```python
-from google import genai
-
-client = genai.Client()
-
-# Upload file
-uploaded_file = client.files.upload(
-    file="large_image.jpg",
-    config={"mime_type": "image/jpeg"}
-)
-
-# Use in generation
-response = client.models.generate_content(
-    model="gemini-2.5-flash",
-    contents=[
-        types.Part.from_uri(uploaded_file.uri, uploaded_file.mime_type),
-        "Describe this image in detail"
-    ]
-)
-
-# Delete when done
-client.files.delete(uploaded_file.name)
-```
-
-## Audio Processing
-
-```python
-from google import genai
-from google.genai import types, createPartFromUri, createUserContent
-
-client = genai.Client()
-
-# Upload audio file
-audio_file = client.files.upload(
-    file="audio.mp3",
-    config={"mime_type": "audio/mp3"}
-)
+from google.genai import types
 
 response = client.models.generate_content(
-    model="gemini-2.5-flash",
-    contents=createUserContent([
-        createPartFromUri(audio_file.uri, audio_file.mime_type),
-        "Transcribe and summarize this audio"
-    ])
-)
-print(response.text)
-```
-
-## Video Understanding
-
-```python
-from google import genai
-import time
-
-client = genai.Client()
-
-# Upload video
-video_file = client.files.upload(file="video.mp4")
-
-# Wait for processing
-while video_file.state.name == "PROCESSING":
-    time.sleep(10)
-    video_file = client.files.get(video_file.name)
-
-response = client.models.generate_content(
-    model="gemini-2.5-flash",
-    contents=[
-        types.Part.from_uri(video_file.uri, video_file.mime_type),
-        "Describe what happens in this video"
-    ]
-)
-print(response.text)
-```
-
-## PDF Document Processing
-
-```python
-from google import genai
-
-client = genai.Client()
-
-# Upload PDF
-pdf_file = client.files.upload(
-    file="document.pdf",
-    config={"mime_type": "application/pdf"}
+    model='gemini-2.5-flash-image',
+    contents='A cartoon infographic for flying sneakers',
+    config=types.GenerateContentConfig(
+        response_modalities=["IMAGE"],
+        image_config=types.ImageConfig(
+            aspect_ratio="9:16",
+        ),
+    ),
 )
 
-response = client.models.generate_content(
-    model="gemini-2.5-flash",
-    contents=[
-        types.Part.from_uri(pdf_file.uri, pdf_file.mime_type),
-        "Summarize this document"
-    ]
-)
-print(response.text)
-```
-
-## Image Generation (Gemini 2.0+)
-
-```python
-from google import genai
-
-client = genai.Client()
-
-response = client.models.generate_content(
-    model="gemini-2.0-flash-preview-image-generation",
-    contents="Generate an image of a sunset over mountains"
-)
-
-# Access generated image
-for part in response.candidates[0].content.parts:
+for part in response.parts:
     if part.inline_data:
-        # Save image
-        with open("generated.png", "wb") as f:
-            f.write(part.inline_data.data)
+        generated_image = part.as_image()
+        generated_image.show()
 ```
 
-## Live API (Real-time Bidirectional Streaming)
+### Imagen Model
+
+```python
+from google.genai import types
+
+response = client.models.generate_images(
+    model='imagen-4.0-generate-001',
+    prompt='An umbrella in the foreground, and a rainy night sky in the background',
+    config=types.GenerateImagesConfig(
+        number_of_images=1,
+        include_rai_reason=True,
+        output_mime_type='image/jpeg',
+    ),
+)
+response.generated_images[0].image.show()
+```
+
+## Live API (Real-time)
+
+The Live API enables real-time interaction with text, audio, and video:
 
 ```python
 from google import genai
-
-client = genai.Client()
 
 # Create live session
-async with client.live.connect(model="gemini-2.0-flash-live-001") as session:
-    # Send audio/video in real-time
+async with client.live.connect(model='gemini-2.0-flash-live-001') as session:
+    # Send content
     await session.send(audio_chunk)
 
     # Receive responses
@@ -543,176 +503,113 @@ async with client.live.connect(model="gemini-2.0-flash-live-001") as session:
         print(response.text)
 ```
 
-## Batch API (Cost-Effective)
+## Batch API
+
+For non-time-sensitive bulk requests with 50% cost discount:
 
 ```python
-from google import genai
+from google.genai import types
 
-client = genai.Client()
-
-# Create batch request
 batch = client.batches.create(
-    model="gemini-2.5-flash",
+    model='gemini-2.5-flash',
     requests=[
-        {"contents": "Summarize article 1"},
-        {"contents": "Summarize article 2"},
-        {"contents": "Summarize article 3"},
+        types.CreateBatchJobRequest(contents='Summarize article 1'),
+        types.CreateBatchJobRequest(contents='Summarize article 2'),
     ]
 )
 
 # Check status
-status = client.batches.get(batch.name)
-print(f"Status: {status.state}")
-
-# Get results when complete
-if status.state == "SUCCEEDED":
-    results = client.batches.list_results(batch.name)
-    for result in results:
-        print(result.response.text)
+status = client.batches.get(name=batch.name)
 ```
 
-## Context Caching (Cost Optimization)
+## Context Caching
+
+Reduce costs for repeated large prompts:
 
 ```python
-from google import genai
-from google.genai import caching
+from google.genai import types
 
-client = genai.Client()
-
-# Cache large context (e.g., a long document)
+# Create cache
 cache = client.caches.create(
-    model="gemini-2.5-flash",
-    contents=[large_document_content],
-    ttl="3600s"  # 1 hour
+    model='gemini-2.5-flash',
+    contents=[large_document],
+    config=types.CreateCacheConfig(ttl='3600s')
 )
 
-# Use cached context for multiple queries
+# Use cache
 response = client.models.generate_content(
-    model="gemini-2.5-flash",
-    contents="What are the key findings?",
-    config={"cached_content": cache.name}
+    model='gemini-2.5-flash',
+    contents='Summarize this',
+    config=types.GenerateContentConfig(cached_content=cache.name)
 )
+```
+
+## Count Tokens
+
+```python
+response = client.models.count_tokens(
+    model='gemini-2.5-flash',
+    contents='Why is the sky blue?',
+)
+print(response.total_tokens)
 ```
 
 ## Embeddings
 
 ```python
-from google import genai
-
-client = genai.Client()
-
-result = client.models.embed_content(
-    model="gemini-embedding-001",
-    contents="What is machine learning?",
-    config={"task_type": "RETRIEVAL_DOCUMENT"}
+response = client.models.embed_content(
+    model='gemini-embedding-001',
+    contents='What is machine learning?',
 )
-
-embedding = result.embedding
-print(f"Embedding dimension: {len(embedding)}")
-```
-
-## Token Counting
-
-```python
-from google import genai
-
-client = genai.Client()
-
-# Count tokens before sending
-token_count = client.models.count_tokens(
-    model="gemini-2.5-flash",
-    contents="Your long prompt here..."
-)
-print(f"Token count: {token_count.total_tokens}")
-```
-
-## Safety Settings
-
-```python
-from google import genai
-from google.genai import types
-
-client = genai.Client()
-
-response = client.models.generate_content(
-    model="gemini-2.5-flash",
-    contents="Your prompt",
-    config=types.GenerateContentConfig(
-        safety_settings=[
-            types.SafetySetting(
-                category="HARM_CATEGORY_HARASSMENT",
-                threshold="BLOCK_MEDIUM_AND_ABOVE"
-            ),
-            types.SafetySetting(
-                category="HARM_CATEGORY_HATE_SPEECH",
-                threshold="BLOCK_ONLY_HIGH"
-            )
-        ]
-    )
-)
-```
-
-## Generation Configuration
-
-```python
-from google import genai
-from google.genai import types
-
-client = genai.Client()
-
-response = client.models.generate_content(
-    model="gemini-2.5-flash",
-    contents="Write a creative story",
-    config=types.GenerateContentConfig(
-        temperature=0.9,
-        top_p=0.95,
-        top_k=40,
-        max_output_tokens=2048,
-        stop_sequences=["THE END"],
-        candidate_count=1
-    )
-)
+print(response.embedding)
 ```
 
 ## Error Handling
 
-```python
-from google import genai
-from google.api_core import exceptions
+### Python
 
-client = genai.Client()
+```python
+from google.genai import errors
 
 try:
     response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents="Hello"
+        model='invalid-model-name',
+        contents='What is your name?',
     )
-except exceptions.ResourceExhausted:
-    print("Rate limit exceeded - implement backoff")
-except exceptions.InvalidArgument as e:
-    print(f"Invalid argument: {e}")
-except exceptions.PermissionDenied:
-    print("API key invalid or lacks permissions")
-except Exception as e:
-    print(f"Error: {e}")
+except errors.APIError as e:
+    print(e.code)    # 404
+    print(e.message)
+```
+
+### TypeScript
+
+```typescript
+await ai.models.generateContent({
+    model: 'non-existent-model',
+    contents: 'Write a poem.',
+}).catch((e) => {
+    console.error('error name:', e.name);
+    console.error('error message:', e.message);
+    console.error('error status:', e.status);
+});
 ```
 
 ## OpenAI Compatibility
 
-Gemini API supports OpenAI-compatible endpoints:
+Use Gemini with OpenAI SDK:
 
 ```python
 from openai import OpenAI
 
 client = OpenAI(
-    api_key="YOUR_GEMINI_API_KEY",
-    base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
+    api_key='YOUR_GEMINI_API_KEY',
+    base_url='https://generativelanguage.googleapis.com/v1beta/openai/'
 )
 
 response = client.chat.completions.create(
-    model="gemini-2.5-flash",
+    model='gemini-2.5-flash',
     messages=[
-        {"role": "user", "content": "Hello!"}
+        {'role': 'user', 'content': 'Hello!'}
     ]
 )
 print(response.choices[0].message.content)
@@ -721,17 +618,21 @@ print(response.choices[0].message.content)
 ## Environment Variables
 
 ```bash
-GEMINI_API_KEY=AIza...
-GOOGLE_API_KEY=AIza...  # Alternative
+# Gemini Developer API
+export GEMINI_API_KEY='your-api-key'
+# or
+export GOOGLE_API_KEY='your-api-key'
+
+# Vertex AI
+export GOOGLE_GENAI_USE_VERTEXAI=true
+export GOOGLE_CLOUD_PROJECT='your-project-id'
+export GOOGLE_CLOUD_LOCATION='us-central1'
 ```
 
-## Best Practices
+## Official Resources
 
-1. **Choose the right model**: Use Flash for speed, Pro for complex reasoning
-2. **Use thinking mode** for math, logic, and multi-step problems
-3. **Leverage caching** for repeated large contexts
-4. **Use batch API** for non-time-sensitive bulk processing (50% cost savings)
-5. **Implement streaming** for better UX on long responses
-6. **Ground with Search** for up-to-date information
-7. **Use JSON mode** for structured, parseable outputs
-8. **Handle rate limits** with exponential backoff
+- **Documentation**: [ai.google.dev/gemini-api/docs](https://ai.google.dev/gemini-api/docs)
+- **Python SDK**: [github.com/googleapis/python-genai](https://github.com/googleapis/python-genai)
+- **TypeScript SDK**: [github.com/googleapis/js-genai](https://github.com/googleapis/js-genai)
+- **Cookbook**: [github.com/google-gemini/cookbook](https://github.com/google-gemini/cookbook)
+- **API Key**: [aistudio.google.com/apikey](https://aistudio.google.com/apikey)
