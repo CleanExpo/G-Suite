@@ -1,5 +1,28 @@
 # FastAPI Documentation
 
+> Official documentation sourced from [fastapi.tiangolo.com](https://fastapi.tiangolo.com)
+
+## Overview
+
+FastAPI is a modern, fast (high-performance) web framework for building APIs with Python based on standard Python type hints.
+
+Key features:
+- **Fast**: Very high performance, on par with NodeJS and Go
+- **Fast to code**: Increase development speed by 200%-300%
+- **Fewer bugs**: Reduce about 40% of human-induced errors
+- **Intuitive**: Editor support, autocompletion everywhere
+- **Easy**: Designed to be easy to use and learn
+- **Short**: Minimize code duplication
+- **Robust**: Get production-ready code with automatic interactive documentation
+- **Standards-based**: Based on OpenAPI and JSON Schema
+
+## Installation
+
+```bash
+pip install fastapi
+pip install "uvicorn[standard]"
+```
+
 ## Basic Setup
 
 ```python
@@ -13,6 +36,77 @@ async def root():
     return {"message": "Hello World"}
 ```
 
+## Run the Server
+
+```bash
+uvicorn main:app --reload
+```
+
+## Path Parameters
+
+```python
+@app.get("/items/{item_id}")
+async def read_item(item_id: int):
+    return {"item_id": item_id}
+
+# With path parameter validation
+from fastapi import Path
+
+@app.get("/items/{item_id}")
+async def read_item(
+    item_id: int = Path(..., title="The ID of the item", ge=1)
+):
+    return {"item_id": item_id}
+```
+
+## Query Parameters
+
+```python
+@app.get("/items/")
+async def read_items(skip: int = 0, limit: int = 10):
+    return {"skip": skip, "limit": limit}
+
+# Optional query parameters
+@app.get("/items/{item_id}")
+async def read_item(item_id: int, q: str | None = None):
+    if q:
+        return {"item_id": item_id, "q": q}
+    return {"item_id": item_id}
+```
+
+## Pydantic Models (v2)
+
+```python
+from pydantic import BaseModel, EmailStr, Field
+from typing import Optional
+
+class UserBase(BaseModel):
+    email: EmailStr
+    name: str = Field(..., min_length=1, max_length=100)
+
+class UserCreate(UserBase):
+    password: str = Field(..., min_length=8)
+
+class UserResponse(UserBase):
+    id: int
+
+    model_config = {"from_attributes": True}  # Pydantic v2 syntax
+```
+
+## Request Body
+
+```python
+class Item(BaseModel):
+    name: str
+    description: str | None = None
+    price: float
+    tax: float | None = None
+
+@app.post("/items/")
+async def create_item(item: Item):
+    return item
+```
+
 ## Authentication
 
 ### OAuth2 with Bearer Token
@@ -24,7 +118,7 @@ from fastapi.security import OAuth2PasswordBearer
 app = FastAPI()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-@app.get("/token")
+@app.get("/items/")
 async def read_items(token: str = Depends(oauth2_scheme)):
     return {"token": token}
 ```
@@ -134,26 +228,6 @@ class AuthMiddleware(BaseHTTPMiddleware):
 app.add_middleware(AuthMiddleware)
 ```
 
-## Pydantic Models
-
-```python
-from pydantic import BaseModel, EmailStr
-from typing import Optional
-
-class UserBase(BaseModel):
-    email: EmailStr
-    name: str
-
-class UserCreate(UserBase):
-    password: str
-
-class UserResponse(UserBase):
-    id: int
-
-    class Config:
-        from_attributes = True
-```
-
 ## Dependency Injection
 
 ```python
@@ -261,3 +335,49 @@ async def get_users(db: AsyncSession = Depends(get_async_db)):
     result = await db.execute(select(User))
     return result.scalars().all()
 ```
+
+## File Upload
+
+```python
+from fastapi import File, UploadFile
+
+@app.post("/uploadfile/")
+async def create_upload_file(file: UploadFile = File(...)):
+    contents = await file.read()
+    return {"filename": file.filename, "size": len(contents)}
+```
+
+## WebSocket
+
+```python
+from fastapi import WebSocket
+
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    while True:
+        data = await websocket.receive_text()
+        await websocket.send_text(f"Message received: {data}")
+```
+
+## Pydantic v2 Migration
+
+FastAPI now fully supports Pydantic v2. Key changes:
+
+```python
+# Pydantic v1 (deprecated)
+class Config:
+    orm_mode = True
+
+# Pydantic v2 (current)
+model_config = {"from_attributes": True}
+
+# For gradual migration, you can use pydantic.v1
+from pydantic.v1 import BaseModel
+```
+
+## Official Resources
+
+- **Documentation**: [fastapi.tiangolo.com](https://fastapi.tiangolo.com)
+- **Tutorial**: [fastapi.tiangolo.com/tutorial](https://fastapi.tiangolo.com/tutorial/)
+- **GitHub**: [github.com/tiangolo/fastapi](https://github.com/tiangolo/fastapi)

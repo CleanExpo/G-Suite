@@ -1,8 +1,26 @@
 # React 19 Documentation
 
-## New Hooks
+> Official documentation sourced from [react.dev](https://react.dev/reference/react)
 
-### useActionState
+## React 19.2 - Available Hooks
+
+### Core Hooks
+- `useState` - State management
+- `useEffect` - Side effects
+- `useContext` - Context consumption
+- `useReducer` - Complex state logic
+- `useCallback` - Memoized callbacks
+- `useMemo` - Memoized values
+- `useRef` - Mutable refs
+
+### React 19 New Hooks
+- `useActionState` - Form action state
+- `useOptimistic` - Optimistic updates
+- `use` - Read resources in render
+- `useFormStatus` - Form submission status
+- `useTransition` - Non-blocking updates
+
+## useActionState
 
 ```typescript
 import { useActionState } from 'react';
@@ -30,7 +48,7 @@ function ChangeName({ name, setName }) {
 }
 ```
 
-### useFormStatus
+## useFormStatus
 
 ```typescript
 import { useFormStatus } from 'react-dom';
@@ -41,7 +59,7 @@ function DesignButton() {
 }
 
 function Submit() {
-  const { pending } = useFormStatus();
+  const { pending, data, method, action } = useFormStatus();
   return (
     <button type="submit" disabled={pending}>
       {pending ? 'Submitting...' : 'Submit'}
@@ -50,36 +68,58 @@ function Submit() {
 }
 ```
 
-### useOptimistic
+## useOptimistic
+
+`useOptimistic` lets you show a different state while an async action is underway, providing immediate feedback to users.
 
 ```typescript
-import { useState, useOptimistic } from 'react';
-import { saveTodo } from "./server";
+import { useOptimistic, useState, useRef, startTransition } from "react";
 
-function TodoList() {
-  const [todos, setTodos] = useState([]);
-  const [optimisticTodos, addOptimisticTodo] = useOptimistic(
-    todos,
-    (todos, newTodo) => [...todos, newTodo]
+function Thread({ messages, sendMessageAction }) {
+  const formRef = useRef();
+
+  const [optimisticMessages, addOptimisticMessage] = useOptimistic(
+    messages,
+    (state, newMessage) => [
+      { text: newMessage, sending: true },
+      ...state,
+    ]
   );
 
-  const addTodo = async (formData) => {
-    addOptimisticTodo(formData.get("todo"));
-    const todo = await saveTodo(formData.get("todo"));
-    setTodos(todos => [...todos, todo]);
-  };
+  function formAction(formData) {
+    addOptimisticMessage(formData.get("message"));
+    formRef.current.reset();
+    startTransition(async () => {
+      await sendMessageAction(formData);
+    });
+  }
 
   return (
-    <form action={addTodo}>
-      <input name="todo" />
-      <button type="submit">Add Todo</button>
-      {optimisticTodos.map(todo => <div key={todo}>{todo}</div>)}
-    </form>
+    <>
+      <form action={formAction} ref={formRef}>
+        <input type="text" name="message" placeholder="Hello!" />
+        <button type="submit">Send</button>
+      </form>
+      {optimisticMessages.map((message, index) => (
+        <div key={index}>
+          {message.text}
+          {!!message.sending && <small> (Sending...)</small>}
+        </div>
+      ))}
+    </>
   );
 }
 ```
 
-### use Hook
+### Parameters
+- `state`: The value to return initially and whenever no action is pending
+- `updateFn(currentState, optimisticValue)`: Pure function that returns the merged optimistic state
+
+### Returns
+- `optimisticState`: The resulting optimistic state
+- `addOptimistic`: Dispatcher function to trigger optimistic updates
+
+## use Hook
 
 ```typescript
 import { use } from 'react';
@@ -98,6 +138,12 @@ function UserProfile() {
       <p>{user.email}</p>
     </div>
   );
+}
+
+// Using with Context
+function Button() {
+  const theme = use(ThemeContext);
+  return <button className={theme}>Click me</button>;
 }
 ```
 
@@ -172,6 +218,57 @@ async function MyServerComponent() {
 }
 ```
 
+## New Components in React 19
+
+### Activity (Experimental)
+```typescript
+import { Activity } from 'react';
+
+function MyComponent() {
+  return (
+    <Activity mode="hidden">
+      <ExpensiveComponent />
+    </Activity>
+  );
+}
+```
+
+### ViewTransition (Experimental)
+```typescript
+import { ViewTransition } from 'react';
+
+function MyComponent() {
+  return (
+    <ViewTransition>
+      <PageContent />
+    </ViewTransition>
+  );
+}
+```
+
+## New APIs
+
+### startTransition
+```typescript
+import { startTransition } from 'react';
+
+function handleClick() {
+  startTransition(() => {
+    setTab('comments');
+  });
+}
+```
+
+### cache
+```typescript
+import { cache } from 'react';
+
+const getUser = cache(async (id) => {
+  const response = await fetch(`/api/user/${id}`);
+  return response.json();
+});
+```
+
 ## Improved Hydration Error Messages
 
 React 19 provides better hydration error messages:
@@ -215,3 +312,10 @@ export default function App() {
   );
 }
 ```
+
+## Official Resources
+
+- **Documentation**: [react.dev](https://react.dev)
+- **Reference**: [react.dev/reference/react](https://react.dev/reference/react)
+- **Hooks**: [react.dev/reference/react/hooks](https://react.dev/reference/react/hooks)
+- **GitHub**: [github.com/facebook/react](https://github.com/facebook/react)

@@ -1,5 +1,7 @@
 # shadcn/ui Documentation
 
+> Official documentation sourced from [ui.shadcn.com](https://ui.shadcn.com/docs/components-json)
+
 ## Installation
 
 ```bash
@@ -11,6 +13,8 @@ npx shadcn@latest add button card form input dialog
 ```
 
 ## Configuration (components.json)
+
+The `components.json` file holds configuration for your project. It's only required if you're using the CLI to add components.
 
 ```json
 {
@@ -34,6 +38,65 @@ npx shadcn@latest add button card form input dialog
   },
   "iconLibrary": "lucide"
 }
+```
+
+### Configuration Options
+
+| Option | Description |
+|--------|-------------|
+| `style` | Style for components. Use `new-york` (default style is deprecated) |
+| `rsc` | Enable React Server Components support |
+| `tsx` | Use TypeScript (`.tsx`) or JavaScript (`.jsx`) |
+| `tailwind.config` | Path to tailwind.config.js. **Leave blank for Tailwind CSS v4** |
+| `tailwind.css` | Path to CSS file importing Tailwind |
+| `tailwind.baseColor` | Base color palette (`gray`, `neutral`, `slate`, `stone`, `zinc`) |
+| `tailwind.cssVariables` | Use CSS variables (`true`) or utility classes (`false`) for theming |
+| `tailwind.prefix` | Prefix for Tailwind utility classes |
+
+## Namespaced Registries
+
+Configure multiple resource registries for components from various sources:
+
+```json
+{
+  "registries": {
+    "@v0": "https://v0.dev/chat/b/{name}",
+    "@acme": "https://registry.acme.com/{name}.json",
+    "@internal": "https://internal.company.com/{name}.json"
+  }
+}
+```
+
+### With Authentication
+
+```json
+{
+  "registries": {
+    "@private": {
+      "url": "https://api.company.com/registry/{name}.json",
+      "headers": {
+        "Authorization": "Bearer ${REGISTRY_TOKEN}",
+        "X-API-Key": "${API_KEY}"
+      },
+      "params": {
+        "version": "latest"
+      }
+    }
+  }
+}
+```
+
+### Using Namespaced Registries
+
+```bash
+# Install from a configured registry
+npx shadcn@latest add @v0/dashboard
+
+# Install from private registry
+npx shadcn@latest add @private/button
+
+# Install multiple resources
+npx shadcn@latest add @acme/header @internal/auth-utils
 ```
 
 ## Project Structure
@@ -80,6 +143,9 @@ export default function Home() {
       <Button>Click me</Button>
       <Button variant="destructive">Delete</Button>
       <Button variant="outline">Outline</Button>
+      <Button variant="secondary">Secondary</Button>
+      <Button variant="ghost">Ghost</Button>
+      <Button variant="link">Link</Button>
     </div>
   )
 }
@@ -88,17 +154,21 @@ export default function Home() {
 ### Card
 
 ```tsx
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
 
 export function MyCard() {
   return (
     <Card>
       <CardHeader>
         <CardTitle>Card Title</CardTitle>
+        <CardDescription>Card description goes here</CardDescription>
       </CardHeader>
       <CardContent>
         Card content goes here
       </CardContent>
+      <CardFooter>
+        <Button>Action</Button>
+      </CardFooter>
     </Card>
   )
 }
@@ -172,12 +242,15 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogFooter,
 } from "@/components/ui/dialog"
 
 export function MyDialog() {
   return (
     <Dialog>
-      <DialogTrigger>Open</DialogTrigger>
+      <DialogTrigger asChild>
+        <Button>Open</Button>
+      </DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Are you sure?</DialogTitle>
@@ -185,6 +258,10 @@ export function MyDialog() {
             This action cannot be undone.
           </DialogDescription>
         </DialogHeader>
+        <DialogFooter>
+          <Button variant="outline">Cancel</Button>
+          <Button>Continue</Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   )
@@ -271,6 +348,8 @@ npx shadcn@latest add select
 npx shadcn@latest add toast
 npx shadcn@latest add dropdown-menu
 npx shadcn@latest add sidebar
+npx shadcn@latest add table
+npx shadcn@latest add tabs
 ```
 
 ## Dependencies
@@ -280,3 +359,10 @@ npm install tailwindcss-animate class-variance-authority clsx tailwind-merge luc
 npm install @radix-ui/react-icons
 npm install react-hook-form @hookform/resolvers zod
 ```
+
+## Official Resources
+
+- **Documentation**: [ui.shadcn.com/docs](https://ui.shadcn.com/docs)
+- **Components**: [ui.shadcn.com/docs/components](https://ui.shadcn.com/docs/components/accordion)
+- **Themes**: [ui.shadcn.com/themes](https://ui.shadcn.com/themes)
+- **GitHub**: [github.com/shadcn-ui/ui](https://github.com/shadcn-ui/ui)

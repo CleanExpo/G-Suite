@@ -1,8 +1,10 @@
 # OpenRouter API Documentation
 
+> Official documentation sourced from [openrouter.ai/docs](https://openrouter.ai/docs/api/reference/overview)
+
 ## Overview
 
-OpenRouter provides a unified API to access 200+ AI models from various providers including OpenAI, Anthropic, Google, Meta, Mistral, and more.
+OpenRouter provides a unified API to access 300+ AI models from various providers including OpenAI, Anthropic, Google, Meta, Mistral, and more.
 
 ## Installation
 
@@ -10,8 +12,8 @@ OpenRouter provides a unified API to access 200+ AI models from various provider
 # Use OpenAI SDK (compatible)
 pip install openai
 
-# Or use requests
-pip install requests
+# TypeScript/JavaScript
+npm install openai
 ```
 
 ## Client Setup
@@ -46,11 +48,11 @@ const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
   headers: {
     "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
     "Content-Type": "application/json",
-    "HTTP-Referer": "https://your-site.com",
-    "X-Title": "Your App Name",
+    "HTTP-Referer": "<YOUR_SITE_URL>",  // Optional. Site URL for rankings
+    "X-Title": "<YOUR_SITE_NAME>",       // Optional. Site title for rankings
   },
   body: JSON.stringify({
-    model: "anthropic/claude-sonnet-4",
+    model: "openai/gpt-4o",
     messages: [{ role: "user", content: "Hello!" }],
   }),
 });
@@ -81,6 +83,8 @@ console.log(completion.choices[0].message.content);
 ```
 
 ## Streaming Responses
+
+Server-Sent Events (SSE) are supported for all models. Send `stream: true` in your request body.
 
 ### Python
 
@@ -115,33 +119,38 @@ for await (const chunk of stream) {
 
 ## Model Selection
 
-### Popular Models
+### Popular Models (2025)
 
 ```python
-# Anthropic
-model = "anthropic/claude-sonnet-4"
+# Anthropic Claude 4.5
+model = "anthropic/claude-sonnet-4-5"
 model = "anthropic/claude-opus-4"
-model = "anthropic/claude-3.5-haiku"
+model = "anthropic/claude-haiku-4-5"
 
 # OpenAI
 model = "openai/gpt-4o"
 model = "openai/gpt-4o-mini"
-model = "openai/o1-preview"
+model = "openai/o1"
+model = "openai/o1-mini"
 
-# Google
-model = "google/gemini-pro-1.5"
-model = "google/gemini-flash-1.5"
+# Google Gemini
+model = "google/gemini-2.5-pro"
+model = "google/gemini-2.5-flash"
+model = "google/gemini-3-pro-preview"
 
-# Meta
+# Meta Llama
+model = "meta-llama/llama-3.3-70b-instruct"
 model = "meta-llama/llama-3.1-405b-instruct"
-model = "meta-llama/llama-3.1-70b-instruct"
 
 # Mistral
 model = "mistralai/mistral-large"
 model = "mistralai/mixtral-8x22b-instruct"
 
-# Open Source
+# DeepSeek
 model = "deepseek/deepseek-chat"
+model = "deepseek/deepseek-r1"
+
+# Qwen
 model = "qwen/qwen-2.5-72b-instruct"
 ```
 
@@ -257,6 +266,31 @@ response = client.chat.completions.create(
 )
 ```
 
+## Finish Reasons
+
+OpenRouter normalizes each model's `finish_reason` to one of:
+- `tool_calls` - Model wants to call a tool
+- `stop` - Natural completion
+- `length` - Max tokens reached
+- `content_filter` - Content filtered
+- `error` - An error occurred
+
+The raw finish_reason is available via `native_finish_reason`.
+
+## Querying Cost and Stats
+
+Token counts in completions API response use a normalized, model-agnostic count (GPT4o tokenizer). For precise native token counts, use the generation endpoint:
+
+```typescript
+const generation = await fetch(
+  'https://openrouter.ai/api/v1/generation?id=$GENERATION_ID',
+  { headers }
+);
+
+const stats = await generation.json();
+// Contains native token counts and actual cost
+```
+
 ## Cost Management
 
 ### Get Model Pricing
@@ -280,14 +314,12 @@ response = client.chat.completions.create(
     messages=[{"role": "user", "content": "Hello"}]
 )
 
-# Access usage
+# Access usage (normalized token counts)
 print(f"Prompt tokens: {response.usage.prompt_tokens}")
 print(f"Completion tokens: {response.usage.completion_tokens}")
 ```
 
 ### Set Spending Limits
-
-Configure in OpenRouter dashboard or use request headers:
 
 ```python
 response = client.chat.completions.create(
@@ -318,27 +350,13 @@ def make_request_with_retry(messages, max_retries=3):
     raise Exception("Max retries exceeded")
 ```
 
-## Request Headers
-
-```python
-# Important headers for attribution
-response = client.chat.completions.create(
-    model="anthropic/claude-sonnet-4",
-    messages=[{"role": "user", "content": "Hello"}],
-    extra_headers={
-        "HTTP-Referer": "https://your-app.com",
-        "X-Title": "Your App Name"
-    }
-)
-```
-
 ## Model Fallbacks
 
 ```python
 models_to_try = [
     "anthropic/claude-sonnet-4",
     "openai/gpt-4o",
-    "google/gemini-pro-1.5"
+    "google/gemini-2.5-pro"
 ]
 
 for model in models_to_try:
@@ -388,42 +406,19 @@ print(f"Credits remaining: ${data['limit'] - data['usage']}")
 OPENROUTER_API_KEY=sk-or-v1-...
 ```
 
-## FastAPI Integration
-
-```python
-from fastapi import FastAPI, HTTPException
-from openai import OpenAI
-from pydantic import BaseModel
-
-app = FastAPI()
-client = OpenAI(
-    base_url="https://openrouter.ai/api/v1",
-    api_key=os.getenv("OPENROUTER_API_KEY")
-)
-
-class ChatRequest(BaseModel):
-    message: str
-    model: str = "anthropic/claude-sonnet-4"
-
-@app.post("/chat")
-async def chat(request: ChatRequest):
-    try:
-        response = client.chat.completions.create(
-            model=request.model,
-            messages=[{"role": "user", "content": request.message}]
-        )
-        return {"response": response.choices[0].message.content}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-```
-
 ## Best Practices
 
 1. **Use model fallbacks** for reliability
-2. **Track costs** with usage monitoring
+2. **Track costs** with generation endpoint for native token counts
 3. **Set spending limits** to avoid surprise bills
 4. **Use provider routing** for latency/cost optimization
 5. **Include HTTP-Referer** for better rate limits
 6. **Cache responses** when appropriate
 7. **Use streaming** for better UX
 8. **Handle rate limits** with exponential backoff
+
+## Official Resources
+
+- **Documentation**: [openrouter.ai/docs](https://openrouter.ai/docs)
+- **Models**: [openrouter.ai/models](https://openrouter.ai/models)
+- **API Reference**: [openrouter.ai/docs/api/reference](https://openrouter.ai/docs/api/reference/overview)

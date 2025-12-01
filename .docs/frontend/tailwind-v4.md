@@ -1,5 +1,76 @@
 # Tailwind CSS v4 Documentation
 
+> Official documentation sourced from [tailwindcss.com](https://tailwindcss.com/docs/installation/using-vite) and [tailwindcss.com/blog/tailwindcss-v4-beta](https://tailwindcss.com/blog/tailwindcss-v4-beta)
+
+## Overview
+
+Tailwind CSS v4.0 is an all-new engine built for performance and designed for the modern web:
+
+- **Built for performance** — Full builds are up to 5x faster, incremental builds are over 100x faster (measured in microseconds)
+- **Unified toolchain** — Built-in import handling, vendor prefixing, and syntax transforms with no additional tooling required
+- **CSS-first configuration** — Customize and extend the framework directly in CSS instead of JavaScript
+- **Designed for the modern web** — Native cascade layers, wide-gamut colors, container queries, `@starting-style`, popovers, and more
+
+## Installation with Vite
+
+### Step 1: Create your project
+
+```bash
+npm create vite@latest my-project
+cd my-project
+```
+
+### Step 2: Install Tailwind CSS
+
+```bash
+npm install tailwindcss @tailwindcss/vite
+```
+
+### Step 3: Configure the Vite plugin
+
+```typescript
+// vite.config.ts
+import { defineConfig } from 'vite'
+import tailwindcss from '@tailwindcss/vite'
+
+export default defineConfig({
+  plugins: [
+    tailwindcss(),
+  ],
+})
+```
+
+### Step 4: Import Tailwind CSS
+
+```css
+/* src/style.css */
+@import "tailwindcss";
+```
+
+### Step 5: Start your build process
+
+```bash
+npm run dev
+```
+
+### Step 6: Use in your HTML
+
+```html
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="/src/style.css" rel="stylesheet">
+</head>
+<body>
+  <h1 class="text-3xl font-bold underline">
+    Hello world!
+  </h1>
+</body>
+</html>
+```
+
 ## CSS-First Configuration
 
 Tailwind v4 uses CSS-first configuration with the `@theme` directive:
@@ -33,25 +104,13 @@ Tailwind v4 uses CSS-first configuration with the `@theme` directive:
 }
 ```
 
-## Spacing Utilities
+## CSS Theme Variables
 
 ```css
-@layer theme {
-  :root {
-    --spacing: 0.25rem;
-  }
-}
-
-@layer utilities {
-  .mt-8 {
-    margin-top: calc(var(--spacing) * 8);
-  }
-  .w-17 {
-    width: calc(var(--spacing) * 17);
-  }
-  .pr-29 {
-    padding-right: calc(var(--spacing) * 29);
-  }
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
 }
 ```
 
@@ -63,7 +122,7 @@ Tailwind v4 uses CSS-first configuration with the `@theme` directive:
   --bg-primary: var(--color-primary-600);
 }
 
-:root, .dark {
+.dark {
   --color-primary-400: rgba(25, 10, 139, 1);
   --bg-primary: var(--color-primary-400);
 }
@@ -103,7 +162,31 @@ Tailwind v4 uses CSS-first configuration with the `@theme` directive:
 }
 ```
 
+## Spacing Utilities
+
+```css
+@layer theme {
+  :root {
+    --spacing: 0.25rem;
+  }
+}
+
+@layer utilities {
+  .mt-8 {
+    margin-top: calc(var(--spacing) * 8);
+  }
+  .w-17 {
+    width: calc(var(--spacing) * 17);
+  }
+  .pr-29 {
+    padding-right: calc(var(--spacing) * 29);
+  }
+}
+```
+
 ## JavaScript Configuration (Legacy Support)
+
+For backwards compatibility, you can still use JavaScript config:
 
 ```javascript
 /** @type {import('tailwindcss').Config} */
@@ -216,3 +299,10 @@ module.exports = {
   }
 }
 ```
+
+## Official Resources
+
+- **Documentation**: [tailwindcss.com/docs](https://tailwindcss.com/docs)
+- **Installation**: [tailwindcss.com/docs/installation](https://tailwindcss.com/docs/installation/using-vite)
+- **v4 Beta**: [tailwindcss.com/blog/tailwindcss-v4-beta](https://tailwindcss.com/blog/tailwindcss-v4-beta)
+- **GitHub**: [github.com/tailwindlabs/tailwindcss](https://github.com/tailwindlabs/tailwindcss)

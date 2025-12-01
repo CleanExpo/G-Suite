@@ -1,8 +1,45 @@
 # LangGraph Documentation
 
+> Official documentation sourced from [langchain-ai.github.io/langgraph](https://langchain-ai.github.io/langgraph/)
+
 ## Overview
 
-LangGraph is a framework for building stateful, multi-agent applications with LLMs.
+LangGraph is a low-level orchestration framework for building, managing, and deploying long-running, stateful agents. Trusted by companies like Klarna, Replit, Elastic, and more.
+
+## Core Benefits
+
+- **Durable execution**: Build agents that persist through failures and can run for extended periods, automatically resuming from exactly where they left off
+- **Human-in-the-loop**: Seamlessly incorporate human oversight by inspecting and modifying agent state at any point during execution
+- **Comprehensive memory**: Create truly stateful agents with both short-term working memory and long-term persistent memory across sessions
+- **Debugging with LangSmith**: Gain deep visibility into complex agent behavior with visualization tools that trace execution paths and capture state transitions
+- **Production-ready deployment**: Deploy sophisticated agent systems confidently with scalable infrastructure
+
+## Installation
+
+```bash
+pip install -U langgraph
+```
+
+## Quick Start with Prebuilt Agent
+
+```python
+from langgraph.prebuilt import create_react_agent
+
+def get_weather(city: str) -> str:
+    """Get weather for a given city."""
+    return f"It's always sunny in {city}!"
+
+agent = create_react_agent(
+    model="anthropic:claude-3-7-sonnet-latest",
+    tools=[get_weather],
+    prompt="You are a helpful assistant"
+)
+
+# Run the agent
+result = agent.invoke(
+    {"messages": [{"role": "user", "content": "what is the weather in sf"}]}
+)
+```
 
 ## Basic StateGraph
 
@@ -276,3 +313,19 @@ langgraph dev
 # Deploy
 langgraph up
 ```
+
+## LangGraph Ecosystem
+
+- **LangSmith**: Agent evals and observability, debug poor-performing runs
+- **LangSmith Deployment**: Deploy and scale agents with purpose-built platform
+- **LangGraph Studio**: Visual prototyping and iteration
+- **LangChain**: Integrations and composable components
+
+## Official Resources
+
+- **Documentation**: [langchain-ai.github.io/langgraph](https://langchain-ai.github.io/langgraph/)
+- **Guides**: [langchain-ai.github.io/langgraph/guides](https://langchain-ai.github.io/langgraph/guides/)
+- **Multi-Agent**: [langchain-ai.github.io/langgraph/agents/multi-agent](https://langchain-ai.github.io/langgraph/agents/multi-agent/)
+- **LangChain Academy**: [academy.langchain.com](https://academy.langchain.com/courses/intro-to-langgraph)
+- **GitHub (Python)**: [github.com/langchain-ai/langgraph](https://github.com/langchain-ai/langgraph)
+- **GitHub (JS)**: [github.com/langchain-ai/langgraphjs](https://github.com/langchain-ai/langgraphjs)

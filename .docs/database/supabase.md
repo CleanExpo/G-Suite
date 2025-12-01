@@ -1,5 +1,13 @@
 # Supabase Documentation
 
+> Official documentation sourced from [supabase.com/docs](https://supabase.com/docs/reference/javascript/initializing)
+
+## Installation
+
+```bash
+npm install @supabase/supabase-js
+```
+
 ## Client Setup
 
 ### JavaScript/TypeScript
@@ -7,20 +15,82 @@
 ```typescript
 import { createClient } from '@supabase/supabase-js'
 
+// Create a single supabase client for interacting with your database
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  'https://xyzcompany.supabase.co',
+  'publishable-or-anon-key'
+)
+```
+
+### With Additional Parameters
+
+```typescript
+import { createClient } from '@supabase/supabase-js'
+
+const options = {
+  db: {
+    schema: 'public',
+  },
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true
+  },
+  global: {
+    headers: { 'x-my-custom-header': 'my-app-name' },
+  },
+}
+const supabase = createClient(
+  "https://xyzcompany.supabase.co",
+  "publishable-or-anon-key",
+  options
+)
+```
+
+### With Custom Schema
+
+```typescript
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(
+  'https://xyzcompany.supabase.co',
+  'publishable-or-anon-key',
   {
-    db: {
-      schema: 'public',
-    },
+    db: { schema: 'other_schema' }
+  }
+)
+```
+
+### Custom Fetch Implementation
+
+```typescript
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(
+  'https://xyzcompany.supabase.co',
+  'publishable-or-anon-key',
+  {
+    global: { fetch: fetch.bind(globalThis) }
+  }
+)
+```
+
+### React Native with AsyncStorage
+
+```typescript
+import 'react-native-url-polyfill/auto'
+import { createClient } from '@supabase/supabase-js'
+import AsyncStorage from "@react-native-async-storage/async-storage"
+
+const supabase = createClient(
+  "https://xyzcompany.supabase.co",
+  "publishable-or-anon-key",
+  {
     auth: {
+      storage: AsyncStorage,
       autoRefreshToken: true,
       persistSession: true,
-    },
-    realtime: {
-      channels,
-      endpoint,
+      detectSessionInUrl: false,
     },
   }
 )
@@ -38,13 +108,36 @@ supabase: Client = create_client(url, key)
 
 ## Authentication
 
-### Sign In
+### Sign Up
+
+```typescript
+const { data, error } = await supabase.auth.signUp({
+  email: 'user@example.com',
+  password: 'password',
+})
+```
+
+### Sign In with Password
 
 ```typescript
 const { data, error } = await supabase.auth.signInWithPassword({
   email: 'user@example.com',
   password: 'password',
 })
+```
+
+### Sign In with OAuth
+
+```typescript
+const { data, error } = await supabase.auth.signInWithOAuth({
+  provider: 'google',
+})
+```
+
+### Sign Out
+
+```typescript
+const { error } = await supabase.auth.signOut()
 ```
 
 ### Auth Provider (React)
@@ -101,6 +194,15 @@ const { data, error } = await supabase
   .from('posts')
   .select('*')
   .order('created_at', { ascending: false })
+
+// Select with relations
+const { data, error } = await supabase
+  .from('posts')
+  .select(`
+    id,
+    title,
+    author:users(name, email)
+  `)
 ```
 
 ### Insert
@@ -109,6 +211,15 @@ const { data, error } = await supabase
 const { data, error } = await supabase
   .from('posts')
   .insert({ title: 'New Post', content: 'Content here' })
+  .select()
+
+// Insert multiple rows
+const { data, error } = await supabase
+  .from('posts')
+  .insert([
+    { title: 'Post 1' },
+    { title: 'Post 2' }
+  ])
   .select()
 ```
 
@@ -129,6 +240,31 @@ const { error } = await supabase
   .from('posts')
   .delete()
   .eq('id', postId)
+```
+
+### Filters
+
+```typescript
+// Equal
+.eq('column', 'value')
+
+// Not equal
+.neq('column', 'value')
+
+// Greater than
+.gt('column', 'value')
+
+// Less than
+.lt('column', 'value')
+
+// Like (pattern matching)
+.like('column', '%pattern%')
+
+// In array
+.in('column', ['value1', 'value2'])
+
+// Is null
+.is('column', null)
 ```
 
 ## Real-time Subscriptions
@@ -238,7 +374,7 @@ import { createClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 
 export async function createServerSupabaseClient() {
-  const cookieStore = cookies()
+  const cookieStore = await cookies()
 
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -278,6 +414,28 @@ const { data } = supabase.storage
 const { data, error } = await supabase.storage
   .from('avatars')
   .download('public/avatar1.png')
+
+// List files
+const { data, error } = await supabase.storage
+  .from('bucket')
+  .list('folder', {
+    limit: 100,
+    offset: 0,
+  })
+
+// Delete file
+const { data, error } = await supabase.storage
+  .from('avatars')
+  .remove(['public/avatar1.png'])
+```
+
+## Edge Functions
+
+```typescript
+// Invoke edge function
+const { data, error } = await supabase.functions.invoke('hello-world', {
+  body: { name: 'Functions' }
+})
 ```
 
 ## Environment Variables
@@ -302,4 +460,14 @@ supabase db reset
 
 # Start local Supabase
 supabase start
+
+# Stop local Supabase
+supabase stop
 ```
+
+## Official Resources
+
+- **Documentation**: [supabase.com/docs](https://supabase.com/docs)
+- **JavaScript Reference**: [supabase.com/docs/reference/javascript](https://supabase.com/docs/reference/javascript/introduction)
+- **Python Reference**: [supabase.com/docs/reference/python](https://supabase.com/docs/reference/python/introduction)
+- **GitHub**: [github.com/supabase/supabase](https://github.com/supabase/supabase)
