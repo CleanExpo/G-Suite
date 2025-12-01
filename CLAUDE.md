@@ -6,6 +6,190 @@
 
 This is a **Claude Code Agent Orchestration System** - a production-ready monorepo for building AI-powered applications. It uses a dual orchestration approach combining SKILL.md files with Python/LangGraph for maximum flexibility.
 
+---
+
+## MANDATORY: Plan-First Execution Protocol (CRITICAL)
+
+**THIS MUST BE FOLLOWED FOR EVERY TASK - NO EXCEPTIONS**
+
+Before executing ANY task, Claude MUST follow this exact sequence:
+
+### Step 1: Clarifying Questions (REQUIRED)
+
+Before ANY work begins, ask clarifying questions upfront:
+
+1. **Scope Questions** - What exactly should be included/excluded?
+2. **Preference Questions** - Are there specific approaches, libraries, or patterns preferred?
+3. **Constraint Questions** - What are the boundaries (time, complexity, dependencies)?
+4. **Validation Questions** - How will success be measured?
+
+```
+Example Questions:
+- "Before I begin, I need to clarify a few things..."
+- "Should this feature include [X] or is that out of scope?"
+- "Do you have a preference for [approach A] vs [approach B]?"
+- "Are there any existing patterns in the codebase I should follow?"
+```
+
+### Step 2: Create User-Editable plan.md (REQUIRED)
+
+After clarifying questions are answered, create a `plan.md` file in the project root:
+
+```markdown
+# Task Plan: [Task Name]
+Generated: [Date]
+Status: AWAITING APPROVAL
+
+## Clarifications Received
+- [Summary of user answers]
+
+## Proposed Approach
+[High-level strategy]
+
+## Implementation Steps
+- [ ] Step 1: [Description]
+- [ ] Step 2: [Description]
+- [ ] Step 3: [Description]
+
+## Files to be Modified/Created
+- `path/to/file.ts` - [What changes]
+
+## Risks & Considerations
+- [Potential issues]
+
+## User Approval
+[ ] Approved - Proceed with implementation
+[ ] Needs Changes - See comments below
+
+### Comments:
+[User can edit this section]
+```
+
+### Step 3: Wait for Approval (REQUIRED)
+
+**DO NOT EXECUTE until the user explicitly approves the plan.**
+
+- Present the plan.md to the user
+- Ask: "Please review the plan above. Reply 'approved' to proceed or edit the plan.md file with your changes."
+- If changes requested, update plan.md and re-present
+
+### Step 4: Execute with Plan Reference
+
+Once approved:
+- Reference plan.md throughout execution
+- Update checkboxes as steps complete
+- Note any deviations in the plan
+
+---
+
+## MANDATORY: Snake Build Pattern (CRITICAL)
+
+**THIS ORCHESTRATION PATTERN MUST BE USED FOR ALL MULTI-STEP TASKS**
+
+### What is the Snake Build Pattern?
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    VISIBLE SURFACE                           │
+│  ┌─────────┐                                                │
+│  │  HEAD   │  ← Orchestrator (Only visible component)       │
+│  │ (User)  │    - Receives requests                         │
+│  └────┬────┘    - Returns final results                     │
+│       │         - Manages communication                      │
+├───────┼─────────────────────────────────────────────────────┤
+│       │              UNDER THE SURFACE                       │
+│  ┌────▼────┐                                                │
+│  │ Agent 1 │  ← Works silently                              │
+│  └────┬────┘                                                │
+│  ┌────▼────┐                                                │
+│  │ Agent 2 │  ← Processes without user visibility           │
+│  └────┬────┘                                                │
+│  ┌────▼────┐                                                │
+│  │ Skill N │  ← Executes tasks internally                   │
+│  └─────────┘                                                │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Core Principles
+
+1. **Single Point of Contact (The Head)**
+   - Only the orchestrator communicates with the user
+   - All other agents/skills work invisibly
+   - User sees streamlined, focused output
+
+2. **Silent Execution (The Body)**
+   - Sub-agents perform work without surfacing details
+   - Skills execute without verbose logging
+   - Internal processing stays internal
+
+3. **Token Conservation**
+   - No redundant explanations between agents
+   - Minimize context passing
+   - Compact handoffs between components
+
+4. **Reduced Compaction**
+   - Less output = less need to compact history
+   - Focused responses prevent context overflow
+   - Efficient memory usage
+
+### Implementation Rules
+
+```
+ALWAYS:
+✓ Orchestrator summarizes final results only
+✓ Sub-tasks execute silently
+✓ Batch related operations
+✓ Return concise, actionable output
+
+NEVER:
+✗ Show internal agent conversations
+✗ Verbose step-by-step narration of sub-tasks
+✗ Repeat information across agents
+✗ Surface intermediate states to user
+```
+
+### Example: Correct Snake Pattern
+
+```
+User: "Add authentication to the app"
+
+Orchestrator (HEAD - Visible):
+"I'll implement authentication. Let me work on this..."
+
+[UNDER SURFACE - Not shown to user]
+- Agent 1: Analyzes existing auth patterns
+- Agent 2: Generates auth components
+- Agent 3: Updates routes
+- Skill: Validates implementation
+
+Orchestrator (HEAD - Visible):
+"Authentication implemented:
+- Added AuthProvider in /lib/auth.ts
+- Created login/signup pages
+- Protected routes configured
+- Run `pnpm test` to verify"
+```
+
+### Example: WRONG (Anti-pattern)
+
+```
+❌ "Now I'm calling the file search agent..."
+❌ "The code generation skill is processing..."
+❌ "Agent 2 returned the following analysis..."
+❌ "Passing context to the next agent..."
+```
+
+### Enforcement
+
+This pattern is **MANDATORY**. If you find yourself:
+- Narrating internal agent operations → STOP
+- Showing skill execution details → STOP
+- Using excessive tokens on process description → STOP
+
+Refocus on HEAD-only communication.
+
+---
+
 ## Foundation-First Architecture
 
 This project follows a **foundation-first architecture** - preventing problems before they exist through strict typing, layered architecture, and automated validation.
