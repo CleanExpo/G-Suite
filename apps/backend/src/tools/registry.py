@@ -29,6 +29,7 @@ class ToolCategory(str, Enum):
     VERSION_CONTROL = "version_control"
     DEPLOYMENT = "deployment"
     MONITORING = "monitoring"
+    MARKETING = "marketing"
 
 
 @dataclass

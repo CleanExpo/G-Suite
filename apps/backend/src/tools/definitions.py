@@ -565,6 +565,368 @@ def register_file_tools(registry: ToolRegistry) -> None:
     )
 
 
+def register_copywriting_tools(registry: ToolRegistry) -> None:
+    """Register copywriting tools - deferred for context efficiency.
+
+    INTEGRITY REQUIREMENTS (Non-negotiable):
+    - 100% UNIQUE: No copied content
+    - ZERO PLAGIARISM: Not even close paraphrasing
+    - 100% VERIFIABLE: Every claim must have evidence
+    """
+
+    # Audience Research
+    registry.register(
+        ToolDefinition(
+            name="copywriting.research_audience",
+            description="Research audience pain points, symptoms, and desires from real sources",
+            input_schema={
+                "type": "object",
+                "properties": {
+                    "business_id": {
+                        "type": "string",
+                        "description": "ID of the business",
+                    },
+                    "sources": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": ["reviews", "forums", "social", "interviews", "support"],
+                        },
+                        "description": "Data sources to search",
+                    },
+                    "category": {
+                        "type": "string",
+                        "enum": ["pain_point", "symptom", "dream_outcome", "failed_solution", "buying_decision"],
+                        "description": "Category of quotes to collect",
+                    },
+                },
+                "required": ["business_id"],
+            },
+            config=ToolConfig(
+                defer_loading=True,
+                allowed_callers=["code_execution_20250825"],
+                parallel_safe=True,
+            ),
+            examples=[
+                ToolExample(
+                    description="Collect pain points from reviews",
+                    input={
+                        "business_id": "biz_123",
+                        "sources": ["reviews", "forums"],
+                        "category": "pain_point",
+                    },
+                    expected_behavior="Returns exact customer quotes categorized by type",
+                ),
+            ],
+            categories=[ToolCategory.MARKETING],
+            keywords=["research", "audience", "voice", "customer", "quotes", "pain", "copywriting"],
+        )
+    )
+
+    # Competitor Analysis
+    registry.register(
+        ToolDefinition(
+            name="copywriting.analyze_competitor",
+            description="Analyze competitor pages for structure and sections",
+            input_schema={
+                "type": "object",
+                "properties": {
+                    "competitor_url": {
+                        "type": "string",
+                        "description": "URL of competitor page to analyze",
+                    },
+                    "page_type": {
+                        "type": "string",
+                        "enum": ["homepage", "services", "about", "contact", "pricing", "faq"],
+                        "description": "Type of page being analyzed",
+                    },
+                },
+                "required": ["competitor_url", "page_type"],
+            },
+            config=ToolConfig(
+                defer_loading=True,
+                allowed_callers=["code_execution_20250825"],
+                parallel_safe=True,
+            ),
+            examples=[
+                ToolExample(
+                    description="Analyze competitor homepage",
+                    input={
+                        "competitor_url": "https://competitor.com.au",
+                        "page_type": "homepage",
+                    },
+                    expected_behavior="Returns page sections in order with notes",
+                ),
+            ],
+            categories=[ToolCategory.MARKETING],
+            keywords=["competitor", "analysis", "pages", "sections", "structure", "copywriting"],
+        )
+    )
+
+    # Copy Generation
+    registry.register(
+        ToolDefinition(
+            name="copywriting.generate_copy",
+            description="Generate conversion-focused copy using customer language (100% original required)",
+            input_schema={
+                "type": "object",
+                "properties": {
+                    "business_id": {
+                        "type": "string",
+                        "description": "ID of the business",
+                    },
+                    "page_type": {
+                        "type": "string",
+                        "enum": ["homepage", "services", "about", "contact", "landing"],
+                        "description": "Type of page to generate copy for",
+                    },
+                    "section": {
+                        "type": "string",
+                        "enum": ["hero", "problem", "value_props", "social_proof", "process", "faq", "cta"],
+                        "description": "Specific section (optional)",
+                    },
+                    "research_ids": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "IDs of audience research to use as inspiration",
+                    },
+                },
+                "required": ["business_id", "page_type"],
+            },
+            config=ToolConfig(
+                defer_loading=True,
+                allowed_callers=["code_execution_20250825"],
+                parallel_safe=True,
+            ),
+            examples=[
+                ToolExample(
+                    description="Generate homepage hero",
+                    input={
+                        "business_id": "biz_123",
+                        "page_type": "homepage",
+                        "section": "hero",
+                        "research_ids": ["research_abc", "research_def"],
+                    },
+                    expected_behavior="Returns unique, customer-voice copy with claims to verify",
+                ),
+            ],
+            categories=[ToolCategory.MARKETING],
+            keywords=["copy", "generate", "write", "content", "conversion", "copywriting"],
+        )
+    )
+
+    # Copy Validation
+    registry.register(
+        ToolDefinition(
+            name="copywriting.validate_copy",
+            description="Validate copy for integrity: uniqueness, plagiarism, verifiability",
+            input_schema={
+                "type": "object",
+                "properties": {
+                    "content": {
+                        "type": "string",
+                        "description": "Copy content to validate",
+                    },
+                    "checks": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": ["plagiarism", "uniqueness", "verifiability", "jargon", "tone"],
+                        },
+                        "description": "Validation checks to run",
+                    },
+                },
+                "required": ["content"],
+            },
+            config=ToolConfig(
+                defer_loading=True,
+                allowed_callers=["code_execution_20250825"],
+                parallel_safe=True,
+            ),
+            examples=[
+                ToolExample(
+                    description="Full integrity check",
+                    input={
+                        "content": "Your copy here...",
+                        "checks": ["plagiarism", "uniqueness", "verifiability"],
+                    },
+                    expected_behavior="Returns integrity scores and claims requiring evidence",
+                ),
+            ],
+            categories=[ToolCategory.MARKETING, ToolCategory.VERIFICATION],
+            keywords=["validate", "copy", "integrity", "plagiarism", "verify", "copywriting"],
+        )
+    )
+
+
+def register_consistency_tools(registry: ToolRegistry) -> None:
+    """Register business consistency tools - deferred for context efficiency."""
+
+    # NAP Audit
+    registry.register(
+        ToolDefinition(
+            name="consistency.audit_nap",
+            description="Audit NAP consistency across all platforms",
+            input_schema={
+                "type": "object",
+                "properties": {
+                    "business_id": {
+                        "type": "string",
+                        "description": "ID of the business to audit",
+                    },
+                    "platform_tiers": {
+                        "type": "array",
+                        "items": {"type": "integer", "minimum": 1, "maximum": 5},
+                        "description": "Platform tiers to audit (1-5)",
+                    },
+                },
+                "required": ["business_id"],
+            },
+            config=ToolConfig(
+                defer_loading=True,
+                allowed_callers=["code_execution_20250825"],
+                parallel_safe=True,
+            ),
+            examples=[
+                ToolExample(
+                    description="Full NAP audit",
+                    input={
+                        "business_id": "biz_123",
+                        "platform_tiers": [1, 2, 3],
+                    },
+                    expected_behavior="Returns consistency score and platform-by-platform breakdown",
+                ),
+            ],
+            categories=[ToolCategory.MARKETING],
+            keywords=["audit", "nap", "consistency", "local", "seo", "business"],
+        )
+    )
+
+    # Schema Generation
+    registry.register(
+        ToolDefinition(
+            name="consistency.generate_schema",
+            description="Generate JSON-LD schema markup from business data",
+            input_schema={
+                "type": "object",
+                "properties": {
+                    "business_id": {
+                        "type": "string",
+                        "description": "ID of the business",
+                    },
+                    "schema_type": {
+                        "type": "string",
+                        "enum": ["LocalBusiness", "Organization", "FAQ", "HowTo", "Service"],
+                        "description": "Type of schema to generate",
+                    },
+                },
+                "required": ["business_id", "schema_type"],
+            },
+            config=ToolConfig(
+                defer_loading=True,
+                allowed_callers=["code_execution_20250825"],
+                parallel_safe=True,
+            ),
+            examples=[
+                ToolExample(
+                    description="Generate LocalBusiness schema",
+                    input={
+                        "business_id": "biz_123",
+                        "schema_type": "LocalBusiness",
+                    },
+                    expected_behavior="Returns valid JSON-LD schema with all NAP data",
+                ),
+            ],
+            categories=[ToolCategory.MARKETING],
+            keywords=["schema", "jsonld", "structured", "data", "local", "business"],
+        )
+    )
+
+    # Platform Check
+    registry.register(
+        ToolDefinition(
+            name="consistency.check_platform",
+            description="Check a specific platform listing for NAP accuracy",
+            input_schema={
+                "type": "object",
+                "properties": {
+                    "business_id": {
+                        "type": "string",
+                        "description": "ID of the business",
+                    },
+                    "platform_name": {
+                        "type": "string",
+                        "description": "Platform to check (e.g., 'Google Business Profile')",
+                    },
+                    "listing_url": {
+                        "type": "string",
+                        "description": "URL of the listing to check",
+                    },
+                },
+                "required": ["business_id", "platform_name"],
+            },
+            config=ToolConfig(
+                defer_loading=True,
+                allowed_callers=["code_execution_20250825"],
+                parallel_safe=True,
+            ),
+            examples=[
+                ToolExample(
+                    description="Check Google Business Profile",
+                    input={
+                        "business_id": "biz_123",
+                        "platform_name": "Google Business Profile",
+                    },
+                    expected_behavior="Returns field-by-field comparison with master document",
+                ),
+            ],
+            categories=[ToolCategory.MARKETING],
+            keywords=["platform", "listing", "check", "nap", "consistency"],
+        )
+    )
+
+    # Export Master Document
+    registry.register(
+        ToolDefinition(
+            name="consistency.export_master",
+            description="Export the master consistency document for a business",
+            input_schema={
+                "type": "object",
+                "properties": {
+                    "business_id": {
+                        "type": "string",
+                        "description": "ID of the business",
+                    },
+                    "format": {
+                        "type": "string",
+                        "enum": ["yaml", "json", "markdown"],
+                        "default": "yaml",
+                        "description": "Export format",
+                    },
+                },
+                "required": ["business_id"],
+            },
+            config=ToolConfig(
+                defer_loading=True,
+                allowed_callers=["code_execution_20250825"],
+                parallel_safe=True,
+            ),
+            examples=[
+                ToolExample(
+                    description="Export as YAML",
+                    input={
+                        "business_id": "biz_123",
+                        "format": "yaml",
+                    },
+                    expected_behavior="Returns complete master document in YAML format",
+                ),
+            ],
+            categories=[ToolCategory.MARKETING],
+            keywords=["export", "master", "document", "consistency", "nap"],
+        )
+    )
+
+
 def register_all_tools() -> ToolRegistry:
     """Register all tools and return the registry.
 
@@ -578,6 +940,9 @@ def register_all_tools() -> ToolRegistry:
     register_audit_tools(registry)
     register_database_tools(registry)
     register_file_tools(registry)
+    # Marketing tools
+    register_copywriting_tools(registry)
+    register_consistency_tools(registry)
 
     return registry
 
