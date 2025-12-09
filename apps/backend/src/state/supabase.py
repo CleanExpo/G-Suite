@@ -329,3 +329,208 @@ class SupabaseStateStore:
         except Exception as e:
             logger.error("Failed to get active agent runs", user_id=user_id, error=str(e))
             return []
+
+    # =========================================================================
+    # Domain Memory - Integration Layer
+    # =========================================================================
+
+    async def create_memory(
+        self,
+        domain: str,
+        category: str,
+        key: str,
+        value: dict[str, Any],
+        user_id: str | None = None,
+        embedding: list[float] | None = None,
+        source: str | None = None,
+        tags: list[str] | None = None,
+    ) -> dict[str, Any] | None:
+        """Create a new domain memory entry.
+
+        Args:
+            domain: Memory domain (knowledge, preference, testing, debugging)
+            category: Sub-category within domain
+            key: Unique key within category
+            value: Memory content as JSON dict
+            user_id: Optional user ID for user-specific memories
+            embedding: Optional vector embedding for semantic search
+            source: Optional source of this memory
+            tags: Optional tags for categorization
+
+        Returns:
+            Created memory entry
+        """
+        try:
+            result = self.client.table("domain_memories").insert({
+                "domain": domain,
+                "category": category,
+                "key": key,
+                "value": value,
+                "user_id": user_id,
+                "embedding": embedding,
+                "source": source,
+                "tags": tags or [],
+            }).execute()
+
+            memory = result.data[0] if result.data else None
+            if memory:
+                logger.info(
+                    "Created memory",
+                    domain=domain,
+                    category=category,
+                    key=key,
+                    user_id=user_id,
+                )
+            return memory
+
+        except Exception as e:
+            logger.error("Failed to create memory", error=str(e))
+            raise
+
+    async def get_memory(self, memory_id: str) -> dict[str, Any] | None:
+        """Get a memory entry by ID."""
+        try:
+            result = self.client.table("domain_memories").select("*").eq(
+                "id", memory_id
+            ).single().execute()
+
+            return result.data
+
+        except Exception as e:
+            logger.error("Failed to get memory", memory_id=memory_id, error=str(e))
+            return None
+
+    async def update_memory(
+        self,
+        memory_id: str,
+        updates: dict[str, Any],
+    ) -> dict[str, Any] | None:
+        """Update a memory entry.
+
+        Args:
+            memory_id: Memory entry ID
+            updates: Fields to update
+
+        Returns:
+            Updated memory entry
+        """
+        try:
+            result = self.client.table("domain_memories").update(updates).eq(
+                "id", memory_id
+            ).execute()
+
+            memory = result.data[0] if result.data else None
+            if memory:
+                logger.info("Updated memory", memory_id=memory_id, updates=list(updates.keys()))
+            return memory
+
+        except Exception as e:
+            logger.error("Failed to update memory", memory_id=memory_id, error=str(e))
+            raise
+
+    async def delete_memory(self, memory_id: str) -> bool:
+        """Delete a memory entry.
+
+        Args:
+            memory_id: Memory entry ID
+
+        Returns:
+            True if deleted, False if not found
+        """
+        try:
+            result = self.client.table("domain_memories").delete().eq(
+                "id", memory_id
+            ).execute()
+
+            success = bool(result.data)
+            if success:
+                logger.info("Deleted memory", memory_id=memory_id)
+            return success
+
+        except Exception as e:
+            logger.error("Failed to delete memory", memory_id=memory_id, error=str(e))
+            return False
+
+    async def query_memories(
+        self,
+        domain: str | None = None,
+        category: str | None = None,
+        user_id: str | None = None,
+        tags: list[str] | None = None,
+        limit: int = 10,
+        offset: int = 0,
+    ) -> list[dict[str, Any]]:
+        """Query memories with filters.
+
+        Args:
+            domain: Filter by domain
+            category: Filter by category
+            user_id: Filter by user ID
+            tags: Filter by tags (must contain all)
+            limit: Maximum results
+            offset: Result offset for pagination
+
+        Returns:
+            List of matching memory entries
+        """
+        try:
+            query = self.client.table("domain_memories").select("*")
+
+            if domain:
+                query = query.eq("domain", domain)
+            if category:
+                query = query.eq("category", category)
+            if user_id:
+                query = query.eq("user_id", user_id)
+            if tags:
+                for tag in tags:
+                    query = query.contains("tags", [tag])
+
+            query = query.order("created_at", desc=True).range(offset, offset + limit - 1)
+
+            result = query.execute()
+            return result.data
+
+        except Exception as e:
+            logger.error("Failed to query memories", error=str(e))
+            return []
+
+    async def find_similar_memories(
+        self,
+        query_embedding: list[float],
+        domain: str | None = None,
+        user_id: str | None = None,
+        match_threshold: float = 0.7,
+        match_count: int = 10,
+    ) -> list[dict[str, Any]]:
+        """Find similar memories using vector search.
+
+        Args:
+            query_embedding: Query vector (1536 dimensions)
+            domain: Optional domain filter
+            user_id: Optional user filter
+            match_threshold: Minimum similarity score (0-1)
+            match_count: Maximum results
+
+        Returns:
+            List of similar memories with similarity scores
+        """
+        try:
+            import json
+
+            result = self.client.rpc(
+                "find_similar_memories",
+                {
+                    "query_embedding": json.dumps(query_embedding),
+                    "match_threshold": match_threshold,
+                    "match_count": match_count,
+                    "filter_domain": domain,
+                    "filter_user_id": user_id,
+                },
+            ).execute()
+
+            return result.data or []
+
+        except Exception as e:
+            logger.error("Failed to find similar memories", error=str(e))
+            return []
