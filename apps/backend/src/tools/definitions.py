@@ -943,8 +943,17 @@ def register_all_tools() -> ToolRegistry:
     # Marketing tools
     register_copywriting_tools(registry)
     register_consistency_tools(registry)
+    # RAG tools
+    register_rag_tools(registry)
 
     return registry
+
+
+def register_rag_tools(registry: ToolRegistry) -> None:
+    """Register RAG (Retrieval-Augmented Generation) tools."""
+    from src.tools.rag_tools import RAG_SEARCH_TOOL
+
+    registry.register(RAG_SEARCH_TOOL)
 
 
 # Context savings estimate
