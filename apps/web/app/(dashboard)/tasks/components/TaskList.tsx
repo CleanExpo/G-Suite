@@ -5,17 +5,26 @@
  */
 
 async function fetchTasks(statusFilter?: string) {
-  const url = statusFilter
-    ? `${process.env.BACKEND_URL}/api/tasks?status_filter=${statusFilter}&page_size=50`
-    : `${process.env.BACKEND_URL}/api/tasks?page_size=50`
+  try {
+    const backendUrl = process.env.BACKEND_URL || 'http://localhost:8000'
+    const url = statusFilter
+      ? `${backendUrl}/api/tasks?status_filter=${statusFilter}&page_size=50`
+      : `${backendUrl}/api/tasks?page_size=50`
 
-  const res = await fetch(url, { cache: 'no-store' })
+    const res = await fetch(url, {
+      cache: 'no-store',
+      next: { revalidate: 0 }
+    })
 
-  if (!res.ok) {
+    if (!res.ok) {
+      return { tasks: [], total: 0 }
+    }
+
+    return res.json()
+  } catch (error) {
+    console.error('Failed to fetch tasks:', error)
     return { tasks: [], total: 0 }
   }
-
-  return res.json()
 }
 
 export async function TaskList() {
@@ -53,11 +62,11 @@ export async function TaskList() {
 
       {tasks.map((task: any) => {
         const statusConfig = {
-          pending: { color: 'bg-yellow-100 text-yellow-800', icon: '○' },
-          in_progress: { color: 'bg-blue-100 text-blue-800', icon: '◐' },
-          completed: { color: 'bg-green-100 text-green-800', icon: '✓' },
-          failed: { color: 'bg-red-100 text-red-800', icon: '✗' },
-          cancelled: { color: 'bg-gray-100 text-gray-800', icon: '○' },
+          pending: { color: 'bg-yellow-100 text-yellow-800', icon: '[>]' },
+          in_progress: { color: 'bg-blue-100 text-blue-800', icon: '[*]' },
+          completed: { color: 'bg-green-100 text-green-800', icon: '[OK]' },
+          failed: { color: 'bg-red-100 text-red-800', icon: '[X]' },
+          cancelled: { color: 'bg-gray-100 text-gray-800', icon: '[-]' },
         }
 
         const config = statusConfig[task.status as keyof typeof statusConfig] || statusConfig.pending

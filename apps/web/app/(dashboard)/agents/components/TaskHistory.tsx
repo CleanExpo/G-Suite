@@ -9,16 +9,25 @@ interface TaskHistoryProps {
 }
 
 async function fetchRecentTasks(limit: number) {
-  const res = await fetch(
-    `${process.env.BACKEND_URL}/api/agents/tasks/recent?limit=${limit}`,
-    { cache: 'no-store' }
-  )
+  try {
+    const backendUrl = process.env.BACKEND_URL || 'http://localhost:8000'
+    const res = await fetch(
+      `${backendUrl}/api/agents/tasks/recent?limit=${limit}`,
+      {
+        cache: 'no-store',
+        next: { revalidate: 0 }
+      }
+    )
 
-  if (!res.ok) {
+    if (!res.ok) {
+      return []
+    }
+
+    return res.json()
+  } catch (error) {
+    console.error('Failed to fetch recent tasks:', error)
     return []
   }
-
-  return res.json()
 }
 
 export async function TaskHistory({ limit = 10 }: TaskHistoryProps) {
@@ -37,7 +46,7 @@ export async function TaskHistory({ limit = 10 }: TaskHistoryProps) {
       <div className="divide-y">
         {tasks.map((task: any) => {
           const statusIcon =
-            task.status === 'completed' ? '✓' : task.status === 'failed' ? '✗' : '○'
+            task.status === 'completed' ? '[OK]' : task.status === 'failed' ? '[X]' : '[>]'
           const statusColor =
             task.status === 'completed'
               ? 'text-green-600'

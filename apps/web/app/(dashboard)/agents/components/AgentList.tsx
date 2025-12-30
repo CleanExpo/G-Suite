@@ -5,15 +5,22 @@
  */
 
 async function fetchAgents() {
-  const res = await fetch(`${process.env.BACKEND_URL}/api/agents/list`, {
-    cache: 'no-store',
-  })
+  try {
+    const backendUrl = process.env.BACKEND_URL || 'http://localhost:8000'
+    const res = await fetch(`${backendUrl}/api/agents/list`, {
+      cache: 'no-store',
+      next: { revalidate: 0 }
+    })
 
-  if (!res.ok) {
+    if (!res.ok) {
+      return []
+    }
+
+    return res.json()
+  } catch (error) {
+    console.error('Failed to fetch agents:', error)
     return []
   }
-
-  return res.json()
 }
 
 export async function AgentList() {

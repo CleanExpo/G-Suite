@@ -15,15 +15,34 @@ export const metadata = {
 }
 
 async function fetchQueueStats() {
-  const res = await fetch(`${process.env.BACKEND_URL}/api/tasks/stats/summary`, {
-    cache: 'no-store',
-  })
+  try {
+    const backendUrl = process.env.BACKEND_URL || 'http://localhost:8000'
+    const res = await fetch(`${backendUrl}/api/tasks/stats/summary`, {
+      cache: 'no-store',
+      next: { revalidate: 0 }
+    })
 
-  if (!res.ok) {
-    return null
+    if (!res.ok) {
+      return {
+        total_tasks: 0,
+        pending: 0,
+        in_progress: 0,
+        completed: 0,
+        failed: 0
+      }
+    }
+
+    return res.json()
+  } catch (error) {
+    console.error('Failed to fetch queue stats:', error)
+    return {
+      total_tasks: 0,
+      pending: 0,
+      in_progress: 0,
+      completed: 0,
+      failed: 0
+    }
   }
-
-  return res.json()
 }
 
 export default async function TaskQueuePage() {
@@ -39,11 +58,9 @@ export default async function TaskQueuePage() {
       </div>
 
       {/* Queue Stats */}
-      {stats && (
-        <div className="mb-8">
-          <QueueStats stats={stats} />
-        </div>
-      )}
+      <div className="mb-8">
+        <QueueStats stats={stats} />
+      </div>
 
       {/* Two Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

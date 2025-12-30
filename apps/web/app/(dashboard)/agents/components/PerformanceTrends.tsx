@@ -9,16 +9,25 @@ interface PerformanceTrendsProps {
 }
 
 async function fetchPerformanceTrends(days: number) {
-  const res = await fetch(
-    `${process.env.BACKEND_URL}/api/agents/performance/trends?days=${days}`,
-    { cache: 'no-store' }
-  )
+  try {
+    const backendUrl = process.env.BACKEND_URL || 'http://localhost:8000'
+    const res = await fetch(
+      `${backendUrl}/api/agents/performance/trends?days=${days}`,
+      {
+        cache: 'no-store',
+        next: { revalidate: 0 }
+      }
+    )
 
-  if (!res.ok) {
+    if (!res.ok) {
+      return null
+    }
+
+    return res.json()
+  } catch (error) {
+    console.error('Failed to fetch performance trends:', error)
     return null
   }
-
-  return res.json()
 }
 
 export async function PerformanceTrends({ days = 7 }: PerformanceTrendsProps) {
