@@ -13,8 +13,11 @@ This document provides comprehensive testing information for the entire system, 
 - ✅ Integration Tests: **Complete**
 - ✅ E2E Tests: **Complete**
 - ✅ Database Tests: **Complete** (RLS, Integrity)
+- ✅ Contract Tests: **Complete** (Pact - Frontend/Backend)
+- ✅ Visual Regression: **Complete** (Percy - 50+ snapshots)
+- ✅ Performance Tests: **Complete** (Lighthouse CI - Core Web Vitals)
 
-**Total Test Count**: **250+ test cases**
+**Total Test Count**: **300+ test cases**
 
 ---
 
@@ -26,8 +29,10 @@ apps/backend/tests/
 ├── test_prd_routes.py                     # Unit tests for API routes
 ├── security/
 │   └── test_api_security.py              # API security tests (SQL injection, XSS, auth)
-└── integration/
-    └── test_supabase_rls.py              # Database integration & RLS tests
+├── integration/
+│   └── test_supabase_rls.py              # Database integration & RLS tests
+└── contracts/
+    └── test_prd_provider.py              # Pact provider verification tests
 
 apps/web/__tests__/
 ├── hooks/
@@ -48,8 +53,12 @@ apps/web/e2e/
 └── prd-generation.spec.ts                # E2E tests with Playwright
 
 apps/web/tests/
-└── accessibility/
-    └── a11y.spec.ts                      # Accessibility tests (50+ tests)
+├── accessibility/
+│   └── a11y.spec.ts                      # Accessibility tests (50+ tests)
+├── contracts/
+│   └── prd-consumer.pact.test.ts         # Pact consumer contract tests
+└── visual/
+    └── components.visual.spec.ts         # Percy visual regression tests (50+ snapshots)
 ```
 
 ---
@@ -545,6 +554,168 @@ pnpm exec playwright show-report
 
 ---
 
+## Contract Testing (Pact) - Phase 2
+
+Contract testing ensures that the frontend (consumer) and backend (provider) API contracts are synchronized and that breaking changes are detected automatically.
+
+### Running Contract Tests
+
+```bash
+# Frontend Consumer Tests (generate pact files)
+cd apps/web
+pnpm run test:contracts
+
+# Backend Provider Tests (verify contracts)
+cd apps/backend
+uv run pytest tests/contracts/test_prd_provider.py -v
+
+# Both in sequence
+pnpm run test:contracts && cd apps/backend && uv run pytest tests/contracts/ -v
+```
+
+### Contract Test Coverage
+
+**Consumer Tests** (`apps/web/tests/contracts/prd-consumer.pact.test.ts`):
+- ✅ POST /api/prd/generate - Valid input
+- ✅ POST /api/prd/generate - Validation errors (422)
+- ✅ GET /api/prd/status/{run_id} - In progress status
+- ✅ GET /api/prd/status/{run_id} - Not found (404)
+- ✅ GET /api/prd/result/{prd_id} - Completed PRD
+- ✅ GET /api/prd/documents/{prd_id} - Document list
+- ✅ GET /health - Health check
+
+**Provider Tests** (`apps/backend/tests/contracts/test_prd_provider.py`):
+- ✅ Verifies all consumer contracts
+- ✅ Provider state setup for each scenario
+- ✅ Contract breaking change detection
+
+**Pact Broker Integration**:
+- Pact files generated: `apps/web/pacts/web-backend-api.json`
+- Can be published to Pact Broker or Pactflow
+- Automated in CI/CD for main branch
+
+**Benefits**:
+- Prevents breaking API changes
+- Documents API contracts
+- Enables independent team deployments
+- Catches integration issues early
+
+---
+
+## Visual Regression Testing (Percy) - Phase 2
+
+Visual regression testing captures screenshots of UI components and pages to detect unintended visual changes automatically.
+
+### Running Visual Tests
+
+```bash
+# Set Percy token (sign up at https://percy.io)
+export PERCY_TOKEN=your_percy_token_here
+
+# Run visual tests
+cd apps/web
+pnpm run test:visual
+
+# Visual tests run automatically in CI on PRs
+```
+
+### Visual Test Coverage
+
+**Components** (`apps/web/tests/visual/components.visual.spec.ts`):
+- ✅ Agent List - Default, Active, Empty states
+- ✅ Queue Stats - Normal load, High load, Color coding
+- ✅ Task Submission Form - Default, Filled, Validation, Loading states
+- ✅ PRD Form - Initial, Filled states
+- ✅ PRD Progress - In progress state
+- ✅ PRD Result - Completed view
+
+**Responsive Design**:
+- ✅ Homepage - Mobile (375px), Tablet (768px), Desktop (1920px)
+- ✅ Dashboard - Responsive grid across breakpoints
+
+**Dark Mode**:
+- ✅ Dashboard - Dark mode
+- ✅ PRD Form - Dark mode
+- ✅ Component contrast validation
+
+**Accessibility Features**:
+- ✅ Focus states
+- ✅ High contrast mode
+- ✅ Reduced motion
+
+**Animation States**:
+- ✅ Loading spinners
+- ✅ Progress bars
+- ✅ Toast notifications
+
+**Configuration**:
+- Percy config: `.percy.yml`
+- Widths: 375px, 768px, 1280px
+- Threshold: 1% difference allowed
+- Browser: Chromium
+
+**Total**: 50+ visual snapshots across 6 categories
+
+---
+
+## Performance Testing (Lighthouse CI) - Phase 2
+
+Lighthouse CI automatically audits web app performance, accessibility, SEO, and best practices on every build.
+
+### Running Performance Tests
+
+```bash
+# Run Lighthouse CI
+cd apps/web
+pnpm run test:lighthouse
+
+# Performance tests run automatically in CI
+```
+
+### Performance Budgets
+
+**Core Web Vitals**:
+- ✅ First Contentful Paint (FCP): < 2000ms
+- ✅ Largest Contentful Paint (LCP): < 2500ms
+- ✅ Cumulative Layout Shift (CLS): < 0.1
+- ✅ Total Blocking Time (TBT): < 300ms
+- ✅ Speed Index: < 3000ms
+
+**Category Scores** (Minimum 90%):
+- ✅ Performance: 90+
+- ✅ Accessibility: 90+
+- ✅ Best Practices: 90+
+- ✅ SEO: 90+
+
+**Audited Pages**:
+- ✅ Homepage (/)
+- ✅ Dashboard (/dashboard)
+- ✅ PRD Generator (/prd/generate)
+
+**Additional Checks**:
+- ✅ Uses HTTPS
+- ✅ No vulnerable libraries
+- ✅ Text compression enabled
+- ✅ Unminified JavaScript/CSS detection
+- ✅ Total page weight < 1MB
+- ✅ Color contrast (accessibility)
+- ✅ Image optimization
+- ✅ Font display strategy
+- ✅ Meta tags (SEO)
+
+**Configuration**:
+- Config file: `lighthouserc.js`
+- Runs: 3 per URL (averaged)
+- Device: Mobile emulation
+- Throttling: Slow 4G
+
+**CI Integration**:
+- Results uploaded to temporary public storage (30 days)
+- PR comments with performance scores
+- Fails build if budgets exceeded
+
+---
+
 ## Test Configuration
 
 ### Backend Configuration (`pytest.ini`)
@@ -956,9 +1127,19 @@ uv run pytest --cov=src --cov-report=html
 - 5 security scanning workflows
 - Complete accessibility coverage
 
+**Phase 2 Completed** (2026-01-06):
+1. Contract testing with Pact (frontend + backend)
+2. Visual regression testing with Percy (50+ snapshots)
+3. Performance testing with Lighthouse CI (Core Web Vitals)
+
+**Added Phase 2**:
+- 3 new test frameworks
+- 50+ additional test cases
+- Advanced CI/CD workflow
+- Performance budgets and monitoring
+
 **Next Phases** (Optional):
-- Phase 2: Contract Testing (Pact), Visual Regression (Percy/Chromatic)
-- Phase 3: Load Testing (k6), OWASP ZAP
+- Phase 3: Load Testing (k6), OWASP ZAP penetration testing
 - Phase 4: Documentation & Metrics Dashboard
 
 ---
@@ -993,8 +1174,29 @@ uv run pytest --cov=src --cov-report=html
 - ✅ Test concurrent access scenarios
 - ✅ Clean up test data after each test
 
+### Contract Testing (Phase 2)
+- ✅ Run consumer tests before provider tests
+- ✅ Keep contracts synchronized between teams
+- ✅ Use Pact Broker for contract sharing
+- ✅ Version contracts properly
+- ✅ Never break existing contracts without migration path
+
+### Visual Regression (Phase 2)
+- ✅ Review all visual changes before approving
+- ✅ Hide dynamic content (timestamps, IDs)
+- ✅ Test across multiple viewports
+- ✅ Include dark mode in visual tests
+- ✅ Keep baseline snapshots up to date
+
+### Performance Testing (Phase 2)
+- ✅ Run Lighthouse on every PR
+- ✅ Monitor Core Web Vitals trends
+- ✅ Set realistic performance budgets
+- ✅ Test on mobile and slow networks
+- ✅ Fix performance regressions immediately
+
 ---
 
 **Questions?** See individual test files for implementation details.
 
-**Last Updated**: 2026-01-06 (Phase 1 Complete)
+**Last Updated**: 2026-01-06 (Phase 2 Complete - Contract, Visual, Performance Testing)
