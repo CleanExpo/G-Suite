@@ -9,7 +9,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.config import get_settings
 from src.utils import setup_logging, get_logger
 
-from .routes import agents, chat, health, webhooks, prd, workflows, rag, analytics, agent_dashboard, task_queue, contractors
+from .routes import agents, chat, health, webhooks, prd, workflows, rag, analytics, agent_dashboard, task_queue
+from .routes import contractors_supabase as contractors
 from .middleware.auth import AuthMiddleware
 from .middleware.rate_limit import RateLimitMiddleware
 
