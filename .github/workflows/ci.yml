@@ -15,6 +15,22 @@ jobs:
   backend-tests:
     name: Backend Tests
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: starter_db
+          POSTGRES_USER: starter_user
+          POSTGRES_PASSWORD: local_dev_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -51,16 +67,19 @@ jobs:
 
       - name: Run tests with coverage
         working-directory: apps/backend
-        run: uv run pytest --cov=src --cov-report=xml --cov-report=term-missing --cov-fail-under=80 -v
+        run: uv run pytest --cov=src --cov-report=xml --cov-report=html --cov-report=term-missing --cov-fail-under=80 -v
+        env:
+          DATABASE_URL: postgresql://starter_user:local_dev_password@localhost:5432/starter_db
 
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
-          file: apps/backend/coverage.xml
-          flags: backend
           name: backend-coverage
-          fail_ci_if_error: false
-          token: ${{ secrets.CODECOV_TOKEN }}
+          path: |
+            apps/backend/coverage.xml
+            apps/backend/htmlcov/
+          retention-days: 30
 
       - name: Upload test results
         if: always()
@@ -99,14 +118,13 @@ jobs:
       - name: Run unit tests with coverage
         run: pnpm turbo run test:coverage
 
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
-          file: apps/web/coverage/coverage-final.json
-          flags: frontend
           name: frontend-coverage
-          fail_ci_if_error: false
-          token: ${{ secrets.CODECOV_TOKEN }}
+          path: apps/web/coverage/
+          retention-days: 30
 
       - name: Upload test results
         if: always()
@@ -140,8 +158,7 @@ jobs:
       - name: Build all packages
         run: pnpm turbo run build
         env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co' }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key' }}
+          NEXT_PUBLIC_BACKEND_URL: http://localhost:8000
 
   e2e-tests:
     name: E2E Tests

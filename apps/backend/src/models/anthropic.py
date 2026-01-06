@@ -6,12 +6,13 @@ from anthropic import AsyncAnthropic
 
 from src.config import get_settings
 from src.utils import get_logger
+from .base_provider import BaseLLMProvider
 
 settings = get_settings()
 logger = get_logger(__name__)
 
 
-class AnthropicClient:
+class AnthropicClient(BaseLLMProvider):
     """Client for Anthropic Claude API."""
 
     # Available models
@@ -124,3 +125,40 @@ class AnthropicClient:
         except Exception as e:
             logger.error("Anthropic tool use error", error=str(e))
             raise
+
+    async def generate_embeddings(self, text: str) -> list[float]:
+        """
+        Generate embeddings (Anthropic doesn't provide embeddings API).
+
+        Note: Anthropic doesn't offer an embeddings API. Consider using:
+        - Ollama with nomic-embed-text for local embeddings
+        - OpenAI embeddings API for cloud embeddings
+
+        Args:
+            text: Text to embed
+
+        Returns:
+            Empty list (not supported)
+
+        Raises:
+            NotImplementedError: Anthropic doesn't support embeddings
+        """
+        raise NotImplementedError(
+            "Anthropic doesn't provide an embeddings API. "
+            "Use Ollama (nomic-embed-text) or OpenAI for embeddings."
+        )
+
+    @property
+    def provider_name(self) -> str:
+        """Get provider name."""
+        return "anthropic"
+
+    @property
+    def model_name(self) -> str:
+        """Get current model name."""
+        return self.model
+
+    @property
+    def supports_tools(self) -> bool:
+        """Anthropic supports tool use."""
+        return True

@@ -1,156 +1,122 @@
 <div align="center">
 
-# 🤖 Claude Code Agent Orchestration System
+# 🤖 NodeJS-Starter-V1
 
-### Production-ready monorepo for AI-powered applications
+### Self-Contained AI Starter Template
 
 [![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
 [![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 
+[![No API Keys Required](https://img.shields.io/badge/🔓_No_API_Keys-Required-success?style=for-the-badge)](/)
+[![Offline First](https://img.shields.io/badge/📡_Offline-First-blue?style=for-the-badge)](/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge)](http://makeapullrequest.com)
 
 <p align="center">
-  <strong>Build intelligent applications with Claude, LangGraph, and modern web technologies</strong>
+  <strong>Production-ready monorepo for AI applications • Works completely offline • Zero external dependencies</strong>
 </p>
 
-[Getting Started](#-getting-started) •
+[Quick Start](#-quick-start) •
 [Features](#-features) •
 [Architecture](#-architecture) •
 [Documentation](#-documentation) •
-[Deployment](#-deployment)
+[Optional Upgrades](#-optional-upgrades)
 
 </div>
 
 ---
 
-## ✨ Features
+## 🎯 What Makes This Different?
 
-<table>
-<tr>
-<td>
+✅ **No API Keys Required** - Works completely without external services
+✅ **Runs Offline** - Local AI with Ollama (llama3.1:8b)
+✅ **Self-Contained Database** - PostgreSQL + pgvector in Docker
+✅ **One Command Setup** - `pnpm run setup` and you're done
+✅ **Clone for New Projects** - Perfect starter template
+✅ **Optional Cloud Upgrades** - Add Claude API, deploy when ready
 
-### 🎨 Frontend
-- **Next.js 15** with App Router
-- **React 19** with Server Components
-- **Tailwind CSS v4** for styling
-- **shadcn/ui** component library
-- Full **TypeScript** support
-- Responsive & accessible design
-
-</td>
-<td>
-
-### ⚡ Backend
-- **FastAPI** for high-performance APIs
-- **LangGraph** agent orchestration
-- Multi-model AI support
-- Async-first architecture
-- Structured logging
-- Rate limiting & auth middleware
-
-</td>
-</tr>
-<tr>
-<td>
-
-### 🗄️ Database
-- **Supabase** (PostgreSQL)
-- **pgvector** for embeddings
-- Row Level Security (RLS)
-- Real-time subscriptions
-- Built-in authentication
-- Migration system
-
-</td>
-<td>
-
-### 🤖 AI Integration
-- **Claude 4.5** (Opus/Sonnet/Haiku)
-- **Gemini 2.0** Flash
-- **OpenRouter** multi-model
-- MCP tool integrations
-- SKILL.md orchestration
-- Verification-first approach
-
-</td>
-</tr>
-</table>
+This is a **starter template**, not a deployed product. Clone it, customize it, and build your own AI-powered application.
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Quick Start
 
 ### Prerequisites
 
 | Tool | Version | Installation |
 |------|---------|--------------|
+| Docker | Latest | [docker.com](https://docker.com/) |
 | Node.js | 20+ | [nodejs.org](https://nodejs.org/) |
 | pnpm | 9+ | `npm install -g pnpm` |
 | Python | 3.12+ | [python.org](https://python.org/) |
 | uv | Latest | `pip install uv` |
-| Supabase CLI | Latest | `npm install -g supabase` |
+| Ollama | Latest | [ollama.com](https://ollama.com/) |
 
-### Quick Start
+### Installation (< 10 minutes)
 
 ```bash
 # 1. Clone the repository
 git clone https://github.com/CleanExpo/NodeJS-Starter-V1.git
 cd NodeJS-Starter-V1
 
-# 2. Install dependencies
-pnpm install
+# 2. Run automated setup
+pnpm run setup
 
-# 3. Configure your environment
-cp .env.example .env
-# Edit .env with your API keys (see Environment Variables section below)
-
-# 4. Start Supabase (optional - for local development)
-supabase start
-
-# 5. Start development servers
+# 3. Start development
 pnpm dev
 ```
 
-<details>
-<summary>📦 Manual Installation</summary>
-
-```bash
-# 1. Install frontend dependencies
-pnpm install
-
-# 2. Install backend dependencies
-cd apps/backend
-uv sync
-cd ../..
-
-# 3. Setup environment variables
-cp .env.example .env
-# Edit .env with your API keys:
-#   - ANTHROPIC_API_KEY (required)
-#   - OPENAI_API_KEY (required)
-#   - Supabase credentials (required)
-
-# 4. Start Supabase (optional - for local development)
-supabase start
-supabase db push
-
-# 5. Verify setup (optional but recommended)
-.\scripts\health-check.ps1 -Quick   # Windows
-./scripts/health-check.sh            # Linux/Mac
-
-# 6. Start development servers
-pnpm dev
-```
+**That's it!** No API keys, no account creation, no external services.
 
 **Services will start on:**
 - Frontend: http://localhost:3000
 - Backend API: http://localhost:8000
-- Supabase Studio: http://localhost:54323
+- PostgreSQL: localhost:5432
+- Ollama: http://localhost:11434
 
-</details>
+---
+
+## ✨ Features
+
+### 🎨 Frontend
+- **Next.js 15** with App Router & React 19
+- **Tailwind CSS v4** with design tokens
+- **shadcn/ui** component library
+- **TypeScript** for type safety
+- Responsive & WCAG 2.1 AA accessible
+- Server Components & RSC
+
+### ⚡ Backend
+- **FastAPI** for high-performance APIs
+- **LangGraph** agent orchestration
+- **JWT Authentication** (no external auth)
+- Async-first architecture
+- Structured logging
+- SQLAlchemy ORM
+
+### 🗄️ Database
+- **PostgreSQL 15** in Docker
+- **pgvector** for AI embeddings
+- **Local-first** - No cloud required
+- Migration system with Alembic
+- Full-text search ready
+- Redis for caching
+
+### 🤖 AI Integration
+- **Ollama** (local, default) - llama3.1:8b
+- **Claude 4.5** (optional, cloud)
+- **Multi-model support** ready
+- Provider abstraction layer
+- Embeddings for RAG
+
+### 🧪 Testing & Quality
+- **Zero external dependencies** for CI/CD
+- pytest + vitest with coverage
+- Playwright E2E tests
+- ESLint + Ruff linting
+- Type checking (mypy + tsc)
+- NPM Audit + Trivy security scans
 
 ---
 
@@ -163,9 +129,9 @@ pnpm dev
 │  │  Next.js 15 │  │   React 19  │  │   Tailwind + shadcn/ui  │  │
 │  └──────┬──────┘  └──────┬──────┘  └────────────┬────────────┘  │
 │         └────────────────┼──────────────────────┘               │
-│                          │                                       │
+│                          │ JWT Auth                              │
 └──────────────────────────┼───────────────────────────────────────┘
-                           │ API Calls
+                           │ REST API
 ┌──────────────────────────┼───────────────────────────────────────┐
 │                          ▼                                       │
 │                       BACKEND                                    │
@@ -174,268 +140,218 @@ pnpm dev
 │  └──────┬──────┘  └──────┬──────┘  └────────────┬────────────┘  │
 │         │                │                       │               │
 │  ┌──────▼──────┐  ┌──────▼──────┐  ┌────────────▼────────────┐  │
-│  │  AI Models  │  │  MCP Tools  │  │      SKILL.md Files     │  │
-│  │ Claude/Gemini│ │ Exa/Playwright│ │   (Agent Behaviors)    │  │
+│  │  AI Models  │  │ SQLAlchemy  │  │      Provider Layer     │  │
+│  │Ollama/Claude│  │     ORM     │  │   (Ollama → Claude)     │  │
 │  └─────────────┘  └─────────────┘  └─────────────────────────┘  │
 │                                                                  │
 └──────────────────────────┬───────────────────────────────────────┘
                            │
 ┌──────────────────────────┼───────────────────────────────────────┐
 │                          ▼                                       │
-│                       DATABASE                                   │
+│                    LOCAL SERVICES                                │
 │  ┌─────────────────────────────────────────────────────────────┐│
-│  │                      Supabase                                ││
-│  │  PostgreSQL  │  pgvector  │  Auth  │  Real-time  │  Storage ││
+│  │           PostgreSQL 15 + pgvector (Docker)                  ││
+│  │           Redis (Docker)                                     ││
+│  │           Ollama (Local AI)                                  ││
 │  └─────────────────────────────────────────────────────────────┘│
 └──────────────────────────────────────────────────────────────────┘
 ```
 
-### Project Structure
+**Key Principle**: Everything runs locally. No external API calls required.
+
+---
+
+## 📁 Project Structure
 
 ```
 📦 NodeJS-Starter-V1
-├── 📂 .github/workflows      # CI/CD pipelines
-├── 📂 .vscode                # VS Code configuration
+├── 📂 .github/workflows      # CI/CD (no secrets required)
+│   └── 📂 examples           # Optional deployment templates
 ├── 📂 apps
 │   ├── 📂 web                # Next.js frontend
 │   │   ├── 📂 app            # App router pages
 │   │   ├── 📂 components     # React components
-│   │   ├── 📂 lib            # Utilities & clients
-│   │   └── 📂 hooks          # Custom React hooks
+│   │   ├── 📂 lib/api        # API client (replaces Supabase)
+│   │   └── 📂 middleware.ts  # JWT auth middleware
 │   └── 📂 backend            # Python backend
 │       ├── 📂 src
 │       │   ├── 📂 agents     # AI agent implementations
 │       │   ├── 📂 api        # FastAPI routes
-│       │   ├── 📂 graphs     # LangGraph workflows
-│       │   ├── 📂 models     # AI model clients
-│       │   └── 📂 skills     # SKILL.md parser
+│       │   ├── 📂 auth       # JWT authentication
+│       │   ├── 📂 config     # Database & settings
+│       │   ├── 📂 db         # SQLAlchemy models
+│       │   └── 📂 models     # AI provider layer
 │       └── 📂 tests          # Pytest tests
-├── 📂 packages
-│   ├── 📂 shared             # Shared TypeScript types
-│   └── 📂 config             # Shared configurations
-├── 📂 skills                 # SKILL.md orchestration files
-├── 📂 supabase               # Database migrations
-└── 📂 scripts                # Setup & utility scripts
+├── 📂 scripts                # Setup & utility scripts
+│   ├── init-db.sql          # PostgreSQL schema
+│   ├── setup.sh             # Automated setup (Unix)
+│   └── setup.ps1            # Automated setup (Windows)
+├── docker-compose.yml       # PostgreSQL + Redis
+├── .env.example             # Environment template (no secrets!)
+└── README.md                # This file
 ```
 
 ---
 
 ## 🔧 Development
 
-<table>
-<tr>
-<th>Frontend</th>
-<th>Backend</th>
-</tr>
-<tr>
-<td>
+### Start All Services
 
 ```bash
-# Development
+# One command to start everything
+pnpm dev
+```
+
+This starts:
+- Frontend (Next.js) on :3000
+- Backend (FastAPI) on :8000
+- PostgreSQL on :5432
+- Redis on :6379
+- Ollama on :11434 (if running)
+
+### Individual Services
+
+```bash
+# Frontend only
 pnpm dev --filter=web
 
-# Build
-pnpm build --filter=web
-
-# Lint
-pnpm lint --filter=web
-
-# Type check
-pnpm type-check --filter=web
-
-# Test
-pnpm test --filter=web
-```
-
-</td>
-<td>
-
-```bash
+# Backend only
 cd apps/backend
-
-# Development
 uv run uvicorn src.api.main:app --reload
 
-# Test
-uv run pytest
-
-# Type check
-uv run mypy src/
-
-# Lint
-uv run ruff check src/
+# Database only
+docker compose up postgres redis
 ```
 
-</td>
-</tr>
-</table>
-
-### Full Stack Commands
+### Quality Checks
 
 ```bash
-# Start all services (frontend + backend + database)
-pnpm dev
-
-# Start services individually
-pnpm dev --filter=web                                           # Frontend only
-cd apps/backend && uv run uvicorn src.api.main:app --reload    # Backend only
-supabase start                                                  # Database only
-
-# Build everything
-pnpm build
-
-# Run all checks
+# Run all checks (linting, type-check, tests)
 pnpm turbo run lint type-check test
 
-# Health check (comprehensive system validation)
-.\scripts\health-check.ps1        # Full check (Windows)
-.\scripts\health-check.ps1 -Quick # Quick check (Windows)
+# Backend checks
+cd apps/backend
+uv run ruff check src/      # Linting
+uv run mypy src/            # Type checking
+uv run pytest --cov         # Tests with coverage
+
+# Frontend checks
+pnpm lint --filter=web      # Linting
+pnpm type-check --filter=web # Type checking
+pnpm test --filter=web      # Tests with coverage
 ```
 
 ---
 
 ## 🤖 AI Models
 
-| Provider | Model | Identifier | Best For |
-|----------|-------|------------|----------|
-| Anthropic | Claude Opus 4.5 | `claude-opus-4-5-20251101` | Complex reasoning |
-| Anthropic | Claude Sonnet 4.5 | `claude-sonnet-4-5-20250929` | Balanced tasks |
-| Anthropic | Claude Haiku 4.5 | `claude-haiku-4-5-20251001` | Fast responses |
-| Google | Gemini 2.0 Flash | `gemini-2.0-flash-exp` | Speed & efficiency |
-| OpenRouter | Various | Multiple | Model flexibility |
+### Default (Local, Free)
 
----
+| Provider | Model | Use Case | Cost |
+|----------|-------|----------|------|
+| **Ollama** | llama3.1:8b | General tasks | **FREE** |
+| **Ollama** | nomic-embed-text | Embeddings | **FREE** |
 
-## 📖 SKILL.md Orchestration
+### Optional (Cloud, Paid)
 
-The `/skills` directory defines agent behaviors using markdown files:
+| Provider | Model | Use Case | Cost |
+|----------|-------|----------|------|
+| Anthropic | Claude Opus 4.5 | Complex reasoning | $15/$75 per 1M tokens |
+| Anthropic | Claude Sonnet 4.5 | Balanced tasks | $3/$15 per 1M tokens |
+| Anthropic | Claude Haiku 4.5 | Fast responses | $0.25/$1.25 per 1M tokens |
 
-```
-skills/
-├── ORCHESTRATOR.md           # Master routing logic
-├── core/
-│   ├── VERIFICATION.md       # Verification-first approach
-│   ├── ERROR-HANDLING.md     # Error patterns
-│   └── CODING-STANDARDS.md   # Code quality rules
-├── frontend/
-│   ├── NEXTJS.md             # Next.js patterns
-│   ├── TAILWIND.md           # Tailwind CSS patterns
-│   └── COMPONENTS.md         # Component guidelines
-├── backend/
-│   ├── LANGGRAPH.md          # LangGraph workflows
-│   ├── FASTAPI.md            # FastAPI patterns
-│   └── AGENTS.md             # Agent building
-└── database/
-    ├── SUPABASE.md           # Supabase patterns
-    └── MIGRATIONS.md         # Migration guidelines
-```
+**To switch to Claude**: Set `AI_PROVIDER=anthropic` and add `ANTHROPIC_API_KEY` to `.env`
 
 ---
 
 ## ⚙️ Environment Variables
 
-### Setup Instructions
-
-1. Copy `.env.example` to `.env` in the root directory:
-   ```bash
-   cp .env.example .env
-   ```
-
-2. Add your API keys to the `.env` file (required keys marked with ⚠️)
-
-### Required Environment Variables
+### Default Configuration (Works Out of the Box)
 
 ```env
-# 🔐 Supabase
-NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
-SUPABASE_SERVICE_ROLE_KEY=eyJ...
-DATABASE_URL=postgresql://postgres:password@host:5432/postgres
+# Database (Docker - no changes needed)
+DATABASE_URL=postgresql://starter_user:local_dev_password@localhost:5432/starter_db
 
-# 🤖 AI Models (REQUIRED) ⚠️
-ANTHROPIC_API_KEY=sk-ant-api03-...      # Get from: https://console.anthropic.com/
-OPENAI_API_KEY=sk-proj-...              # Get from: https://platform.openai.com/api-keys
+# JWT Authentication (change in production!)
+JWT_SECRET_KEY=your-secret-key-change-in-production
+JWT_EXPIRE_MINUTES=60
 
-# 🔗 Backend
+# AI Provider (local by default)
+AI_PROVIDER=ollama
+OLLAMA_BASE_URL=http://localhost:11434
+OLLAMA_MODEL=llama3.1:8b
+
+# Backend
 BACKEND_URL=http://localhost:8000
 ```
 
-### Optional Environment Variables
+**That's it!** No API keys required for local development.
+
+### Optional Upgrades
 
 ```env
-# 🤖 Additional AI Models
-GOOGLE_AI_API_KEY=AI...                 # Google Gemini
-OPENROUTER_API_KEY=sk-or-...            # OpenRouter multi-model
+# Cloud AI (Optional)
+AI_PROVIDER=anthropic
+ANTHROPIC_API_KEY=sk-ant-xxx
 
-# 🔧 MCP Tools
-EXA_API_KEY=...                         # Exa web search
-REF_TOOLS_API_KEY=...                   # Ref.tools documentation
-BRAVE_API_KEY=...                       # Brave search
-GITHUB_TOKEN=...                        # GitHub integration
+# Other AI Providers (Optional)
+GOOGLE_AI_API_KEY=xxx
+OPENROUTER_API_KEY=sk-or-xxx
 
-# 📱 Slack Integration
-SLACK_BOT_TOKEN=...
-SLACK_TEAM_ID=...
+# MCP Tools (Optional)
+EXA_API_KEY=xxx
+REF_TOOLS_API_KEY=xxx
 ```
-
-### Environment File Locations
-
-The project uses multiple environment files:
-- **Root**: `.env` - Main configuration (Supabase, AI keys)
-- **Frontend**: `apps/web/.env.local` - Frontend-specific variables
-- **Backend**: `apps/backend/.env` - Backend-specific variables (automatically inherits from root)
-
-> **Note**: The root `.env` file is the primary configuration. Workspace-specific files inherit these values and can override them if needed.
 
 ---
 
-## 🚢 Deployment
+## 🚢 Optional Upgrades
 
-<table>
-<tr>
-<th width="33%">Frontend</th>
-<th width="33%">Backend</th>
-<th width="33%">Database</th>
-</tr>
-<tr>
-<td>
+### Deploy to Cloud (When Ready)
 
-**Vercel**
+The template includes example deployment workflows in `.github/workflows/examples/`:
 
-1. Import from GitHub
-2. Set root: `apps/web`
-3. Add environment variables
-4. Deploy
+**Frontend Options:**
+- Vercel (recommended) - see `deploy-frontend.yml.example`
+- Netlify
+- Cloudflare Pages
+- AWS Amplify
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
+**Backend Options:**
+- DigitalOcean App Platform - see `deploy-backend.yml.example`
+- Railway
+- Fly.io
+- Render
+- AWS/GCP/Azure
 
-</td>
-<td>
+**Database Options:**
+- Keep PostgreSQL in Docker (recommended for small apps)
+- Supabase (managed PostgreSQL)
+- Neon, PlanetScale, or any PostgreSQL host
 
-**DigitalOcean**
+### Upgrade to Cloud AI
 
-1. Create App Platform app
-2. Connect GitHub repo
-3. Set Dockerfile path
-4. Configure secrets
-
-[![Deploy to DO](https://www.deploytodo.com/do-btn-blue.svg)](https://cloud.digitalocean.com/apps)
-
-</td>
-<td>
-
-**Supabase**
-
-1. Create project
-2. Get connection string
-3. Run migrations:
 ```bash
-supabase db push
+# 1. Get Claude API key from https://console.anthropic.com/
+# 2. Update .env
+AI_PROVIDER=anthropic
+ANTHROPIC_API_KEY=sk-ant-xxx
+
+# 3. Restart backend
+pnpm dev
 ```
 
-</td>
-</tr>
-</table>
+The provider layer automatically switches from Ollama to Claude.
+
+### Add External Services
+
+See `docs/OPTIONAL_SERVICES.md` for guides on adding:
+- Codecov for coverage tracking
+- Snyk for security scanning
+- Additional AI providers
+- Payment processing
+- Email services
+- Analytics
 
 ---
 
@@ -445,118 +361,105 @@ supabase db push
 # Run all tests
 pnpm turbo run test
 
-# Frontend tests with coverage
-pnpm test --filter=web -- --coverage
-
-# Backend tests with coverage
-cd apps/backend && uv run pytest --cov
-
-# E2E tests
+# Frontend tests
+pnpm test --filter=web
+pnpm test:coverage --filter=web
 pnpm test:e2e --filter=web
 
-# Health check (comprehensive system validation)
-.\scripts\health-check.ps1          # Full validation
-.\scripts\health-check.ps1 -Quick   # Quick validation (skip build/E2E)
-```
-
----
-
-## 🔧 Troubleshooting
-
-### `.env` file errors
-
-**Problem**: Getting errors about missing environment variables
-
-**Solution**:
-```bash
-# 1. Ensure .env file exists in root directory
-ls -la .env  # Should show the file
-
-# 2. Verify required variables are set
-cat .env | grep -E "ANTHROPIC_API_KEY|OPENAI_API_KEY|SUPABASE_URL"
-
-# 3. Check backend .env file
-cat apps/backend/.env | grep -E "ANTHROPIC_API_KEY|OPENAI_API_KEY"
-```
-
-### Supabase connection issues
-
-**Problem**: Cannot connect to Supabase
-
-**Solution**:
-```bash
-# Check if Supabase is running
-supabase status
-
-# Restart Supabase
-supabase stop
-supabase start
-
-# Reset database (CAUTION: destructive)
-supabase db reset
-```
-
-### Backend startup issues
-
-**Problem**: Backend fails to start
-
-**Solution**:
-```bash
-# Verify Python environment
+# Backend tests
 cd apps/backend
-uv sync
+uv run pytest
+uv run pytest --cov
+uv run pytest --cov --cov-report=html
 
-# Test imports
-uv run python -c "from src.api.main import app; print('OK')"
-
-# Check API keys are loaded
-uv run python -c "import os; from dotenv import load_dotenv; load_dotenv(); print('Anthropic:', 'OK' if os.getenv('ANTHROPIC_API_KEY') else 'MISSING')"
+# View coverage reports
+open apps/web/coverage/index.html       # Frontend
+open apps/backend/htmlcov/index.html    # Backend
 ```
 
-### Frontend build errors
-
-**Problem**: TypeScript errors during build
-
-**Solution**:
-```bash
-# Run type check to see errors
-pnpm type-check --filter=web
-
-# Clear cache and reinstall
-pnpm clean
-rm -rf node_modules
-pnpm install
-```
+**Note**: Tests run without any external services. CI/CD works out of the box.
 
 ---
 
 ## 📚 Documentation
 
-| Resource | Description |
+| Document | Description |
 |----------|-------------|
-| [Next.js Docs](https://nextjs.org/docs) | Frontend framework |
-| [FastAPI Docs](https://fastapi.tiangolo.com/) | Backend framework |
-| [LangGraph Docs](https://langchain-ai.github.io/langgraph/) | Agent orchestration |
-| [Supabase Docs](https://supabase.com/docs) | Database & auth |
-| [shadcn/ui](https://ui.shadcn.com/) | UI components |
-| [Tailwind CSS](https://tailwindcss.com/docs) | Styling |
+| [LOCAL_SETUP.md](docs/LOCAL_SETUP.md) | Docker setup & troubleshooting |
+| [AI_PROVIDERS.md](docs/AI_PROVIDERS.md) | Ollama vs Claude comparison |
+| [OPTIONAL_SERVICES.md](docs/OPTIONAL_SERVICES.md) | Deployment & upgrade guides |
+| [.github/SECRETS.md](.github/SECRETS.md) | Optional secrets reference |
+
+**Framework Documentation:**
+- [Next.js](https://nextjs.org/docs) - Frontend framework
+- [FastAPI](https://fastapi.tiangolo.com/) - Backend framework
+- [LangGraph](https://langchain-ai.github.io/langgraph/) - Agent orchestration
+- [Ollama](https://ollama.com/) - Local AI
+- [shadcn/ui](https://ui.shadcn.com/) - UI components
+
+---
+
+## 🔧 Troubleshooting
+
+### Ollama not running
+
+```bash
+# Install Ollama
+curl -fsSL https://ollama.com/install.sh | sh  # Linux/Mac
+# Windows: Download from https://ollama.com/
+
+# Pull models
+ollama pull llama3.1:8b
+ollama pull nomic-embed-text
+
+# Start Ollama
+ollama serve
+```
+
+### Database connection errors
+
+```bash
+# Check if Docker services are running
+docker compose ps
+
+# Restart services
+docker compose down
+docker compose up -d
+
+# Reset database (CAUTION: destroys data)
+docker compose down -v
+docker compose up -d
+```
+
+### Port already in use
+
+```bash
+# Check what's using the port
+lsof -i :3000   # Frontend
+lsof -i :8000   # Backend
+lsof -i :5432   # PostgreSQL
+
+# Kill the process or change ports in .env
+```
+
+**More troubleshooting**: See `docs/LOCAL_SETUP.md`
 
 ---
 
 ## 🤝 Contributing
 
-We welcome contributions! Please follow these steps:
+Contributions welcome! This is a **template project** - feel free to:
 
-1. **Fork** the repository
-2. **Create** a feature branch: `git checkout -b feature/amazing-feature`
-3. **Commit** your changes: `git commit -m 'Add amazing feature'`
-4. **Push** to the branch: `git push origin feature/amazing-feature`
-5. **Open** a Pull Request
+1. **Fork** for your own projects
+2. **Submit PRs** to improve the template
+3. **Report issues** if something doesn't work
+4. **Share** your projects built with this template
 
-Please ensure your code:
-- Passes all linting and type checks
-- Includes appropriate tests
-- Follows the existing code style
+**Guidelines:**
+- Keep it self-contained (no required external services)
+- Maintain offline-first capability
+- Document any new dependencies
+- Include tests for new features
 
 ---
 
@@ -564,14 +467,20 @@ Please ensure your code:
 
 This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
 
+**TL;DR**: Use it for anything, commercially or personally, with or without attribution.
+
 ---
 
 <div align="center">
 
-### Built with ❤️ using Claude Code
+### 🎯 Perfect For
 
-[![Claude](https://img.shields.io/badge/Powered%20by-Claude-blueviolet?style=for-the-badge)](https://anthropic.com/)
+New AI projects • Internal tools • MVPs • Learning • Experimentation
 
-**[⬆ Back to Top](#-claude-code-agent-orchestration-system)**
+### 🚀 Clone → Setup → Build
+
+No API keys • No accounts • No deployment required
+
+**[⬆ Back to Top](#-nodejs-starter-v1)**
 
 </div>
