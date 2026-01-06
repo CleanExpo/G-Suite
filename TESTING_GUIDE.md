@@ -7,7 +7,7 @@ This document provides comprehensive testing information for the entire system, 
 **Test Coverage** (Updated 2026-01-06):
 - ✅ Backend Unit Tests: **87%+** coverage
 - ✅ Frontend Unit Tests: **77%+** coverage
-- ✅ Security Tests: **Complete** (XSS, API Security)
+- ✅ Security Tests: **Complete** (XSS, API Security, OWASP ZAP)
 - ✅ Accessibility Tests: **Complete** (WCAG 2.1 AA)
 - ✅ Component Tests: **Complete** (Dashboard, Forms)
 - ✅ Integration Tests: **Complete**
@@ -16,8 +16,10 @@ This document provides comprehensive testing information for the entire system, 
 - ✅ Contract Tests: **Complete** (Pact - Frontend/Backend)
 - ✅ Visual Regression: **Complete** (Percy - 50+ snapshots)
 - ✅ Performance Tests: **Complete** (Lighthouse CI - Core Web Vitals)
+- ✅ Load Testing: **Complete** (k6 - 4 scenarios)
+- ✅ Penetration Testing: **Complete** (OWASP ZAP - Baseline + Full)
 
-**Total Test Count**: **300+ test cases**
+**Total Test Count**: **300+ test cases** | **4 load test scenarios** | **Automated security scans**
 
 ---
 
@@ -716,6 +718,204 @@ pnpm run test:lighthouse
 
 ---
 
+## Load Testing (k6) - Phase 3
+
+Load testing validates system performance under various load conditions using k6, a modern developer-centric load testing tool.
+
+### Running Load Tests
+
+```bash
+# Install k6 (one-time setup)
+# Windows: winget install k6 --source winget
+# macOS: brew install k6
+# Linux: See tests/performance/README.md
+
+# Run baseline test (50 users, 3 min)
+k6 run tests/performance/baseline-test.js
+
+# Run load test (100 users, 5 min)
+k6 run tests/performance/load-test.js
+
+# Run stress test (200 users, 10 min)
+k6 run tests/performance/stress-test.js
+
+# Run spike test (0→500→0 users)
+k6 run tests/performance/spike-test.js
+
+# Save results to JSON
+k6 run tests/performance/load-test.js --out json=results.json
+```
+
+### Load Test Scenarios
+
+**Baseline Test** (`baseline-test.js`):
+- ✅ 50 concurrent users for 3 minutes
+- ✅ Establishes performance baseline
+- ✅ Thresholds: p95 < 300ms, p99 < 500ms, errors < 0.5%
+
+**Load Test** (`load-test.js`):
+- ✅ Ramp to 100 concurrent users over 5 minutes
+- ✅ Tests normal expected load
+- ✅ Thresholds: p95 < 500ms, p99 < 1000ms, errors < 1%
+- ✅ Tests: Health check, PRD generation, status check, homepage
+
+**Stress Test** (`stress-test.js`):
+- ✅ Gradually increase to 200 users over 10 minutes
+- ✅ Finds system breaking point
+- ✅ Thresholds: p95 < 1000ms, p99 < 2000ms, errors < 5%
+- ✅ Monitors: Timeouts, error rates, response degradation
+
+**Spike Test** (`spike-test.js`):
+- ✅ Sudden spike: 0 → 500 users in 1 minute
+- ✅ Tests auto-scaling and recovery
+- ✅ Thresholds: p95 < 3000ms, p99 < 5000ms, errors < 10%
+- ✅ Measures recovery time after spike
+
+### Performance Metrics
+
+**Key Metrics Tracked**:
+- `http_req_duration`: Response time (avg, p95, p99, max)
+- `http_req_failed`: Failed request rate
+- `vus`: Virtual users (concurrent load)
+- `iterations`: Total requests completed
+- `data_received` / `data_sent`: Network throughput
+
+**Custom Metrics**:
+- `errors`: Custom error rate tracking
+- `success`: Success rate tracking
+- `prd_generation_duration`: PRD-specific performance
+- `timeouts`: Request timeout count
+
+**Performance Thresholds**:
+- Baseline: p95 < 300ms, p99 < 500ms
+- Normal Load: p95 < 500ms, p99 < 1000ms
+- Stress: p95 < 1000ms, p99 < 2000ms
+- Spike: p95 < 3000ms, p99 < 5000ms
+
+### CI/CD Integration
+
+Load tests run automatically:
+- ✅ Weekly (Sunday 00:00 UTC) - Baseline, Load, Stress tests
+- ✅ Manual trigger - All tests including Spike test
+- ✅ Results uploaded as artifacts (30 days retention)
+- ⚠️  Not on every PR (resource intensive)
+
+---
+
+## Penetration Testing (OWASP ZAP) - Phase 3
+
+OWASP ZAP (Zed Attack Proxy) performs automated security testing to identify vulnerabilities in web applications.
+
+### Running Security Scans
+
+```bash
+# Prerequisites: Docker must be installed
+
+# Baseline Scan (Passive - Safe for production)
+docker run -v $(pwd):/zap/wrk/:rw -t ghcr.io/zaproxy/zaproxy:stable \
+  zap-baseline.py \
+  -t http://host.docker.internal:3000 \
+  -c .zap/baseline-scan.yaml \
+  -r reports/zap-baseline.html
+
+# Full Scan (Active - Test/Staging ONLY)
+docker run -v $(pwd):/zap/wrk/:rw -t ghcr.io/zaproxy/zaproxy:stable \
+  zap-full-scan.py \
+  -t http://host.docker.internal:3000 \
+  -c .zap/full-scan.yaml \
+  -r reports/zap-full-scan.html
+
+# View reports
+open reports/zap-baseline.html
+```
+
+### Scan Types
+
+**Baseline Scan** (Passive):
+- ✅ Analyzes HTTP traffic without attacking
+- ✅ Safe to run on production
+- ✅ Fast execution (5-10 minutes)
+- ✅ Identifies: Missing headers, insecure cookies, info disclosure
+- ✅ Spider: Crawls application to discover endpoints
+- ✅ Automated in CI weekly
+
+**Full Scan** (Active):
+- ⚠️  Actively attacks the application
+- ⚠️  Test/Staging environments ONLY
+- ✅ Comprehensive testing (30-90 minutes)
+- ✅ Identifies: SQL injection, XSS, CSRF, path traversal, XXE
+- ✅ Tests OWASP Top 10 vulnerabilities
+- ✅ Automated in CI weekly on staging
+
+### Vulnerability Coverage
+
+**High Severity** (Build-failing):
+- SQL Injection (40018)
+- Cross-Site Scripting / XSS (40012, 40014, 40016, 40017)
+- Path Traversal (6)
+- Remote File Inclusion (7)
+- XXE - XML External Entity (90019)
+- Command Injection (90020)
+- LDAP Injection (40015)
+- Server Side Template Injection (90035)
+- Insecure Deserialization (90034)
+
+**Medium Severity** (Warnings):
+- CSRF - Cross-Site Request Forgery (10202)
+- Cookie Security (10010, 10011, 10054)
+- Authentication Issues (10101, 10102)
+- Session Management (10112)
+- Security Headers (10020, 10021, 10023, etc.)
+
+**Informational**:
+- Private IP Disclosure (2)
+- Version Disclosure (10068)
+- HTML Comments (10015)
+
+### Configuration Files
+
+`.zap/rules.tsv`:
+- Defines vulnerability severity levels
+- FAIL = Build fails if found
+- WARN = Report as warning
+- INFO = Informational only
+- IGNORE = Skip check
+
+`.zap/baseline-scan.yaml`:
+- Passive scan configuration
+- Spider settings
+- Report generation
+
+`.zap/full-scan.yaml`:
+- Active scan configuration
+- Attack policies
+- Scan duration limits
+
+### Security Reports
+
+**Report Formats**:
+- HTML: Visual report with details
+- JSON: Machine-readable results
+- Markdown: Documentation format
+- XML: Integration format
+
+**Severity Levels**:
+- 🔴 **High**: Critical vulnerabilities (fix immediately)
+- 🟠 **Medium**: Serious issues (fix within 30 days)
+- 🟡 **Low**: Minor issues (fix within 90 days)
+- 🔵 **Informational**: Best practices
+
+### CI/CD Integration
+
+ZAP scans run automatically:
+- ✅ Baseline scan: Weekly (Sunday 00:00 UTC)
+- ✅ Full scan: Weekly (Sunday 02:00 UTC) on staging
+- ✅ Manual trigger: Workflow dispatch
+- ✅ Reports uploaded as artifacts (30 days)
+- ✅ Build fails on High severity findings
+
+---
+
 ## Test Configuration
 
 ### Backend Configuration (`pytest.ini`)
@@ -1138,9 +1338,21 @@ uv run pytest --cov=src --cov-report=html
 - Advanced CI/CD workflow
 - Performance budgets and monitoring
 
+**Phase 3 Completed** (2026-01-06):
+1. Load testing with k6 (4 scenarios: baseline, load, stress, spike)
+2. Penetration testing with OWASP ZAP (baseline + full scans)
+3. Performance & security CI/CD automation
+
+**Added Phase 3**:
+- k6 load testing framework (4 test scenarios)
+- OWASP ZAP security scanning (baseline + full)
+- Automated weekly performance & security testing
+- Comprehensive vulnerability coverage (OWASP Top 10)
+
 **Next Phases** (Optional):
-- Phase 3: Load Testing (k6), OWASP ZAP penetration testing
 - Phase 4: Documentation & Metrics Dashboard
+- Performance monitoring dashboard (Grafana + InfluxDB)
+- Test metrics and trends visualization
 
 ---
 
@@ -1195,8 +1407,26 @@ uv run pytest --cov=src --cov-report=html
 - ✅ Test on mobile and slow networks
 - ✅ Fix performance regressions immediately
 
+### Load Testing (Phase 3)
+- ✅ Run baseline test before making changes
+- ✅ Use production builds, not development mode
+- ✅ Test on dedicated infrastructure (avoid local dev)
+- ✅ Monitor server resources during tests (CPU, memory, disk)
+- ✅ Compare results over time to identify trends
+- ✅ Don't run spike tests on production
+- ✅ Fix performance degradations before they reach production
+
+### Penetration Testing (Phase 3)
+- ✅ Run baseline scans weekly minimum
+- ✅ Full active scans on staging only, never production
+- ✅ Review all High severity findings immediately
+- ✅ Validate findings aren't false positives
+- ✅ Fix vulnerabilities based on severity (High: 7 days, Medium: 30 days)
+- ✅ Retest after fixes to confirm remediation
+- ✅ Keep ZAP and security rules up to date
+
 ---
 
 **Questions?** See individual test files for implementation details.
 
-**Last Updated**: 2026-01-06 (Phase 2 Complete - Contract, Visual, Performance Testing)
+**Last Updated**: 2026-01-06 (Phase 3 Complete - Load Testing & Penetration Testing)
