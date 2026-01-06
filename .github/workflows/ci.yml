@@ -188,3 +188,50 @@ jobs:
         with:
           name: e2e-test-results
           path: apps/web/test-results/
+
+  accessibility-tests:
+    name: Accessibility Tests
+    runs-on: ubuntu-latest
+    needs: [frontend-tests]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Run accessibility tests
+        working-directory: apps/web
+        run: pnpm exec playwright test tests/accessibility/
+        env:
+          CI: true
+
+      - name: Upload accessibility test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: accessibility-test-results
+          path: apps/web/test-results/
+          retention-days: 30
+
+      - name: Upload Playwright report (accessibility)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: accessibility-playwright-report
+          path: apps/web/playwright-report/
+          retention-days: 30
