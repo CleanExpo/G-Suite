@@ -1,7 +1,7 @@
 # Skills Index
 
-**Total Skills**: 35+
-**Last Updated**: Phase 2 Complete
+**Total Skills**: 36+
+**Last Updated**: Ralph Wiggum Technique Added
 
 ---
 
@@ -91,13 +91,14 @@ Supabase, PostgreSQL migrations, Australian compliance.
 
 ---
 
-### Workflow (2 skills)
-Feature development and bug fixing workflows.
+### Workflow (3 skills)
+Feature development, bug fixing, and autonomous task completion workflows.
 
 | Skill | Priority | Auto-load | Description |
 |-------|----------|-----------|-------------|
 | **feature-development.skill.md** | 3 | ❌ | 6-phase workflow (Requirements → Design → Implementation → Testing → Documentation → PR), TDD-first, Australian context |
 | **bug-fixing.skill.md** | 3 | ❌ | 7-phase workflow (Reproduce → Locate → Root Cause → Fix → Regression Test → Document → PR), en-AU error messages |
+| **ralph-wiggum.skill.md** | 2 | ❌ | Autonomous task loop (PRD → progress.txt → verification → commit), Matt Pocock/Jeffrey Huntley technique |
 
 ---
 
@@ -129,8 +130,9 @@ Critical skills loaded when relevant tasks are detected.
 | **blue-ocean.skill.md** | Search Dominance | Opportunity discovery |
 | **geo-australian.skill.md** | Australian | Australian GEO optimization |
 | **project-context.skill.md** | Context | Project-specific knowledge |
+| **ralph-wiggum.skill.md** | Workflow | Autonomous task completion loop |
 
-**Total**: 7 skills
+**Total**: 8 skills
 
 ---
 
@@ -187,6 +189,7 @@ These 4 skills are **ALWAYS** loaded on every response:
 | **Content** | truth-finder.skill.md |
 | **New Feature** | feature-development.skill.md, foundation-first.skill.md |
 | **Bug Fix** | bug-fixing.skill.md, error-handling.skill.md |
+| **Autonomous Loop** | ralph-wiggum.skill.md, verification-first.skill.md |
 
 #### By Agent
 | Agent | Skills Pre-loaded |
@@ -200,6 +203,7 @@ These 4 skills are **ALWAYS** loaded on every response:
 | **Frontend Specialist** | nextjs.skill.md, components.skill.md, design-system.skill.md |
 | **Backend Specialist** | fastapi.skill.md, langgraph.skill.md, advanced-tool-use.skill.md |
 | **Database Specialist** | supabase.skill.md, migrations.skill.md |
+| **Ralph Wiggum** | ralph-wiggum.skill.md, verification-first.skill.md, feature-development.skill.md |
 
 ---
 
