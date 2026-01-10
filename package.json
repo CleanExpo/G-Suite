@@ -51,5 +51,8 @@
     "*.{json,md,yml,yaml}": [
       "prettier --write"
     ]
+  },
+  "dependencies": {
+    "prettier-plugin-tailwindcss": "^0.7.2"
   }
 }
