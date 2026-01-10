@@ -264,6 +264,106 @@ else
     check_fail "Backend .venv not found (run: cd apps/backend && uv sync)"
 fi
 
+# Check 6.5: Dependency Integrity
+print_header "6.5 Dependency Integrity"
+
+# Source dependency check functions
+if [ -f "scripts/dependency-checks.sh" ]; then
+    source scripts/dependency-checks.sh
+else
+    check_fail "scripts/dependency-checks.sh not found"
+fi
+
+# Check lockfile integrity
+check_info "Checking pnpm-lock.yaml integrity..."
+LOCKFILE_RESULT=$(check_lockfile_integrity)
+LOCKFILE_EXIT=$?
+
+if [ $LOCKFILE_EXIT -eq 0 ]; then
+    check_pass "Lockfile is valid and synchronized"
+elif [ $LOCKFILE_EXIT -eq 1 ]; then
+    check_fail "$(echo "$LOCKFILE_RESULT" | cut -d':' -f3-)"
+    echo "   Fix: pnpm install"
+else
+    check_warn "$(echo "$LOCKFILE_RESULT" | cut -d':' -f3-)"
+    echo "   Recommended: pnpm install"
+fi
+
+# Check each workspace
+WORKSPACES=("." "apps/web" "packages/shared" "packages/config")
+for WORKSPACE in "${WORKSPACES[@]}"; do
+    if [ ! -f "$WORKSPACE/package.json" ]; then
+        continue
+    fi
+
+    check_info "Verifying: $WORKSPACE"
+
+    # Check dependency synchronization
+    SYNC_OUTPUT=$(check_dependency_sync "$WORKSPACE" 2>&1)
+    SYNC_EXIT=$?
+
+    if [ $SYNC_EXIT -eq 0 ]; then
+        check_pass "$WORKSPACE: Dependencies synchronized"
+    else
+        # Parse issues
+        MISSING_COUNT=$(echo "$SYNC_OUTPUT" | grep -c "^MISSING:" || true)
+        MISMATCH_COUNT=$(echo "$SYNC_OUTPUT" | grep -c "^MISMATCH:" || true)
+
+        if [ $MISSING_COUNT -gt 0 ]; then
+            check_fail "$WORKSPACE: $MISSING_COUNT missing dependencies"
+            echo "$SYNC_OUTPUT" | grep "^MISSING:" | head -3 | while IFS=: read TYPE PKG VERSION INSTALLED; do
+                echo "     - $PKG@$VERSION not installed"
+            done
+            if [ $MISSING_COUNT -gt 3 ]; then
+                echo "     ... and $((MISSING_COUNT - 3)) more"
+            fi
+            echo "   Fix: pnpm install --filter=$WORKSPACE"
+        fi
+
+        if [ $MISMATCH_COUNT -gt 0 ]; then
+            check_warn "$WORKSPACE: $MISMATCH_COUNT version mismatches"
+            echo "$SYNC_OUTPUT" | grep "^MISMATCH:" | head -3 | while IFS=: read TYPE PKG VERSION INSTALLED; do
+                echo "     - $PKG: declared=$VERSION, installed=$INSTALLED"
+            done
+            if [ $MISMATCH_COUNT -gt 3 ]; then
+                echo "     ... and $((MISMATCH_COUNT - 3)) more"
+            fi
+            echo "   Fix: pnpm install"
+        fi
+    fi
+
+    # Check for orphaned dependencies (warning only)
+    ORPHAN_OUTPUT=$(check_orphaned_dependencies "$WORKSPACE" 2>&1 || true)
+    ORPHAN_COUNT=$(echo "$ORPHAN_OUTPUT" | grep -c "^ORPHANED:" || true)
+
+    if [ $ORPHAN_COUNT -gt 0 ]; then
+        check_warn "$WORKSPACE: $ORPHAN_COUNT orphaned dependencies"
+        echo "$ORPHAN_OUTPUT" | grep "^ORPHANED:" | head -3 | while IFS=: read TYPE PKG VERSION; do
+            echo "     - $PKG@$VERSION (not in package.json)"
+        done
+        if [ $ORPHAN_COUNT -gt 3 ]; then
+            echo "     ... and $((ORPHAN_COUNT - 3)) more"
+        fi
+        echo "   Fix: pnpm prune"
+    fi
+done
+
+# Check workspace consistency
+check_info "Checking workspace consistency..."
+CONSISTENCY_OUTPUT=$(check_workspace_consistency 2>&1 || true)
+CONSISTENCY_EXIT=$?
+
+if [ $CONSISTENCY_EXIT -eq 0 ]; then
+    check_pass "Workspace dependencies are consistent"
+else
+    CONFLICT_COUNT=$(echo "$CONSISTENCY_OUTPUT" | grep -c "^CONFLICT:" || true)
+    if [ $CONFLICT_COUNT -gt 0 ]; then
+        check_warn "Found $CONFLICT_COUNT dependency conflicts"
+        echo "$CONSISTENCY_OUTPUT" | head -15
+        echo "   Recommended: Align dependency versions across workspaces"
+    fi
+fi
+
 # Check 7: Service Health (if services are supposed to be running)
 print_header "7. Service Health"
 
