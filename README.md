@@ -1074,4 +1074,10 @@ git clone https://github.com/CleanExpo/NodeJS-Starter-V1.git && cd NodeJS-Starte
 
 **[⬆ Back to Top](#-nodejs-starter-v1)**
 
+---
+
+<p align="center">
+  <sub>Last Updated: 2026-01-11 • Maintained By: Development Team</sub>
+</p>
+
 </div>
