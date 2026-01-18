@@ -40,8 +40,14 @@ export default function RootLayout({
             }}
         >
             <html lang="en">
-                <body className={inter.className} suppressHydrationWarning>{children}</body>
+                <body className={inter.className} suppressHydrationWarning>
+                    <SignedOut>
+                        <RedirectToSignIn />
+                    </SignedOut>
+                    {children}
+                </body>
             </html>
         </ClerkProvider>
     );
 }
+```
