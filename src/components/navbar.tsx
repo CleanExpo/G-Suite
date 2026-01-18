@@ -39,12 +39,12 @@ export function Navbar() {
       }}
       className="fixed top-0 z-50 bg-white/70 dark:bg-[#0b0e14]/80 backdrop-blur-3xl border-b border-gray-200 dark:border-white/10 transition-colors shadow-2xl shadow-black/5"
     >
-      <div className="max-w-[1600px] mx-auto h-full px-12 flex items-center justify-between">
+      <div className="max-w-[1600px] mx-auto h-full px-4 md:px-12 flex items-center justify-between gap-4">
         {/* Branding Block */}
         <Link href="/" className="flex items-center gap-6 group">
           <motion.div
             whileHover={{ rotate: 5, scale: 1.05 }}
-            className="relative w-20 h-20 overflow-hidden"
+            className="relative w-12 h-12 md:w-20 md:h-20 overflow-hidden shrink-0"
           >
             <Image
               src="/assets/brand/g-pilot-shield-3d-v2.png"
@@ -54,22 +54,22 @@ export function Navbar() {
             />
           </motion.div>
           <div className="flex flex-col">
-            <span className="font-black text-3xl lg:text-4xl text-gray-900 dark:text-white tracking-tighter leading-none uppercase italic flex items-center gap-3">
+            <span className="font-black text-xl md:text-3xl lg:text-4xl text-gray-900 dark:text-white tracking-tighter leading-none uppercase italic flex items-center gap-2 md:gap-3">
               G-PILOT
               <motion.span
                 animate={{ opacity: [1, 0.5, 1] }}
                 transition={{ duration: 2, repeat: Infinity }}
-                className="w-3 h-3 rounded-full bg-blue-600 shadow-[0_0_10px_rgba(37,99,235,0.8)]"
+                className="w-2 h-2 md:w-3 md:h-3 rounded-full bg-blue-600 shadow-[0_0_10px_rgba(37,99,235,0.8)]"
               />
             </span>
-            <span className="text-xs uppercase tracking-[0.5em] text-blue-600 dark:text-blue-400 font-black mt-1">
+            <span className="text-[8px] md:text-xs uppercase tracking-[0.2em] md:tracking-[0.5em] text-blue-600 dark:text-blue-400 font-black mt-1 whitespace-nowrap">
               Algorithm Dominance Node
             </span>
           </div>
         </Link>
 
         {/* Tactical Navigation */}
-        <div className="hidden lg:flex items-center gap-10">
+        <div className="hidden xl:flex items-center gap-10">
           {[
             { label: 'Platform', href: '/platform' },
             { label: 'Solutions', href: '/solutions' },
@@ -102,7 +102,7 @@ export function Navbar() {
 
           <SignedOut>
             <SignInButton mode="modal">
-              <button className="h-16 px-10 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-black text-sm uppercase tracking-widest shadow-[0_15px_40px_rgba(37,99,235,0.3)] transition-all hover:scale-105 active:scale-95 flex items-center gap-3">
+              <button className="h-12 md:h-16 px-6 md:px-10 bg-blue-600 hover:bg-blue-700 text-white rounded-xl md:rounded-2xl font-black text-[10px] md:text-sm uppercase tracking-widest shadow-[0_15px_40px_rgba(37,99,235,0.3)] transition-all hover:scale-105 active:scale-95 flex items-center gap-2 md:gap-3 whitespace-nowrap">
                 Ignite Protocol
               </button>
             </SignInButton>

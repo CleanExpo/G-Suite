@@ -39,7 +39,9 @@ export function EcosystemVisual() {
             <div className="absolute inset-0 z-10">
                 {TOOLS.map((tool, i) => {
                     const angle = (i / TOOLS.length) * Math.PI * 2;
-                    const radius = 350;
+                    // Responsive radius
+                    const radius = typeof window !== 'undefined' && window.innerWidth < 768 ? 160 :
+                        typeof window !== 'undefined' && window.innerWidth < 1024 ? 240 : 350;
                     const x = Math.cos(angle) * radius;
                     const y = Math.sin(angle) * radius;
 

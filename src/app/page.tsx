@@ -54,27 +54,27 @@ export default function LandingPage() {
               The Ultimate Bridge for AI Mastery
             </div>
 
-            <h1 className="text-7xl lg:text-[9rem] font-black tracking-tighter text-gray-900 dark:text-white leading-[0.8] uppercase group font-tactical italic">
-              Architect Your <br />
+            <h1 className="text-4xl md:text-7xl lg:text-[9rem] font-black tracking-tighter text-gray-900 dark:text-white leading-[0.8] uppercase group font-tactical italic">
+              Architect Your <br className="hidden md:block" />
               <span className="text-blue-600 transition-colors font-serif-emphasis normal-case drop-shadow-2xl">
                 Future with G-Pilot.
               </span>
             </h1>
 
-            <p className="text-xl lg:text-3xl text-gray-600 dark:text-gray-400 leading-relaxed font-medium max-w-xl">
+            <p className="text-lg md:text-xl lg:text-3xl text-gray-600 dark:text-gray-400 leading-relaxed font-medium max-w-xl">
               The only platform that seamlessly integrates 20+ Google AI Studio tools into one unified workflow.{' '}
               <span className="text-blue-600 font-bold underline decoration-blue-600/20 underline-offset-8">Master innovation</span> without the learning curve.
             </p>
 
-            <div className="flex flex-wrap items-center gap-8 pt-6">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-8 pt-6">
               <SignInButton mode="modal">
-                <button className="h-24 px-14 bg-blue-600 hover:bg-blue-700 text-white rounded-[2.5rem] font-black text-2xl shadow-[0_20px_60px_rgba(37,99,235,0.4)] flex items-center gap-4 transition-all hover:scale-105 active:scale-95 group relative overflow-hidden">
+                <button className="h-16 md:h-24 px-8 md:px-14 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl md:rounded-[2.5rem] font-black text-lg md:text-2xl shadow-[0_20px_60px_rgba(37,99,235,0.4)] flex items-center justify-center gap-4 transition-all hover:scale-105 active:scale-95 group relative overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                   Unleash G-Pilot Now
                 </button>
               </SignInButton>
-              <Link href="/abilities">
-                <button className="h-24 px-12 rounded-[2.5rem] font-black text-xl text-gray-500 hover:text-gray-900 dark:hover:text-white transition-all flex items-center gap-3 border-4 border-transparent hover:border-blue-600/10">
+              <Link href="/abilities" className="w-full sm:w-auto">
+                <button className="h-16 md:h-24 w-full px-8 md:px-12 rounded-2xl md:rounded-[2.5rem] font-black text-lg md:text-xl text-gray-500 hover:text-gray-900 dark:hover:text-white transition-all flex items-center justify-center gap-3 border-4 border-transparent hover:border-blue-600/10">
                   Explore Ecosystem
                 </button>
               </Link>
@@ -82,10 +82,10 @@ export default function LandingPage() {
           </motion.div>
 
           {/* Right: The Ecosystem Visual (3D Brand Hub) */}
-          <div className="relative h-[800px] flex items-center justify-center">
+          <div className="relative h-[400px] md:h-[600px] lg:h-[800px] flex items-center justify-center">
             <motion.div
               style={{ y, opacity, scale }}
-              className="w-full h-full"
+              className="w-full h-full scale-50 md:scale-75 lg:scale-100"
             >
               <EcosystemVisual />
             </motion.div>
@@ -94,14 +94,14 @@ export default function LandingPage() {
       </section>
 
       {/* 2. Trusted By Sector (3D Depth) */}
-      <section className="py-32 px-6 border-y border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.02] backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          <div className="space-y-8">
+      <section id="partners" className="scroll-mt-32 py-24 md:py-32 px-6 border-y border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.02] backdrop-blur-xl">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          <div className="space-y-6 md:space-y-8">
             <h3 className="text-sm font-black uppercase tracking-[0.5em] text-blue-600 dark:text-blue-400">
               Trusted Partners
             </h3>
-            <h2 className="text-6xl font-black italic tracking-tighter text-gray-900 dark:text-white uppercase leading-none">
-              Powered By <br />
+            <h2 className="text-4xl md:text-6xl font-black italic tracking-tighter text-gray-900 dark:text-white uppercase leading-none">
+              Powered By <br className="hidden md:block" />
               <span className="text-blue-600 font-serif-emphasis normal-case">
                 Vanguard Industry Nodes.
               </span>

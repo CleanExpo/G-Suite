@@ -32,7 +32,7 @@ export function TacticalBox({
       whileInView={{ opacity: 1, scale: 1 }}
       viewport={{ once: true }}
       whileHover={{ boxShadow: '0 40px 100px rgba(0,0,0,0.1)' }}
-      className={`group p-12 rounded-[4.5rem] bg-white dark:bg-white/[0.02] border border-gray-100 dark:border-white/5 hover:border-blue-500/30 relative overflow-hidden perspective-[2000px] ${className}`}
+      className={`group p-6 md:p-12 rounded-[2.5rem] md:rounded-[4.5rem] bg-white dark:bg-white/[0.02] border border-gray-100 dark:border-white/5 hover:border-blue-500/30 relative overflow-hidden perspective-[2000px] ${className}`}
     >
       {/* 3D Depth Backdrop */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
@@ -63,8 +63,8 @@ export function TacticalBox({
         )}
 
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-3xl font-black italic uppercase tracking-tighter dark:text-white leading-tight underline decoration-blue-600/10 underline-offset-8 group-hover:decoration-blue-600/50 transition-all">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <h3 className="text-xl md:text-3xl font-black italic uppercase tracking-tighter dark:text-white leading-tight underline decoration-blue-600/10 underline-offset-8 group-hover:decoration-blue-600/50 transition-all">
               {title}
             </h3>
             {badge && (
