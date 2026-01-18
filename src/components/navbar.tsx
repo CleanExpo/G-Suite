@@ -1,5 +1,6 @@
 'use client';
 
+import * as React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { SignInButton, UserButton, SignedIn, SignedOut } from '@clerk/nextjs';
@@ -7,12 +8,24 @@ import { ThemeToggle } from './theme-toggle';
 import { motion, useScroll, useTransform } from 'framer-motion';
 
 export function Navbar() {
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const { scrollY } = useScroll();
   const height = useTransform(scrollY, [0, 50], [120, 80]);
   const backgroundSize = useTransform(scrollY, [0, 50], ['100%', '95%']);
   const borderRadius = useTransform(scrollY, [0, 50], [0, 32]);
   const marginTop = useTransform(scrollY, [0, 50], [0, 16]);
   const borderOpacity = useTransform(scrollY, [0, 50], [0.1, 0.2]);
+
+  if (!mounted) {
+    return (
+      <nav className="fixed top-0 left-1/2 -translate-x-1/2 z-50 bg-white/70 dark:bg-[#0b0e14]/80 backdrop-blur-3xl border-b border-gray-200 dark:border-white/10 w-full h-[120px]" />
+    );
+  }
 
   return (
     <motion.nav

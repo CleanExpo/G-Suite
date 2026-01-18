@@ -148,7 +148,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             disableTransitionOnChange
           >
             <SystemBanner />
-            <div className="relative pt-[env(safe-area-inset-top)]">{children}</div>
+            {children}
             <Footer />
           </ThemeProvider>
         </body>
