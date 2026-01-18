@@ -1,9 +1,8 @@
 import type { Metadata } from 'next';
 import { Inter, Outfit, DM_Serif_Display } from 'next/font/google';
 import './globals.css';
-import { ClerkProvider } from '@clerk/nextjs';
-import { dark } from '@clerk/themes';
 import { ThemeProvider } from '@/components/theme-provider';
+import { AuthProvider } from '@/components/auth/auth-provider';
 import { Footer } from '@/components/footer';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
@@ -16,6 +15,12 @@ const dmSerif = DM_Serif_Display({
 });
 
 const appUrl = 'https://g-pilot.app';
+
+// Check if Supabase is configured
+const isSupabaseConfigured = !!(
+  process.env.NEXT_PUBLIC_SUPABASE_URL &&
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+);
 
 export const metadata: Metadata = {
   metadataBase: new URL(appUrl),
@@ -109,50 +114,43 @@ const jsonLd = {
 
 import { SystemBanner } from '@/components/ui/system-banner';
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+// Development mode banner component
+function DevModeBanner() {
   return (
-    <ClerkProvider
-      appearance={{
-        baseTheme: dark,
-        variables: {
-          colorPrimary: '#0b57d0',
-          colorBackground: '#0d1117',
-          colorText: '#ffffff',
-          colorInputBackground: '#161b22',
-          colorInputText: '#ffffff',
-        },
-        elements: {
-          card: 'bg-[#0d1117] border border-white/5 shadow-2xl rounded-3xl',
-          navbar: 'bg-[#0d1117]',
-          footer: 'bg-[#0d1117]',
-          headerTitle: 'text-white font-black italic uppercase tracking-tighter',
-          headerSubtitle: 'text-slate-500',
-          socialButtonsBlockButton: 'bg-white/5 border-white/5 hover:bg-white/10 text-white',
-          formButtonPrimary:
-            'bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-widest py-3 rounded-2xl transition-all shadow-lg shadow-blue-600/20',
-        },
-      }}
-    >
-      <html lang="en" suppressHydrationWarning>
-        <head>
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-          />
-        </head>
-        <body className={`${inter.variable} ${outfit.variable} ${dmSerif.variable} font-sans`}>
+    <div className="fixed top-0 left-0 right-0 z-[9999] bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white text-center py-2 px-4 text-sm font-bold shadow-lg">
+      ⚠️ DEV MODE - Authentication Bypassed | <span className="font-mono">Set SUPABASE keys in .env to enable auth</span>
+    </div>
+  );
+}
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const showDevBanner = !isSupabaseConfigured;
+
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
+      <body className={`${inter.variable} ${outfit.variable} ${dmSerif.variable} font-sans`}>
+        <AuthProvider>
           <ThemeProvider
             attribute="class"
             defaultTheme="dark"
             enableSystem
             disableTransitionOnChange
           >
-            <SystemBanner />
-            {children}
-            <Footer />
+            {showDevBanner && <DevModeBanner />}
+            <div className={showDevBanner ? 'pt-10' : ''}>
+              <SystemBanner />
+              {children}
+              <Footer />
+            </div>
           </ThemeProvider>
-        </body>
-      </html>
-    </ClerkProvider>
+        </AuthProvider>
+      </body>
+    </html>
   );
 }

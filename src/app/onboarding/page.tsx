@@ -2,17 +2,14 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useUser } from '@clerk/nextjs';
+import { useAuth } from '@/components/auth/auth-provider';
 import {
   ArrowRight,
   Globe,
   Lock,
-  Check,
   Loader2,
   Link as LinkIcon,
   Shield,
-  Laptop,
-  Zap,
   Cpu,
 } from 'lucide-react';
 import { completeOnboarding } from '@/actions/onboarding.actions';
@@ -20,7 +17,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
 export default function OnboardingPage() {
-  const { user } = useUser();
+  const { user } = useAuth();
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);

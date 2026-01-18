@@ -1,6 +1,6 @@
 'use server';
 
-import { auth } from '@clerk/nextjs/server';
+import { getAuthUserIdOrDev } from '@/lib/supabase/auth';
 import { app as workflow } from '@/graph/workflow';
 import { revalidatePath } from 'next/cache';
 
@@ -10,10 +10,7 @@ import { revalidatePath } from 'next/cache';
  */
 export async function runMission(query: string) {
   // 1. Security Check
-  const { userId } = await auth();
-  if (!userId) {
-    throw new Error('Unauthorized: Commander identification required.');
-  }
+  const userId = await getAuthUserIdOrDev();
 
   console.log(`🚀 Mission Initiated by ${userId}: ${query}`);
 

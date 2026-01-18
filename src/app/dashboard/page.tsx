@@ -1,23 +1,18 @@
 'use client';
 
-import { useState, useEffect, Suspense, useRef } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { getWalletData } from '@/actions/wallet-actions';
-import { UserButton, SignedIn, SignedOut, SignInButton } from '@clerk/nextjs';
+import { useAuth } from '@/components/auth/auth-provider';
 import {
   Wallet,
   Rocket,
   Activity,
-  CreditCard,
   Plus,
   ArrowRight,
-  Loader2,
   AlertCircle,
   CheckCircle2,
-  ChevronRight,
-  Zap,
   Cpu,
   Target,
-  Layout,
   Shield,
   History,
   Lock as LockIcon,
@@ -336,6 +331,7 @@ function DashboardContent() {
     message: string;
   } | null>(null);
 
+  const { user, isLoading } = useAuth();
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -376,8 +372,8 @@ function DashboardContent() {
           >
             <div
               className={`p-6 rounded-[2rem] border shadow-[0_30px_60px_rgba(0,0,0,0.1)] flex items-center gap-6 ${notification.type === 'success'
-                  ? 'bg-emerald-600 text-white border-emerald-500'
-                  : 'bg-blue-600 text-white border-blue-500'
+                ? 'bg-emerald-600 text-white border-emerald-500'
+                : 'bg-blue-600 text-white border-blue-500'
                 }`}
             >
               <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center border border-white/30 backdrop-blur-md">
@@ -403,14 +399,20 @@ function DashboardContent() {
       </AnimatePresence>
 
       <main className="relative z-10 p-6 md:p-12 lg:pt-32 max-w-7xl mx-auto">
-        <SignedIn>
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center py-40 gap-8">
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+              className="w-20 h-20 rounded-[2rem] border-4 border-blue-600 border-t-transparent shadow-2xl shadow-blue-600/20"
+            />
+          </div>
+        ) : user ? (
           <AuthenticatedDashboard
             onOpenModal={() => setIsModalOpen(true)}
             onOpenCreditDialog={() => setIsCreditDialogOpen(true)}
           />
-        </SignedIn>
-
-        <SignedOut>
+        ) : (
           <div className="text-center py-40 space-y-12">
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
@@ -428,15 +430,15 @@ function DashboardContent() {
               dashboard and mission ledger.
             </p>
             <div className="flex items-center justify-center gap-8 pt-12 text-center">
-              <SignInButton mode="modal">
+              <Link href="/sign-in">
                 <button className="h-16 md:h-24 px-8 md:px-16 bg-blue-600 text-white rounded-2xl md:rounded-[2rem] font-black text-lg md:text-2xl hover:scale-105 transition-all shadow-[0_30px_60px_rgba(37,99,235,0.3)] active:scale-95 group flex items-center gap-4 mx-auto">
                   Initialize Login{' '}
                   <ArrowRight className="w-6 h-6 md:w-8 md:h-8 group-hover:translate-x-3 transition-transform" />
                 </button>
-              </SignInButton>
+              </Link>
             </div>
           </div>
-        </SignedOut>
+        )}
       </main>
 
       <AnimatePresence>

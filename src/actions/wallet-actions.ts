@@ -1,20 +1,16 @@
 'use server';
 
 import prisma from '../prisma';
-import { auth } from '@clerk/nextjs/server';
+import { getAuthUserIdOrDev } from '@/lib/supabase/auth';
 
 /**
  * Fetches the wallet data for the current authenticated user.
  */
 export async function getWalletData() {
-  const { userId } = await auth();
-
-  if (!userId) {
-    throw new Error('Unauthorized');
-  }
+  const userId = await getAuthUserIdOrDev();
 
   const wallet = await prisma.userWallet.findUnique({
-    where: { clerkId: userId },
+    where: { clerkId: userId }, // Note: 'clerkId' field name kept for backwards compatibility
     include: {
       transactions: {
         orderBy: { createdAt: 'desc' },

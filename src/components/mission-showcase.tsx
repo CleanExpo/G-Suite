@@ -66,17 +66,19 @@ export function MissionShowcase() {
           <AnimatePresence mode="wait">
             <motion.div
               key={index}
-              initial={{ opacity: 0, scale: 0.95, x: 20 }}
-              animate={{ opacity: 1, scale: 1, x: 0 }}
-              exit={{ opacity: 0, scale: 1.05, x: -20 }}
-              transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.4, ease: 'easeOut' }}
               className="absolute inset-0"
             >
               <Image
                 src={current.image}
                 alt={current.title}
                 fill
-                className="object-cover opacity-90 group-hover:scale-110 transition-transform duration-700"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="object-cover opacity-90"
+                loading="lazy"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
             </motion.div>

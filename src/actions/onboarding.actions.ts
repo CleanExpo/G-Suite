@@ -2,7 +2,7 @@
 
 import prisma from '@/prisma';
 import { encrypt } from '@/lib/encryption';
-import { currentUser } from '@clerk/nextjs/server';
+import { getAuthUserIdOrDev } from '@/lib/supabase/auth';
 import { revalidatePath } from 'next/cache';
 
 interface OnboardingData {
@@ -14,12 +14,11 @@ interface OnboardingData {
 }
 
 export async function completeOnboarding(data: OnboardingData) {
-  const user = await currentUser();
-  if (!user) throw new Error('Unauthorized');
+  const userId = await getAuthUserIdOrDev();
 
   // 1. Encrypt existing and new keys if provided
   const updateData: any = {
-    clerkId: user.id,
+    clerkId: userId,
     onboardingCompleted: true,
   };
 
@@ -54,7 +53,7 @@ export async function completeOnboarding(data: OnboardingData) {
   // 3. Upsert to DB
   // @ts-ignore - Prisma client regeneration may be needed
   await prisma.userProfile.upsert({
-    where: { clerkId: user.id },
+    where: { clerkId: userId },
     update: updateData,
     create: updateData,
   });

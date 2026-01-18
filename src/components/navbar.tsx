@@ -3,12 +3,13 @@
 import * as React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { SignInButton, UserButton, SignedIn, SignedOut } from '@clerk/nextjs';
 import { ThemeToggle } from './theme-toggle';
 import { motion, useScroll, useTransform } from 'framer-motion';
+import { useAuth } from '@/components/auth/auth-provider';
 
 export function Navbar() {
   const [mounted, setMounted] = React.useState(false);
+  const { user, isLoading, signOut } = useAuth();
 
   React.useEffect(() => {
     setMounted(true);
@@ -19,7 +20,6 @@ export function Navbar() {
   const backgroundSize = useTransform(scrollY, [0, 50], ['100%', '95%']);
   const borderRadius = useTransform(scrollY, [0, 50], [0, 32]);
   const marginTop = useTransform(scrollY, [0, 50], [0, 16]);
-  const borderOpacity = useTransform(scrollY, [0, 50], [0.1, 0.2]);
 
   if (!mounted) {
     return (
@@ -100,27 +100,32 @@ export function Navbar() {
         <div className="flex items-center gap-6">
           <ThemeToggle />
 
-          <SignedOut>
-            <SignInButton mode="modal">
+          {isLoading ? (
+            <div className="h-12 w-32 bg-white/5 rounded-xl animate-pulse" />
+          ) : user ? (
+            // Signed In State
+            <div className="flex items-center gap-4">
+              <Link
+                href="/dashboard"
+                className="h-12 md:h-14 px-6 md:px-8 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-xl md:rounded-2xl font-bold text-xs md:text-sm transition-all flex items-center gap-2"
+              >
+                Dashboard
+              </Link>
+              <button
+                onClick={() => signOut()}
+                className="relative w-12 h-12 rounded-xl border border-white/10 bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center text-white font-bold text-lg shadow-lg hover:scale-105 transition-all"
+              >
+                {user.email?.charAt(0).toUpperCase() || 'U'}
+              </button>
+            </div>
+          ) : (
+            // Signed Out State
+            <Link href="/sign-in">
               <button className="h-12 md:h-16 px-6 md:px-10 bg-blue-600 hover:bg-blue-700 text-white rounded-xl md:rounded-2xl font-black text-[10px] md:text-sm uppercase tracking-widest shadow-[0_15px_40px_rgba(37,99,235,0.3)] transition-all hover:scale-105 active:scale-95 flex items-center gap-2 md:gap-3 whitespace-nowrap">
                 Ignite Protocol
               </button>
-            </SignInButton>
-          </SignedOut>
-
-          <SignedIn>
-            <div className="flex items-center gap-6">
-              <UserButton
-                afterSignOutUrl="/"
-                appearance={{
-                  elements: {
-                    avatarBox:
-                      'w-12 h-12 rounded-xl border border-gray-200 dark:border-white/10 shadow-sm',
-                  },
-                }}
-              />
-            </div>
-          </SignedIn>
+            </Link>
+          )}
         </div>
       </div>
 

@@ -1,6 +1,6 @@
 'use server';
 
-import { auth } from '@clerk/nextjs/server';
+import { getAuthUserIdOrDev } from '@/lib/supabase/auth';
 import { stripe } from '@/lib/stripe';
 import { headers } from 'next/headers';
 
@@ -32,13 +32,9 @@ const PACKAGES = {
 };
 
 export async function createCheckoutSession(packageKey: keyof typeof PACKAGES) {
-  const { userId } = await auth();
+  const userId = await getAuthUserIdOrDev();
   const headerList = await headers();
   const origin = headerList.get('origin');
-
-  if (!userId) {
-    throw new Error('Unauthorized');
-  }
 
   const pkg = PACKAGES[packageKey];
 

@@ -1,17 +1,41 @@
 'use client';
 
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { SignInButton } from '@clerk/nextjs';
 import Link from 'next/link';
 import Image from 'next/image';
+import dynamic from 'next/dynamic';
 import { Navbar } from '@/components/navbar';
-import { MissionShowcase } from '@/components/mission-showcase';
-import { TacticalBox } from '@/components/ui/tactical-box';
-import { TacticalTabs } from '@/components/ui/tactical-tabs';
-import { CommandCTA } from '@/components/ui/command-cta';
-import { EcosystemVisual } from '@/components/ui/ecosystem-visual';
-import { MissionSimulator } from '@/components/ui/mission-simulator';
-import { useRef } from 'react';
+import { useRef, Suspense } from 'react';
+
+// Dynamic imports for below-the-fold heavy components - significantly improves initial load
+const MissionShowcase = dynamic(() => import('@/components/mission-showcase').then(mod => ({ default: mod.MissionShowcase })), {
+  loading: () => <div className="w-full h-96 bg-gray-100 dark:bg-gray-900/20 rounded-[4rem] animate-pulse" />,
+  ssr: false,
+});
+
+const TacticalBox = dynamic(() => import('@/components/ui/tactical-box').then(mod => ({ default: mod.TacticalBox })), {
+  ssr: true,
+});
+
+const TacticalTabs = dynamic(() => import('@/components/ui/tactical-tabs').then(mod => ({ default: mod.TacticalTabs })), {
+  loading: () => <div className="w-full h-96 bg-gray-100 dark:bg-gray-900/20 rounded-3xl animate-pulse" />,
+  ssr: false,
+});
+
+const CommandCTA = dynamic(() => import('@/components/ui/command-cta').then(mod => ({ default: mod.CommandCTA })), {
+  ssr: true,
+});
+
+const EcosystemVisual = dynamic(() => import('@/components/ui/ecosystem-visual').then(mod => ({ default: mod.EcosystemVisual })), {
+  loading: () => <div className="w-full h-full flex items-center justify-center"><div className="w-60 h-60 bg-gray-100 dark:bg-gray-900/20 rounded-full animate-pulse" /></div>,
+  ssr: false,
+});
+
+const MissionSimulator = dynamic(() => import('@/components/ui/mission-simulator').then(mod => ({ default: mod.MissionSimulator })), {
+  loading: () => <div className="w-full h-64 bg-gray-900 rounded-[4rem] animate-pulse" />,
+  ssr: false,
+});
+
 
 export default function LandingPage() {
   const targetRef = useRef(null);
@@ -67,12 +91,12 @@ export default function LandingPage() {
             </p>
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-8 pt-6">
-              <SignInButton mode="modal">
+              <Link href="/sign-in">
                 <button className="h-16 md:h-24 px-8 md:px-14 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl md:rounded-[2.5rem] font-black text-lg md:text-2xl shadow-[0_20px_60px_rgba(37,99,235,0.4)] flex items-center justify-center gap-4 transition-all hover:scale-105 active:scale-95 group relative overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                   Unleash G-Pilot Now
                 </button>
-              </SignInButton>
+              </Link>
               <Link href="/abilities" className="w-full sm:w-auto">
                 <button className="h-16 md:h-24 w-full px-8 md:px-12 rounded-2xl md:rounded-[2.5rem] font-black text-lg md:text-xl text-gray-500 hover:text-gray-900 dark:hover:text-white transition-all flex items-center justify-center gap-3 border-4 border-transparent hover:border-blue-600/10">
                   Explore Ecosystem

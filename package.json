@@ -30,6 +30,8 @@
     "@langchain/langgraph": "^1.1.0",
     "@prisma/client": "^6.4.1",
     "@stripe/stripe-js": "^8.6.1",
+    "@supabase/ssr": "^0.8.0",
+    "@supabase/supabase-js": "^2.90.1",
     "bullmq": "^5.66.5",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",

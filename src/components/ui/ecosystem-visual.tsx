@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Image from 'next/image';
+import { useState, useEffect, memo } from 'react';
 
 const TOOLS = [
     { id: 'gemini', name: 'Gemini Pro', img: '/assets/google/gemini_logo_v2.png', color: '#4285F4' },
@@ -14,113 +15,140 @@ const TOOLS = [
     { id: 'notebooklm', name: 'NotebookLM', img: '/assets/google/notebooklm_logo_v2.png', color: '#4285F4' },
 ];
 
-export function EcosystemVisual() {
+// Memoized tool node to prevent unnecessary re-renders
+const ToolNode = memo(function ToolNode({
+    tool,
+    x,
+    y,
+    index
+}: {
+    tool: typeof TOOLS[0];
+    x: number;
+    y: number;
+    index: number;
+}) {
     return (
-        <div className="relative w-full h-full flex items-center justify-center perspective-[2000px]">
-            {/* Central Hub - G-Pilot Shield 3D Circular Medallion */}
+        <motion.div
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{
+                opacity: 1,
+                scale: 1,
+                x: x,
+                y: y,
+            }}
+            transition={{
+                duration: 0.8,
+                delay: 0.3 + (index * 0.08),
+            }}
+            className="absolute w-20 h-20 md:w-28 md:h-28 lg:w-32 lg:h-32 rounded-full bg-white/5 dark:bg-[#1d232a]/40 backdrop-blur-md border-2 border-white/20 dark:border-white/10 flex flex-col items-center justify-center shadow-lg group overflow-hidden hover:shadow-blue-500/20 hover:scale-110 transition-transform duration-300"
+        >
+            {/* Center Masked Image - optimized with priority false and lazy loading */}
+            <div className="relative w-12 h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 rounded-full overflow-hidden border border-white/5 bg-[#0b0e14]">
+                <Image
+                    src={tool.img}
+                    alt={tool.name}
+                    fill
+                    sizes="(max-width: 768px) 48px, (max-width: 1024px) 64px, 80px"
+                    className="object-cover scale-110 group-hover:scale-125 transition-transform duration-500"
+                    loading="lazy"
+                />
+            </div>
+
+            {/* Label on hover */}
+            <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[8px] md:text-[10px] font-black uppercase tracking-widest text-blue-500 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
+                {tool.name}
+            </span>
+
+            {/* Simple glow effect - no animation */}
+            <div
+                className="absolute inset-x-0 bottom-0 h-1 opacity-40 blur-sm"
+                style={{ backgroundColor: tool.color }}
+            />
+        </motion.div>
+    );
+});
+
+export function EcosystemVisual() {
+    // Use state for responsive radius to avoid SSR mismatch
+    const [radius, setRadius] = useState(280);
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+        const updateRadius = () => {
+            if (window.innerWidth < 768) {
+                setRadius(120);
+            } else if (window.innerWidth < 1024) {
+                setRadius(200);
+            } else {
+                setRadius(280);
+            }
+        };
+
+        updateRadius();
+        window.addEventListener('resize', updateRadius);
+        return () => window.removeEventListener('resize', updateRadius);
+    }, []);
+
+    // Simple loading state for SSR
+    if (!isMounted) {
+        return (
+            <div className="relative w-full h-full flex items-center justify-center">
+                <div className="w-60 h-60 md:w-72 md:h-72 lg:w-80 lg:h-80 rounded-full bg-white/5 dark:bg-[#161b22]/60 animate-pulse" />
+            </div>
+        );
+    }
+
+    return (
+        <div className="relative w-full h-full flex items-center justify-center">
+            {/* Central Hub - G-Pilot Shield - Simplified animation */}
             <motion.div
-                initial={{ scale: 0, rotateY: 180 }}
-                animate={{ scale: 1, rotateY: 0 }}
-                transition={{ duration: 1.5, ease: 'easeOut' }}
-                className="relative z-20 w-80 h-80 rounded-full bg-white/5 dark:bg-[#161b22]/60 backdrop-blur-2xl border-[6px] border-blue-600/30 flex items-center justify-center shadow-[0_0_150px_rgba(66,133,244,0.5)] overflow-hidden"
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.8, ease: 'easeOut' }}
+                className="relative z-20 w-60 h-60 md:w-72 md:h-72 lg:w-80 lg:h-80 rounded-full bg-white/5 dark:bg-[#161b22]/60 backdrop-blur-xl border-4 border-blue-600/30 flex items-center justify-center shadow-[0_0_80px_rgba(66,133,244,0.3)] overflow-hidden"
             >
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 via-transparent to-transparent pointer-events-none" />
-                <div className="relative w-56 h-56 rounded-full overflow-hidden p-4 bg-[#0b0e14]/40">
+                <div className="relative w-40 h-40 md:w-48 md:h-48 lg:w-56 lg:h-56 rounded-full overflow-hidden p-4 bg-[#0b0e14]/40">
                     <Image
                         src="/assets/brand/g-pilot-shield-3d-v2.png"
                         alt="G-Pilot Shield"
                         fill
-                        className="object-cover scale-110 animate-pulse-glow"
+                        sizes="(max-width: 768px) 160px, (max-width: 1024px) 192px, 224px"
+                        className="object-cover scale-105"
+                        priority // Only this central image gets priority
                     />
                 </div>
             </motion.div>
 
-            {/* Orbiting Tools & High-Fidelity Beams */}
+            {/* Orbiting Tools - Removed complex animations */}
             <div className="absolute inset-0 z-10">
                 {TOOLS.map((tool, i) => {
                     const angle = (i / TOOLS.length) * Math.PI * 2;
-                    // Responsive radius
-                    const radius = typeof window !== 'undefined' && window.innerWidth < 768 ? 160 :
-                        typeof window !== 'undefined' && window.innerWidth < 1024 ? 240 : 350;
                     const x = Math.cos(angle) * radius;
                     const y = Math.sin(angle) * radius;
 
                     return (
                         <div key={tool.id} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                            {/* Converging 3D Beams */}
-                            <motion.div
-                                initial={{ opacity: 0, scaleX: 0 }}
-                                animate={{ opacity: [0, 0.7, 0], scaleX: 1 }}
-                                transition={{
-                                    duration: 2.5,
-                                    repeat: Infinity,
-                                    delay: i * 0.2,
-                                    ease: "easeInOut"
-                                }}
-                                className="absolute origin-left h-[4px] rounded-full"
+                            {/* Static beam instead of animated */}
+                            <div
+                                className="absolute origin-left h-0.5 rounded-full opacity-20"
                                 style={{
                                     width: `${radius}px`,
-                                    background: `linear-gradient(90deg, transparent, ${tool.color}, transparent)`,
-                                    rotate: `${angle}rad`,
-                                    top: '0',
-                                    left: '0',
-                                    boxShadow: `0 0 20px ${tool.color}88`
+                                    background: `linear-gradient(90deg, transparent, ${tool.color})`,
+                                    transform: `rotate(${angle}rad)`,
                                 }}
                             />
 
-                            {/* Tool Node - 3D Illustration */}
-                            <motion.div
-                                initial={{ opacity: 0, scale: 0, x: 0, y: 0 }}
-                                animate={{
-                                    opacity: 1,
-                                    scale: 1,
-                                    x: x,
-                                    y: y,
-                                    rotateY: [0, 15, 0],
-                                    rotateX: [0, -15, 0]
-                                }}
-                                transition={{
-                                    duration: 1.2,
-                                    delay: 0.5 + (i * 0.1),
-                                    rotateY: { duration: 5, repeat: Infinity, ease: "easeInOut" },
-                                    rotateX: { duration: 6, repeat: Infinity, ease: "easeInOut" }
-                                }}
-                                className="absolute w-32 h-32 rounded-full bg-white/5 dark:bg-[#1d232a]/40 backdrop-blur-md border-2 border-white/20 dark:border-white/10 flex flex-col items-center justify-center shadow-[0_20px_50px_rgba(0,0,0,0.3)] group perspective-[1000px] overflow-hidden hover:shadow-blue-500/20"
-                                style={{ transformStyle: 'preserve-3d' }}
-                            >
-                                {/* Center Masked Image */}
-                                <div className="relative w-20 h-20 rounded-full overflow-hidden border border-white/5 bg-[#0b0e14]">
-                                    <Image
-                                        src={tool.img}
-                                        alt={tool.name}
-                                        fill
-                                        className="object-cover scale-110 group-hover:scale-125 transition-transform duration-700"
-                                    />
-                                </div>
-
-                                {/* Invisible Hover Label */}
-                                <motion.span
-                                    initial={{ opacity: 0, y: 10 }}
-                                    whileHover={{ opacity: 1, y: 0 }}
-                                    className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-[10px] font-black uppercase tracking-widest text-blue-500 whitespace-nowrap"
-                                >
-                                    {tool.name}
-                                </motion.span>
-
-                                {/* 3D Circular Glow */}
-                                <div
-                                    className="absolute inset-x-0 bottom-0 h-1.5 opacity-40 transition-all group-hover:h-3 blur-sm"
-                                    style={{ backgroundColor: tool.color }}
-                                />
-                            </motion.div>
+                            <ToolNode tool={tool} x={x} y={y} index={i} />
                         </div>
                     );
                 })}
             </div>
 
-            {/* Background Spatial Atmosphere */}
-            <div className="absolute inset-0 opacity-30 pointer-events-none">
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-600/10 blur-[150px] rounded-full" />
+            {/* Simplified background glow - static, not animated */}
+            <div className="absolute inset-0 opacity-20 pointer-events-none">
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-600/20 blur-[100px] rounded-full" />
             </div>
         </div>
     );

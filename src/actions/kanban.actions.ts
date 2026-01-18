@@ -1,16 +1,15 @@
 'use server';
 
 import prisma from '@/prisma';
-import { currentUser } from '@clerk/nextjs/server';
+import { getAuthUserIdOrDev, getAuthUser } from '@/lib/supabase/auth';
 import { revalidatePath } from 'next/cache';
 
 export async function getKanbanTasks() {
-  const user = await currentUser();
-  if (!user) return [];
+  const userId = await getAuthUserIdOrDev();
 
   // @ts-ignore - Prisma client regeneration may be needed
   return await prisma.kanbanTask.findMany({
-    where: { clerkId: user.id },
+    where: { clerkId: userId },
     orderBy: { updatedAt: 'desc' },
   });
 }
@@ -21,13 +20,12 @@ export async function createKanbanTask(data: {
   status?: string;
   priority?: string;
 }) {
-  const user = await currentUser();
-  if (!user) throw new Error('Unauthorized');
+  const userId = await getAuthUserIdOrDev();
 
   // @ts-ignore - Prisma client regeneration may be needed
   const task = await prisma.kanbanTask.create({
     data: {
-      clerkId: user.id,
+      clerkId: userId,
       title: data.title,
       description: data.description,
       status: data.status || 'OBLIGATION',
@@ -40,12 +38,11 @@ export async function createKanbanTask(data: {
 }
 
 export async function updateTaskStatus(taskId: string, status: string) {
-  const user = await currentUser();
-  if (!user) throw new Error('Unauthorized');
+  const userId = await getAuthUserIdOrDev();
 
   // @ts-ignore - Prisma client regeneration may be needed
   await prisma.kanbanTask.update({
-    where: { id: taskId, clerkId: user.id },
+    where: { id: taskId, clerkId: userId },
     data: { status },
   });
 
