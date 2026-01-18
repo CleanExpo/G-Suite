@@ -1,0 +1,25 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model UserWallet {
+  id        String        @id @default(uuid())
+  clerkId   String        @unique
+  balance   Int           @default(0) // Stored in 'credits' (100 = $1.00)
+  transactions Transaction[]
+}
+
+model Transaction {
+  id          String     @id @default(uuid())
+  walletId    String
+  wallet      UserWallet @relation(fields: [walletId], references: [id])
+  amount      Int        // Negative for usage, positive for top-up
+  description String
+  metadata    Json?
+  createdAt   DateTime   @default(now())
+}

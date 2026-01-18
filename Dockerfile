@@ -1,0 +1,45 @@
+# 1. Base Image
+FROM node:20-bullseye-slim AS base
+
+# 2. Install Chrome Dependencies (Crucial for Puppeteer)
+# We use 'bullseye' because it has stable chrome libs
+RUN apt-get update && apt-get install -y \
+    wget \
+    gnupg \
+    ca-certificates \
+    procps \
+    libxss1 \
+    fonts-ipafont-gothic \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Google Chrome Stable
+RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
+    && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
+    && apt-get update \
+    && apt-get install -y google-chrome-stable --no-install-recommends \
+    && rm -rf /var/lib/apt/lists/*
+
+# 3. Setup App Directory
+WORKDIR /app
+
+# 4. Install Node Dependencies
+COPY package.json package-lock.json ./
+# Skip the massive Chromium download since we installed Chrome above
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
+
+RUN npm ci
+
+# 5. Copy Application Code
+COPY . .
+COPY prisma ./prisma/
+
+# 6. Build Next.js & Generate Prisma Client
+RUN npx prisma generate
+RUN npm run build
+
+# 7. Start
+EXPOSE 8080
+ENV PORT 8080
+# Cloud Run injects PORT, but we set a default
+CMD ["npm", "start"]
