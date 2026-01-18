@@ -28,6 +28,13 @@ COPY package.json package-lock.json ./
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
 
+# Secrets & Keys (Build Time)
+ARG NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_c2F2ZWQtYnV6emFyZC0xNy5jbGVyay5hY2NvdW50cy5kZXYk
+ENV NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=$NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+
+# INCREASE MEMORY LIMIT FOR BUILD
+ENV NODE_OPTIONS="--max-old-space-size=4096"
+
 RUN npm ci
 
 # 5. Copy Application Code
