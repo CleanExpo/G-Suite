@@ -3,34 +3,36 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-    const userId = "user_boss_123";
+  const userId = 'user_boss_123';
 
-    console.log(`📊 Querying Audit Trail for ${userId}...`);
+  console.log(`📊 Querying Audit Trail for ${userId}...`);
 
-    const wallet = await prisma.userWallet.findUnique({
-        where: { clerkId: userId },
-        include: {
-            transactions: {
-                orderBy: { createdAt: 'desc' }
-            }
-        }
-    });
+  const wallet = await prisma.userWallet.findUnique({
+    where: { clerkId: userId },
+    include: {
+      transactions: {
+        orderBy: { createdAt: 'desc' },
+      },
+    },
+  });
 
-    if (!wallet) {
-        console.error("❌ No wallet found.");
-        return;
-    }
+  if (!wallet) {
+    console.error('❌ No wallet found.');
+    return;
+  }
 
-    console.log(`\n💰 Current Balance: ${wallet.balance} credits`);
-    console.log("\n📜 Transaction History:");
-    console.log("------------------------------------------");
+  console.log(`\n💰 Current Balance: ${wallet.balance} credits`);
+  console.log('\n📜 Transaction History:');
+  console.log('------------------------------------------');
 
-    wallet.transactions.forEach((tx) => {
-        const symbol = tx.amount > 0 ? "➕" : "➖";
-        console.log(`${tx.createdAt.toISOString()} | ${symbol} ${Math.abs(tx.amount).toString().padEnd(6)} | ${tx.description}`);
-    });
+  wallet.transactions.forEach((tx) => {
+    const symbol = tx.amount > 0 ? '➕' : '➖';
+    console.log(
+      `${tx.createdAt.toISOString()} | ${symbol} ${Math.abs(tx.amount).toString().padEnd(6)} | ${tx.description}`,
+    );
+  });
 }
 
 main()
-    .catch((e) => console.error(e))
-    .finally(async () => await prisma.$disconnect());
+  .catch((e) => console.error(e))
+  .finally(async () => await prisma.$disconnect());

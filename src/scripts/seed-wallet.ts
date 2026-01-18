@@ -4,8 +4,8 @@ const prisma = new PrismaClient();
 
 async function main() {
   // Use arg or env or default
-  const userId = process.argv[2] || process.env.CLERK_USER_ID || "user_boss_123";
-  const initialCredits = 5000;    // $50.00
+  const userId = process.argv[2] || process.env.CLERK_USER_ID || 'user_boss_123';
+  const initialCredits = 5000; // $50.00
 
   console.log(`🌱 Seeding Wallet for ${userId}...`);
 
@@ -23,9 +23,9 @@ async function main() {
     data: {
       walletId: wallet.id,
       amount: initialCredits,
-      description: "ADMIN: Initial Dev Mode Top-up",
-      metadata: { source: "seed-script" }
-    }
+      description: 'ADMIN: Initial Dev Mode Top-up',
+      metadata: { source: 'seed-script' },
+    },
   });
 
   console.log(`✅ Wallet Funded! New Balance: ${wallet.balance} credits.`);
