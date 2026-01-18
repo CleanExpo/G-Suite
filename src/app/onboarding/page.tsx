@@ -42,15 +42,17 @@ export default function OnboardingPage() {
   return (
     <div className="min-h-screen bg-[#f8f9fa] dark:bg-[#0b0e14] flex items-center justify-center p-6 transition-colors">
       <div className="fixed top-12 left-1/2 -translate-x-1/2 flex items-center gap-3">
-        <div className="relative w-10 h-10 overflow-hidden rounded-full border dark:border-white/10 shadow-sm">
-          <Image src="/logo-light.png" alt="G-Pilot" fill className="object-cover dark:hidden" />
+        <motion.div
+          whileHover={{ rotate: 5, scale: 1.05 }}
+          className="relative w-12 h-12 overflow-hidden"
+        >
           <Image
-            src="/logo-dark.png"
+            src="/assets/brand/g-pilot-shield-3d-v2.png"
             alt="G-Pilot"
             fill
-            className="object-cover hidden dark:block"
+            className="object-contain drop-shadow-[0_10px_20px_rgba(0,0,0,0.15)]"
           />
-        </div>
+        </motion.div>
         <div className="flex flex-col">
           <span className="font-bold text-xl text-gray-900 dark:text-white tracking-tight leading-none uppercase italic">
             G-Pilot

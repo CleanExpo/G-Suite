@@ -10,27 +10,24 @@ export function Footer() {
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-16">
         {/* Brand Column */}
         <div className="col-span-1 md:col-span-1 space-y-8">
-          <Link href="/" className="flex items-center gap-3">
-            <div className="relative w-10 h-10 overflow-hidden rounded-full border border-gray-100 dark:border-white/10 shadow-sm">
+          <Link href="/" className="flex items-center gap-6 group">
+            <motion.div
+              whileHover={{ rotate: 5, scale: 1.05 }}
+              className="relative w-16 h-16 overflow-hidden"
+            >
               <Image
-                src="/logo-light.png"
+                src="/assets/brand/g-pilot-shield-3d-v2.png"
                 alt="G-Pilot"
                 fill
-                className="object-cover dark:hidden"
+                className="object-contain drop-shadow-[0_10px_20px_rgba(0,0,0,0.15)]"
               />
-              <Image
-                src="/logo-dark.png"
-                alt="G-Pilot"
-                fill
-                className="object-cover hidden dark:block"
-              />
-            </div>
+            </motion.div>
             <div className="flex flex-col">
-              <span className="font-bold text-xl text-gray-900 dark:text-white tracking-tight leading-none">
-                G-Pilot
+              <span className="font-black text-2xl text-gray-900 dark:text-white tracking-tighter leading-none uppercase italic">
+                G-PILOT
               </span>
-              <span className="text-[10px] uppercase tracking-widest text-blue-600 font-bold">
-                Gemini Suite
+              <span className="text-[9px] uppercase tracking-[0.4em] text-blue-600 font-black mt-1">
+                Gemini Node
               </span>
             </div>
           </Link>
@@ -126,7 +123,7 @@ export function Footer() {
               </Link>
             </li>
             <li>
-              <Link href="#" className="hover:text-blue-600 transition-colors">
+              <Link href="/privacy" className="hover:text-blue-600 transition-colors">
                 Terms of Service
               </Link>
             </li>

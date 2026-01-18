@@ -17,19 +17,20 @@ const TOOLS = [
 export function EcosystemVisual() {
     return (
         <div className="relative w-full h-full flex items-center justify-center perspective-[2000px]">
-            {/* Central Hub - G-Pilot Shield 3D */}
+            {/* Central Hub - G-Pilot Shield 3D Circular Medallion */}
             <motion.div
                 initial={{ scale: 0, rotateY: 180 }}
                 animate={{ scale: 1, rotateY: 0 }}
                 transition={{ duration: 1.5, ease: 'easeOut' }}
-                className="relative z-20 w-64 h-64 rounded-full bg-white dark:bg-[#161b22] border-4 border-blue-600/30 flex items-center justify-center shadow-[0_0_120px_rgba(66,133,244,0.4)]"
+                className="relative z-20 w-80 h-80 rounded-full bg-white/5 dark:bg-[#161b22]/60 backdrop-blur-2xl border-[6px] border-blue-600/30 flex items-center justify-center shadow-[0_0_150px_rgba(66,133,244,0.5)] overflow-hidden"
             >
-                <div className="relative w-48 h-48">
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 via-transparent to-transparent pointer-events-none" />
+                <div className="relative w-56 h-56 rounded-full overflow-hidden p-4 bg-[#0b0e14]/40">
                     <Image
                         src="/assets/brand/g-pilot-shield-3d-v2.png"
                         alt="G-Pilot Shield"
                         fill
-                        className="object-contain animate-pulse-glow"
+                        className="object-cover scale-110 animate-pulse-glow"
                     />
                 </div>
             </motion.div>
@@ -82,24 +83,31 @@ export function EcosystemVisual() {
                                     rotateY: { duration: 5, repeat: Infinity, ease: "easeInOut" },
                                     rotateX: { duration: 6, repeat: Infinity, ease: "easeInOut" }
                                 }}
-                                className="absolute w-28 h-28 bg-white dark:bg-[#1d232a] rounded-[2rem] border-2 border-gray-100 dark:border-white/10 flex flex-col items-center justify-center shadow-2xl group perspective-[1000px] overflow-hidden"
+                                className="absolute w-32 h-32 rounded-full bg-white/5 dark:bg-[#1d232a]/40 backdrop-blur-md border-2 border-white/20 dark:border-white/10 flex flex-col items-center justify-center shadow-[0_20px_50px_rgba(0,0,0,0.3)] group perspective-[1000px] overflow-hidden transition-all duration-500 hover:shadow-blue-500/20"
                                 style={{ transformStyle: 'preserve-3d' }}
                             >
-                                <div className="relative w-16 h-16 mb-2">
+                                {/* Center Masked Image */}
+                                <div className="relative w-20 h-20 rounded-full overflow-hidden border border-white/5 bg-[#0b0e14]">
                                     <Image
                                         src={tool.img}
                                         alt={tool.name}
                                         fill
-                                        className="object-contain drop-shadow-[0_5px_15px_rgba(0,0,0,0.2)]"
+                                        className="object-cover scale-110 group-hover:scale-125 transition-transform duration-700"
                                     />
                                 </div>
-                                <span className="text-[10px] font-black uppercase tracking-widest text-gray-500 group-hover:text-blue-600 transition-colors">
-                                    {tool.name}
-                                </span>
 
-                                {/* 3D Depth Shadow */}
+                                {/* Invisible Hover Label */}
+                                <motion.span
+                                    initial={{ opacity: 0, y: 10 }}
+                                    whileHover={{ opacity: 1, y: 0 }}
+                                    className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-[10px] font-black uppercase tracking-widest text-blue-500 whitespace-nowrap"
+                                >
+                                    {tool.name}
+                                </motion.span>
+
+                                {/* 3D Circular Glow */}
                                 <div
-                                    className="absolute inset-x-0 bottom-0 h-1 opacity-50 transition-all group-hover:h-3"
+                                    className="absolute inset-x-0 bottom-0 h-1.5 opacity-40 transition-all group-hover:h-3 blur-sm"
                                     style={{ backgroundColor: tool.color }}
                                 />
                             </motion.div>

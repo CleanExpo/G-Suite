@@ -40,15 +40,24 @@ export function TacticalBox({
       <div className="relative z-10 space-y-10">
         {image && (
           <motion.div
-            whileHover={{ translateZ: 50, rotateY: 10 }}
-            className="w-24 h-24 relative transform-style-3d drop-shadow-[0_15px_30px_rgba(0,0,0,0.15)]"
+            whileHover={{ translateZ: 50, scale: 1.1 }}
+            className="w-32 h-32 relative mx-auto mb-6 transform-style-3d group-hover:drop-shadow-[0_20px_40px_rgba(37,99,235,0.3)] transition-all duration-700"
           >
-            <Image
-              src={image}
-              alt="Feature Illustration"
-              fill
-              className="object-contain"
-            />
+            {/* Circular Glass Medallion Ring */}
+            <div className="absolute inset-0 rounded-full border-2 border-white/20 dark:border-white/10 bg-gradient-to-br from-white/10 to-transparent backdrop-blur-md shadow-xl" />
+
+            {/* Asset Container */}
+            <div className="absolute inset-2 rounded-full overflow-hidden bg-[#0b0e14] flex items-center justify-center p-2">
+              <Image
+                src={image}
+                alt="Feature Illustration"
+                fill
+                className="object-cover scale-110"
+              />
+            </div>
+
+            {/* Inner Glow */}
+            <div className="absolute inset-0 rounded-full bg-blue-600/5 group-hover:bg-blue-600/10 transition-colors pointer-events-none" />
           </motion.div>
         )}
 
