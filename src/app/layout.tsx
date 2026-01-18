@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { ClerkProvider } from "@clerk/nextjs";
+import { ClerkProvider, SignedOut, RedirectToSignIn } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
 
 
@@ -10,6 +10,9 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
     title: "SuitePilot App - Mission Control",
     description: "Launch AI-driven missions with full workspace autonomy.",
+    verification: {
+        google: "mDIgeR6iYVwPHejVxBe9Nx-3Jr0XAO_W5R3jiXiFpOs",
+    },
 };
 
 export default function RootLayout({
@@ -50,4 +53,3 @@ export default function RootLayout({
         </ClerkProvider>
     );
 }
-```
