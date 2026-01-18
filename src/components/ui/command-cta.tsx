@@ -25,9 +25,6 @@ export function CommandCTA({ title, subtitle, buttonText, href, id }: CommandCTA
       <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay pointer-events-none" />
 
       <div className="relative z-10 flex flex-col items-center text-center space-y-12 max-w-4xl mx-auto">
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-blue-400 text-[10px] font-black uppercase tracking-[0.3em] border border-white/10 backdrop-blur-md">
-          <Sparkles className="w-4 h-4" /> Ready for Deployment
-        </div>
 
         <h2 className="text-5xl lg:text-9xl font-black italic tracking-tighter uppercase leading-[0.8]">
           {title}
@@ -46,13 +43,6 @@ export function CommandCTA({ title, subtitle, buttonText, href, id }: CommandCTA
           </Link>
         </div>
 
-        <div className="flex items-center gap-8 text-[10px] font-black text-gray-500 uppercase tracking-widest pt-8">
-          <span>Google Cloud Secure</span>
-          <span>•</span>
-          <span>AES-256 Vaulted</span>
-          <span>•</span>
-          <span>Gemini-3 Enabled</span>
-        </div>
       </div>
     </motion.section>
   );

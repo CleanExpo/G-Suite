@@ -165,15 +165,6 @@ export default function OnboardingPage() {
         </AnimatePresence>
       </motion.div>
 
-      {/* Micro Stats */}
-      <div className="fixed bottom-12 flex gap-8 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">
-        <div className="flex items-center gap-2">
-          <div className="w-1.5 h-1.5 rounded-full bg-blue-600" /> SOC2 Verified
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-1.5 h-1.5 rounded-full bg-blue-600" /> AES-256 Active
-        </div>
-      </div>
     </div>
   );
 }

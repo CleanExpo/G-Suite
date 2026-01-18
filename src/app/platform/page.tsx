@@ -78,36 +78,6 @@ export default function PlatformPage() {
           ))}
         </div>
 
-        {/* Technical Stack Section */}
-        <section className="mt-40 grid grid-cols-1 lg:grid-cols-3 gap-16 items-start">
-          <div className="space-y-6">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
-              Built Exclusively on <br />
-              Google Cloud.
-            </h2>
-            <p className="text-gray-600 dark:text-gray-400">
-              We leverage the full power of the Google ecosystem to deliver unmatched reliability
-              and speed.
-            </p>
-          </div>
-          <div className="lg:col-span-2 grid grid-cols-2 md:grid-cols-4 gap-8">
-            {[
-              { name: 'Gemini 3.0', icon: Cpu },
-              { name: 'Cloud Run', icon: Cloud },
-              { name: 'Vertex AI', icon: Database },
-              { name: 'Artifacts', icon: Network },
-            ].map((tech, i) => (
-              <div key={i} className="flex flex-col items-center gap-4">
-                <div className="w-16 h-16 rounded-full bg-gray-50 dark:bg-white/5 flex items-center justify-center text-gray-400 dark:text-blue-400/50 grayscale hover:grayscale-0 transition-all">
-                  <tech.icon className="w-8 h-8" />
-                </div>
-                <span className="text-sm font-bold text-gray-500 dark:text-gray-500">
-                  {tech.name}
-                </span>
-              </div>
-            ))}
-          </div>
-        </section>
 
         <div className="mt-40">
           <CommandCTA

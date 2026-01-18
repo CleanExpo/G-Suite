@@ -33,9 +33,6 @@ export default function InfrastructurePage() {
 
       <main className="pt-32 px-6 pb-24 max-w-7xl mx-auto">
         <header className="mb-24 space-y-8">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 text-xs font-black border border-blue-100 dark:border-blue-800 uppercase tracking-widest shadow-sm">
-            <Activity className="w-4 h-4" /> Global Cluster v7.2
-          </div>
           <h1 className="text-6xl lg:text-[10rem] font-black italic tracking-tighter text-gray-900 dark:text-white uppercase leading-[0.75]">
             Global Scale. <br />
             <span className="text-blue-600 dark:text-blue-500">Zero Latency.</span>
@@ -74,11 +71,6 @@ export default function InfrastructurePage() {
               speed of thought."
             </p>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <StatCard label="Isolation" val="gVisor" icon={Lock} />
-              <StatCard label="Uptime" val="99.999%" icon={Zap} />
-              <StatCard label="Compute" val="L4 NVIDIA" icon={Cpu} />
-            </div>
           </motion.div>
 
           {/* Secondary Modules */}
@@ -125,20 +117,6 @@ export default function InfrastructurePage() {
               Your missions execute on the hardware nearest to your users, minimizing latent drag
               across the global fleet.
             </p>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {['US-East-1', 'EU-West-3', 'ASIA-South-1', 'AU-SE-1'].map((region, i) => (
-              <div
-                key={i}
-                className="p-8 bg-white dark:bg-black/20 rounded-[2rem] border border-gray-100 dark:border-white/5"
-              >
-                <span className="text-[10px] font-black text-blue-600 block mb-2">{region}</span>
-                <div className="flex items-center justify-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="font-mono text-sm dark:text-white">Active</span>
-                </div>
-              </div>
-            ))}
           </div>
         </section>
       </main>

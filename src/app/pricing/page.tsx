@@ -132,25 +132,6 @@ export default function PricingPage() {
           ))}
         </div>
 
-        {/* Infrastructure Stats Row */}
-        <div className="mt-40 grid grid-cols-1 md:grid-cols-2 gap-12">
-          <TacticalBox
-            title="Vault Verified"
-            description="All plans include secure AES-256 key encapsulation and SOC2 alignment as standard."
-            icon={Shield}
-            id="pricing-stat-vault"
-            badge="SOC2"
-            accent="Military-Grade Sovereignty"
-          />
-          <TacticalBox
-            title="Gemini GPU Compute"
-            description="Enterprise scaling is powered by the Google Cloud Run L4 GPU matrix for near-zero latency."
-            icon={Cpu}
-            id="pricing-stat-compute"
-            badge="L4 GPU"
-            accent="Near-Zero-Latency Matrix"
-          />
-        </div>
       </main>
     </div>
   );

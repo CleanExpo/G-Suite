@@ -1,13 +1,13 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { LucideIcon } from 'lucide-react';
+import Image from 'next/image';
 import { ReactNode } from 'react';
 
 interface TacticalBoxProps {
   title: string | ReactNode;
   description: string;
-  icon?: LucideIcon;
+  image?: string;
   children?: ReactNode;
   className?: string;
   id?: string;
@@ -18,7 +18,7 @@ interface TacticalBoxProps {
 export function TacticalBox({
   title,
   description,
-  icon: Icon,
+  image,
   children,
   className = '',
   id,
@@ -28,19 +28,28 @@ export function TacticalBox({
   return (
     <motion.div
       id={id}
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, scale: 0.95 }}
+      whileInView={{ opacity: 1, scale: 1 }}
       viewport={{ once: true }}
-      className={`group p-12 rounded-[4rem] bg-white dark:bg-white/[0.01] border border-gray-100 dark:border-white/5 transition-all hover:shadow-2xl hover:border-blue-500/30 relative overflow-hidden ${className}`}
+      className={`group p-12 rounded-[4.5rem] bg-white dark:bg-white/[0.02] border border-gray-100 dark:border-white/5 transition-all hover:shadow-[0_40px_100px_rgba(0,0,0,0.1)] dark:hover:shadow-black/50 hover:border-blue-500/30 relative overflow-hidden perspective-[2000px] ${className}`}
     >
-      {/* Spatial Aura */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/5 blur-[80px] rounded-full group-hover:bg-blue-600/10 transition-colors pointer-events-none" />
+      {/* 3D Depth Backdrop */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+      <div className="absolute top-0 right-0 w-80 h-80 bg-blue-600/5 blur-[100px] rounded-full group-hover:bg-blue-600/15 transition-colors pointer-events-none" />
 
-      <div className="relative z-10 space-y-8">
-        {Icon && (
-          <div className="w-16 h-16 bg-blue-50 dark:bg-blue-900/20 rounded-[1.5rem] flex items-center justify-center border border-blue-100 dark:border-blue-800 group-hover:bg-blue-600 transition-all duration-500 shadow-sm">
-            <Icon className="w-8 h-8 text-blue-600 group-hover:text-white transition-colors" />
-          </div>
+      <div className="relative z-10 space-y-10">
+        {image && (
+          <motion.div
+            whileHover={{ translateZ: 50, rotateY: 10 }}
+            className="w-24 h-24 relative transform-style-3d drop-shadow-[0_15px_30px_rgba(0,0,0,0.15)]"
+          >
+            <Image
+              src={image}
+              alt="Feature Illustration"
+              fill
+              className="object-contain"
+            />
+          </motion.div>
         )}
 
         <div className="space-y-4">

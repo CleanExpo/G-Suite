@@ -118,19 +118,6 @@ export default function WorkflowsPage() {
               </p>
             </div>
           </div>
-          <div className="flex gap-8">
-            {[
-              { label: 'Concurrency', val: 'Unlimited' },
-              { label: 'Latency', val: '< 140ms' },
-            ].map((s, i) => (
-              <div key={i} className="text-right">
-                <div className="text-[10px] font-black uppercase tracking-widest text-gray-400">
-                  {s.label}
-                </div>
-                <div className="text-2xl font-black text-blue-600 tracking-tighter">{s.val}</div>
-              </div>
-            ))}
-          </div>
         </div>
       </main>
     </div>

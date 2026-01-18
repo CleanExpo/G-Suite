@@ -21,9 +21,6 @@ export default function SecurityPage() {
 
       <main className="pt-32 px-6 pb-24 max-w-7xl mx-auto">
         <header className="mb-32 space-y-8">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 text-xs font-black border border-emerald-100 dark:border-emerald-800 uppercase tracking-widest shadow-sm">
-            Zero-Trust Sovereignty
-          </div>
           <h1 className="text-6xl lg:text-[10rem] font-black italic tracking-tighter text-gray-900 dark:text-white uppercase leading-[0.75]">
             The Security <br />
             <span className="text-blue-600 dark:text-blue-500">Vault.</span>

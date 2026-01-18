@@ -220,24 +220,6 @@ export default function AbilitiesPage() {
                 Launch Mission
               </button>
             </div>
-            <div className="flex-1 grid grid-cols-2 gap-8 w-full">
-              {[
-                { val: '100%', label: 'Encrypted' },
-                { val: '1.5M', label: 'Ctx Window' },
-                { val: '400ms', label: 'Latency' },
-                { val: 'Zero', label: 'Persistence' },
-              ].map((stat, i) => (
-                <div
-                  key={i}
-                  className="p-8 bg-white/5 rounded-[2rem] border border-white/5 backdrop-blur-md"
-                >
-                  <div className="text-3xl font-black italic">{stat.val}</div>
-                  <div className="text-[10px] uppercase font-bold tracking-widest text-blue-500 mt-1">
-                    {stat.label}
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
         </motion.div>
       </main>
