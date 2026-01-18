@@ -60,11 +60,11 @@ export default function PricingPage() {
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 text-xs font-black border border-blue-100 dark:border-blue-800 uppercase tracking-widest shadow-sm">
               <Zap className="w-4 h-4" /> Cost Transparency Mode
             </div>
-            <h1 className="text-6xl lg:text-[10rem] font-black italic tracking-tighter text-gray-900 dark:text-white uppercase leading-[0.75]">
-              Tactical <br />
+            <h1 className="text-4xl md:text-6xl lg:text-[10rem] font-black italic tracking-tighter text-gray-900 dark:text-white uppercase leading-[0.75]">
+              Tactical <br className="hidden md:block" />
               <span className="text-blue-600 dark:text-blue-500">Pricing.</span>
             </h1>
-            <p className="text-2xl text-gray-600 dark:text-gray-400 leading-relaxed font-medium">
+            <p className="text-lg md:text-2xl text-gray-600 dark:text-gray-400 leading-relaxed font-medium">
               Transparent, mission-driven cost modeling. No hidden tokens. No enterprise bloat. You
               pay for the compute intelligence you deploy.
             </p>
@@ -73,14 +73,14 @@ export default function PricingPage() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1.2, ease: 'easeOut' }}
-            className="relative aspect-video rounded-[4rem] overflow-hidden border border-gray-100 dark:border-white/5 shadow-2xl group"
+            className="relative aspect-video rounded-3xl md:rounded-[4rem] overflow-hidden border border-gray-100 dark:border-white/5 shadow-2xl group"
           >
             <Image src="/pricing_nodes_8k.png" alt="Pricing Nodes" fill className="object-cover" />
             <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 via-transparent to-transparent pointer-events-none" />
           </motion.div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 items-stretch">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12 items-stretch">
           {plans.map((plan, i) => (
             <motion.div
               key={i}
@@ -88,7 +88,7 @@ export default function PricingPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
               whileHover={{ y: -10 }}
-              className={`p-10 rounded-[3.5rem] bg-white dark:bg-[#161b22] border ${plan.popular ? 'border-blue-600 dark:border-blue-500/50 shadow-2xl shadow-blue-600/10' : 'border-gray-100 dark:border-white/5'} flex flex-col group relative`}
+              className={`p-8 md:p-10 rounded-3xl md:rounded-[3.5rem] bg-white dark:bg-[#161b22] border ${plan.popular ? 'border-blue-600 dark:border-blue-500/50 shadow-2xl shadow-blue-600/10' : 'border-gray-100 dark:border-white/5'} flex flex-col group relative`}
             >
               {plan.popular && (
                 <div className="absolute -top-6 left-1/2 -translate-x-1/2 px-6 py-2 bg-blue-600 text-white text-[10px] uppercase font-black tracking-[0.3em] rounded-full shadow-xl shadow-blue-600/30">
@@ -100,9 +100,9 @@ export default function PricingPage() {
                 <h3 className="text-xs uppercase tracking-[0.3em] font-black text-gray-400 mb-4">
                   {plan.name}
                 </h3>
-                <div className="text-7xl font-black text-gray-900 dark:text-white tracking-tighter mb-6 flex items-baseline">
+                <div className="text-5xl md:text-7xl font-black text-gray-900 dark:text-white tracking-tighter mb-6 flex items-baseline">
                   {plan.price}
-                  <span className="text-xl text-gray-400 font-bold uppercase tracking-widest ml-1">
+                  <span className="text-base md:text-xl text-gray-400 font-bold uppercase tracking-widest ml-1">
                     {plan.price !== 'Custom' ? '/mo' : ''}
                   </span>
                 </div>
@@ -124,9 +124,9 @@ export default function PricingPage() {
               </ul>
 
               <button
-                className={`w-full h-20 rounded-[1.5rem] font-black text-xl uppercase tracking-widest transition-all active:scale-95 flex items-center justify-center gap-3 ${plan.popular ? 'bg-blue-600 text-white shadow-xl shadow-blue-600/20' : 'bg-gray-50 dark:bg-white/5 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 border border-gray-100 dark:border-white/10'}`}
+                className={`w-full h-16 md:h-20 rounded-xl md:rounded-[1.5rem] font-black text-lg md:text-xl uppercase tracking-widest transition-all active:scale-95 flex items-center justify-center gap-3 ${plan.popular ? 'bg-blue-600 text-white shadow-xl shadow-blue-600/20' : 'bg-gray-50 dark:bg-white/5 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 border border-gray-100 dark:border-white/10'}`}
               >
-                Select Tier <ArrowRight className="w-6 h-6" />
+                Select Tier <ArrowRight className="w-5 h-5 md:w-6 md:h-6" />
               </button>
             </motion.div>
           ))}

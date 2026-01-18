@@ -38,11 +38,11 @@ export default function SolutionsPage() {
 
       <main className="pt-32 px-6 pb-24 max-w-7xl mx-auto">
         <header className="mb-32 text-center max-w-3xl mx-auto">
-          <h1 className="text-5xl lg:text-8xl font-black tracking-tighter text-gray-900 dark:text-white mb-8">
+          <h1 className="text-4xl md:text-5xl lg:text-8xl font-black tracking-tighter text-gray-900 dark:text-white mb-8">
             The Intelligence <br />
             <span className="text-blue-600 dark:text-blue-400 italic">Workforce.</span>
           </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-400 leading-relaxed font-medium">
+          <p className="text-lg md:text-xl text-gray-600 dark:text-gray-400 leading-relaxed font-medium">
             Whether you are a solo-founder or a global enterprise, G-Pilot provides the blueprints
             to scale your efficiency with agentic AI.
           </p>
@@ -53,7 +53,7 @@ export default function SolutionsPage() {
             <div
               key={i}
               id={`solution-block-${i}`}
-              className={`flex flex-col ${i % 2 !== 0 ? 'lg:flex-row-reverse' : 'lg:flex-row'} gap-20 items-center group`}
+              className={`flex flex-col ${i % 2 !== 0 ? 'lg:flex-row-reverse' : 'lg:flex-row'} gap-12 md:gap-20 items-center group`}
             >
               {/* Visual Representation */}
               <motion.div
@@ -85,10 +85,10 @@ export default function SolutionsPage() {
 
               {/* Content */}
               <div className="flex-1 space-y-8">
-                <h3 className="text-4xl lg:text-5xl font-black italic uppercase tracking-tighter text-gray-900 dark:text-white leading-tight">
+                <h3 className="text-3xl md:text-4xl lg:text-5xl font-black italic uppercase tracking-tighter text-gray-900 dark:text-white leading-tight">
                   {solution.title}
                 </h3>
-                <p className="text-xl text-gray-600 dark:text-gray-400 font-medium leading-relaxed">
+                <p className="text-lg md:text-xl text-gray-600 dark:text-gray-400 font-medium leading-relaxed">
                   {solution.desc}
                 </p>
                 <ul className="space-y-4">
@@ -105,9 +105,9 @@ export default function SolutionsPage() {
                     </li>
                   ))}
                 </ul>
-                <Link href={solution.href}>
-                  <button className="h-20 px-12 bg-gray-900 dark:bg-white dark:text-black text-white rounded-[1.5rem] font-black text-xl flex items-center gap-3 hover:scale-105 transition-all shadow-xl active:scale-95">
-                    Learn More <ArrowRight className="w-6 h-6" />
+                <Link href={solution.href} className="w-full sm:w-auto">
+                  <button className="h-16 md:h-20 w-full sm:w-auto px-10 md:px-12 bg-gray-900 dark:bg-white dark:text-black text-white rounded-xl md:rounded-[1.5rem] font-black text-lg md:text-xl flex items-center justify-center gap-3 hover:scale-105 transition-all shadow-xl active:scale-95">
+                    Learn More <ArrowRight className="w-5 h-5 md:w-6 md:h-6" />
                   </button>
                 </Link>
               </div>

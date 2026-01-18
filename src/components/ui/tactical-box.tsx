@@ -8,6 +8,7 @@ interface TacticalBoxProps {
   title: string | ReactNode;
   description: string;
   image?: string;
+  icon?: any;
   children?: ReactNode;
   className?: string;
   id?: string;
@@ -19,6 +20,7 @@ export function TacticalBox({
   title,
   description,
   image,
+  icon: Icon,
   children,
   className = '',
   id,
@@ -39,7 +41,7 @@ export function TacticalBox({
       <div className="absolute top-0 right-0 w-80 h-80 bg-blue-600/5 blur-[100px] rounded-full group-hover:bg-blue-600/15 transition-colors pointer-events-none" />
 
       <div className="relative z-10 space-y-10">
-        {image && (
+        {image ? (
           <motion.div
             whileHover={{ translateZ: 50, scale: 1.1 }}
             className="w-32 h-32 relative mx-auto mb-6 transform-style-3d group-hover:drop-shadow-[0_20px_40px_rgba(37,99,235,0.3)]"
@@ -60,7 +62,17 @@ export function TacticalBox({
             {/* Inner Glow */}
             <div className="absolute inset-0 rounded-full bg-blue-600/5 group-hover:bg-blue-600/10 transition-colors pointer-events-none" />
           </motion.div>
-        )}
+        ) : Icon ? (
+          <motion.div
+            whileHover={{ translateZ: 50, scale: 1.1 }}
+            className="w-32 h-32 relative mx-auto mb-6 transform-style-3d group-hover:drop-shadow-[0_20px_40px_rgba(37,99,235,0.3)] flex items-center justify-center"
+          >
+            <div className="absolute inset-0 rounded-full border-2 border-white/20 dark:border-white/10 bg-gradient-to-br from-white/10 to-transparent backdrop-blur-md shadow-xl" />
+            <div className="absolute inset-2 rounded-full overflow-hidden bg-[#0b0e14] flex items-center justify-center p-2">
+              <Icon className="w-12 h-12 text-blue-600" />
+            </div>
+          </motion.div>
+        ) : null}
 
         <div className="space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">

@@ -40,7 +40,7 @@ export default function PlatformPage() {
             >
               Foundation
             </motion.div>
-            <h1 className="text-5xl lg:text-9xl font-black italic tracking-tighter text-gray-900 dark:text-white uppercase leading-[0.8]">
+            <h1 className="text-4xl md:text-5xl lg:text-9xl font-black italic tracking-tighter text-gray-900 dark:text-white uppercase leading-[0.8]">
               The G-Pilot <br />
               <span className="text-blue-600 dark:text-blue-400">Architecture</span>
             </h1>
@@ -49,7 +49,7 @@ export default function PlatformPage() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1.2, ease: 'easeOut' }}
-            className="relative aspect-video rounded-[3rem] overflow-hidden border border-gray-100 dark:border-white/5 shadow-2xl group"
+            className="relative aspect-video rounded-2xl md:rounded-[3rem] overflow-hidden border border-gray-100 dark:border-white/5 shadow-2xl group"
           >
             <Image
               src="/global_infrastructure_8k.png"
