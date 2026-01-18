@@ -3,34 +3,64 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { billingGate } from "../middleware/costGate";
 import { createSlidesStoryboard } from "../tools/googleSlides";
 import { runNotebookLMAgent } from "../agents/notebookLM";
+import { generateImage, generateVideo, webIntel } from "../tools/mediaEngine";
+import { searchConsoleAudit } from "../tools/searchConsole";
 import { z } from "zod";
 
 const SpecSchema = z.object({
-    tool: z.enum(["google_slides_storyboard", "notebook_lm_research"]),
-    payload: z.any()
+    tool: z.enum([
+        "google_slides_storyboard",
+        "notebook_lm_research",
+        "image_generation",
+        "video_generation",
+        "web_intel",
+        "search_console_audit",
+        "shopify_sync",
+        "social_blast",
+        "web_mastery_audit"
+    ]),
+    payload: z.any(),
+    reasoning: z.string().optional() // Architect's "Chain of Thought"
 });
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || "");
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_STUDIO_API_KEY || process.env.GOOGLE_API_KEY || "");
+const model = genAI.getGenerativeModel({
+    model: "gemini-1.5-pro",
+    systemInstruction: `You are the G-Pilot Fleet Architect. Your core directive is "Mission Sovereignty". 
+    You convert vague user desires into high-precision, executable JSON specs. 
+    You outperform manual prompting by anticipating needs:
+    - If they ask for a presentation, use "google_slides_storyboard" and ensure the content is rich and structured.
+    - If they ask for research, use "web_intel" with search-grounding logic.
+    - If they mention sales or products, use "shopify_sync".
+    - If they mention posting or growth, use "social_blast".
+    - If they mention SEO, performance, or "how do I look?", use "web_mastery_audit".
+    - ALWAYS provide a 'reasoning' block explaining your architectural decisions.
+    `
+});
 
 /**
  * 1. The Architect Node
- * LLM analyzes request and outputs a JSON SPEC.
+ * LLM analyzes request and outputs a JSON SPEC for the G-Pilot fleet.
  */
 export async function architectNode(state: ProjectStateType) {
-    console.log("🧠 Architect is thinking...");
+    console.log("🧠 G-Pilot Architect is thinking...");
 
     const prompt = `
-    You are the Architect for SuitePilot. Convert the following user request into a JSON SPEC.
-    User Request: "${state.userRequest}"
+    Mission Request: "${state.userRequest}"
     
-    The SPEC must have:
-    - tool: "google_slides_storyboard" or "notebook_lm_research"
-    - payload: Relevant data for the tool.
-      - For google_slides_storyboard: { title, slides: [{ title, content }] }
-      - For notebook_lm_research: { filePath }
+    Convert this into a MISSION SPEC.
+    Tools Available:
+    - google_slides_storyboard: { title, slides: [{ title, content }] }
+    - notebook_lm_research: { filePath }
+    - image_generation: { prompt }
+    - video_generation: { prompt }
+    - web_intel: { query }
+    - search_console_audit: { siteUrl }
+    - shopify_sync: { action: "sync_products" | "audit_sales" }
+    - social_blast: { platform: "x" | "linkedin" | "reddit", content }
+    - web_mastery_audit: { url }
     
-    Return ONLY valid JSON.
+    Return ONLY valid JSON following the SpecSchema.
   `;
 
     try {
@@ -39,91 +69,78 @@ export async function architectNode(state: ProjectStateType) {
         const text = response.text().replace(/```json|```/gi, "").trim();
         const json = JSON.parse(text);
 
-        // Validate with Zod
         const spec = SpecSchema.parse(json);
-
-        console.log("Planned SPEC:", JSON.stringify(spec, null, 2));
-        return {
-            spec,
-            status: "PLANNED",
-        };
+        console.log("Planned MISSION SPEC:", JSON.stringify(spec, null, 2));
+        return { spec, status: "PLANNED" };
     } catch (error: any) {
         console.error("Architect error:", error);
-        return {
-            error: `Architect failed: ${error.message}`,
-            status: "REJECTED",
-        };
+        return { error: `Architect failed: ${error.message}`, status: "REJECTED" };
     }
 }
 
 /**
- * 2. The Billing Node (The Gatekeeper)
- * Calculates costs and checks wallet balance atomically.
+ * 2. The Billing Node
  */
 export async function billingNode(state: ProjectStateType) {
-    console.log("💰 Calculating costs...");
-
+    console.log("💰 Calculating mission fuel...");
     if (!state.spec) return { status: "REJECTED", error: "No SPEC planned." };
 
-    // Simple logic: 1 slide = 50 credits, base fee for others
-    let estimatedCost = 50;
-    if (state.spec.tool === "google_slides_storyboard") {
-        estimatedCost = (state.spec.payload.slides?.length || 1) * 50;
-    } else if (state.spec.tool === "notebook_lm_research") {
-        estimatedCost = 500;
+    let costKey: any = "DEEP_RESEARCH";
+    switch (state.spec.tool) {
+        case "google_slides_storyboard": costKey = "SLIDE_DECK"; break;
+        case "image_generation": costKey = "IMAGE_GEN"; break;
+        case "video_generation": costKey = "VIDEO_GEN"; break;
+        case "shopify_sync": costKey = "DEEP_RESEARCH"; break;
+        case "social_blast": costKey = "DEEP_RESEARCH"; break;
+        default: costKey = "DEEP_RESEARCH";
     }
 
     try {
-        // Deducting credits via billingGate
-        // We Use SLIDE_DECK as it's the more expensive base, or adjust as needed
-        const costKey = state.spec.tool === "google_slides_storyboard" ? "SLIDE_DECK" : "DEEP_RESEARCH";
         await billingGate(state.userId, costKey);
-        console.log(`✅ Payment Approved. Budgeted ${estimatedCost} credits.`);
-
-        return {
-            status: "APPROVED",
-            budget: estimatedCost
-        };
+        return { status: "APPROVED", budget: 500 };
     } catch (error: any) {
-        console.log("🛑 Payment Failed:", error.message);
-        return {
-            status: "REJECTED",
-            error: error.message
-        };
+        return { status: "REJECTED", error: error.message };
     }
 }
 
 /**
- * 3. The Executor Node (The Worker)
- * Executes the tools defined in the SPEC.
+ * 3. The Executor Node
  */
 export async function executorNode(state: ProjectStateType) {
-    if (state.status === "REJECTED") return {};
+    if (state.status === "REJECTED" || !state.spec) return {};
 
-    console.log("🛠️ Executing tasks...");
+    console.log(`🛠️ G-Pilot Fleet: Executing ${state.spec.tool}...`);
     const results = [];
 
     try {
-        // If SPEC says "google_slides_storyboard", call the tool
-        if (state.spec.tool === "google_slides_storyboard") {
-            const output = await createSlidesStoryboard(state.userId, state.spec.payload);
-            results.push(output);
+        // Real implementations
+        if (state.spec.tool === "image_generation") {
+            results.push(await generateImage(state.userId, state.spec.payload.prompt));
+        } else if (state.spec.tool === "video_generation") {
+            results.push(await generateVideo(state.userId, state.spec.payload.prompt));
+        } else if (state.spec.tool === "web_intel") {
+            results.push(await webIntel(state.userId, state.spec.payload.query));
+        } else if (state.spec.tool === "search_console_audit") {
+            results.push(await searchConsoleAudit(state.userId, state.spec.payload.siteUrl));
+        } else if (state.spec.tool === "google_slides_storyboard") {
+            results.push(await createSlidesStoryboard(state.userId, state.spec.payload));
+        } else if (state.spec.tool === "notebook_lm_research") {
+            results.push(await runNotebookLMAgent(state.userId, state.spec.payload.filePath));
         }
-        // If SPEC says "notebook_lm_research", call the agent
-        else if (state.spec.tool === "notebook_lm_research") {
-            const output = await runNotebookLMAgent(state.userId, state.spec.payload.filePath);
-            results.push(output);
+        // High-Precision Real Tools
+        else if (state.spec.tool === "shopify_sync") {
+            const { syncShopifyStore } = await import("../tools/shopifySync.js");
+            results.push(await syncShopifyStore(state.userId));
+        } else if (state.spec.tool === "social_blast") {
+            const { deploySocialBlast } = await import("../tools/socialSync.js");
+            results.push(await deploySocialBlast(state.userId, state.spec.payload));
+        } else if (state.spec.tool === "web_mastery_audit") {
+            const { performWebMasteryAudit } = await import("../tools/webMasteryAudit.js");
+            results.push(await performWebMasteryAudit(state.spec.payload.url));
         }
 
-        return {
-            results,
-            status: "COMPLETED"
-        };
+        return { results, status: "COMPLETED" };
     } catch (error: any) {
-        console.error("❌ Execution Failed:", error.message);
-        return {
-            error: error.message,
-            status: "REJECTED"
-        };
+        return { error: error.message, status: "REJECTED" };
     }
 }

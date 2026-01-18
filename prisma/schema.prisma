@@ -23,3 +23,42 @@ model Transaction {
   metadata    Json?
   createdAt   DateTime   @default(now())
 }
+
+model UserProfile {
+  id                  String   @id @default(uuid())
+  clerkId             String   @unique
+  websiteUrl          String?
+  brandConfig         Json?    // Stores extracted logo, fonts, colors (The Mirror)
+  
+  // Encrypted Keys (The Vault)
+  googleApiKey        String?  // Google AI Studio / Gemini Key
+  shopifyAccessToken  String?  // For Shopify sync
+  redditApiKey        String?  // For Reddit scraping/posting
+  socialApiKeys       Json?    // Encrypted map of other social keys (X, LinkedIn, etc.)
+  
+  integrations        Json?    // Connection status & metadata
+  onboardingCompleted Boolean  @default(false)
+  
+  tasks               KanbanTask[]
+  
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model KanbanTask {
+  id          String   @id @default(uuid())
+  clerkId     String
+  profile     UserProfile @relation(fields: [clerkId], references: [clerkId])
+  
+  title       String
+  description String?
+  status      String   @default("OBLIGATION") // OBLIGATION, EXECUTION, VALIDATION, ARCHIVE
+  priority    String   @default("MEDIUM")     // LOW, MEDIUM, HIGH, KINETIC
+  
+  dueDate     DateTime?
+  payload     Json?    // Mission data (tool options, specs)
+  resultUrl   String?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

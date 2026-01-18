@@ -11,6 +11,8 @@ const config: Config = {
             colors: {
                 background: "var(--background)",
                 foreground: "var(--foreground)",
+                "gcp-dark": "#1f1f1f",
+                "gcp-card": "#2d2d2d",
             },
         },
     },

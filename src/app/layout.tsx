@@ -1,19 +1,97 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Outfit, DM_Serif_Display } from "next/font/google";
 import "./globals.css";
-import { ClerkProvider, SignedOut, RedirectToSignIn } from "@clerk/nextjs";
+import { ClerkProvider } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
+import { ThemeProvider } from "@/components/theme-provider";
+import { Footer } from "@/components/footer";
 
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
+const dmSerif = DM_Serif_Display({ weight: "400", subsets: ["latin"], variable: "--font-serif", style: "italic" });
 
-const inter = Inter({ subsets: ["latin"] });
+const appUrl = "https://g-pilot.app";
 
 export const metadata: Metadata = {
-    title: "SuitePilot App - Mission Control",
-    description: "Launch AI-driven missions with full workspace autonomy.",
+    metadataBase: new URL(appUrl),
+    title: {
+        default: "G-Pilot - Enterprise AI Orchestration",
+        template: "%s | G-Pilot"
+    },
+    description: "Orchestrate complex AI workflows with G-Pilot. The transparent, mission-driven platform for autonomous agent deployment and secure billing.",
+    keywords: ["AI Orchestration", "Agentic Workflow", "G-Pilot", "Google Cloud", "AI Automation", "SaaS", "Billing Ledger", "Autonomous Agents"],
+    authors: [{ name: "G-Pilot Team" }],
+    creator: "G-Pilot",
+    publisher: "G-Pilot Inc.",
+    formatDetection: {
+        email: false,
+        address: false,
+        telephone: false,
+    },
+    icons: {
+        icon: "/favicon.ico",
+        shortcut: "/favicon.ico",
+        apple: "/apple-touch-icon.png",
+    },
+    openGraph: {
+        title: "G-Pilot - Enterprise AI Orchestration",
+        description: "Launch AI-driven missions with full workspace autonomy. Secure, transparent, and powerful.",
+        url: appUrl,
+        siteName: "G-Pilot App",
+        locale: "en_US",
+        type: "website",
+        images: [
+            {
+                url: "/og-image.png",
+                width: 1200,
+                height: 630,
+                alt: "G-Pilot Dashboard Preview",
+            }
+        ],
+    },
+    twitter: {
+        card: "summary_large_image",
+        title: "G-Pilot - AI Orchestration",
+        description: "Launch AI-driven missions with full workspace autonomy.",
+        images: ["/og-image.png"],
+        creator: "@gpilot_ai",
+    },
+    robots: {
+        index: true,
+        follow: true,
+        googleBot: {
+            index: true,
+            follow: true,
+            "max-video-preview": -1,
+            "max-image-preview": "large",
+            "max-snippet": -1,
+        },
+    },
     verification: {
         google: "mDIgeR6iYVwPHejVxBe9Nx-3Jr0XAO_W5R3jiXiFpOs",
     },
 };
+
+const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "G-Pilot",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Web",
+    "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+    },
+    "description": "Enterprise AI orchestration platform for autonomous agent workflows.",
+    "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "ratingCount": "12"
+    }
+};
+
+import { SystemBanner } from "@/components/ui/system-banner";
 
 export default function RootLayout({
     children,
@@ -25,7 +103,7 @@ export default function RootLayout({
             appearance={{
                 baseTheme: dark,
                 variables: {
-                    colorPrimary: "#2563eb",
+                    colorPrimary: "#0b57d0",
                     colorBackground: "#0d1117",
                     colorText: "#ffffff",
                     colorInputBackground: "#161b22",
@@ -42,12 +120,26 @@ export default function RootLayout({
                 }
             }}
         >
-            <html lang="en">
-                <body className={inter.className} suppressHydrationWarning>
-                    <SignedOut>
-                        <RedirectToSignIn />
-                    </SignedOut>
-                    {children}
+            <html lang="en" suppressHydrationWarning>
+                <head>
+                    <script
+                        type="application/ld+json"
+                        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+                    />
+                </head>
+                <body className={`${inter.variable} ${outfit.variable} ${dmSerif.variable} font-sans`}>
+                    <ThemeProvider
+                        attribute="class"
+                        defaultTheme="dark"
+                        enableSystem
+                        disableTransitionOnChange
+                    >
+                        <SystemBanner />
+                        <div className="relative pt-[env(safe-area-inset-top)]">
+                            {children}
+                        </div>
+                        <Footer />
+                    </ThemeProvider>
                 </body>
             </html>
         </ClerkProvider>

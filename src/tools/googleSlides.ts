@@ -23,7 +23,7 @@ export async function createSlidesStoryboard(clerkId: string, storyboard: Slides
     // Use the refined billing gate
     await billingGate(clerkId, 'SLIDE_DECK');
 
-    const auth = getGoogleAuth();
+    const auth = await getGoogleAuth(clerkId);
     const slides = google.slides({ version: 'v1', auth });
 
     // 3. Create a new presentation

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Configuration - UPDATE THESE
-PROJECT_ID="suitepilot-484603-484603"
+PROJECT_ID="suite-pilot-app"
 REGION="australia-southeast1"
 SERVICE_NAME="suitepilot"
 
@@ -9,12 +9,12 @@ echo "🚀 Starting SuitePilot Deployment to Google Cloud Run..."
 
 # 1. Build and Submit to Google Cloud Build
 echo "📦 Building container image..."
-gcloud builds submit --tag gcr.io/$PROJECT_ID/$SERVICE_NAME --config=Dockerfile.prod .
+gcloud builds submit --tag australia-southeast1-docker.pkg.dev/$PROJECT_ID/containers/$SERVICE_NAME --config=Dockerfile.prod .
 
 # 2. Deploy to Cloud Run
 echo "🌍 Deploying to Cloud Run..."
 gcloud run deploy $SERVICE_NAME \
-    --image gcr.io/$PROJECT_ID/$SERVICE_NAME \
+    --image australia-southeast1-docker.pkg.dev/$PROJECT_ID/containers/$SERVICE_NAME \
     --platform managed \
     --region $REGION \
     --allow-unauthenticated \

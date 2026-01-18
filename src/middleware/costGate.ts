@@ -6,7 +6,9 @@ export const COST_TABLE = {
     'SIMPLE_CHAT': 10,       // $0.10
     'DOC_GENERATION': 50,    // $0.50
     'SLIDE_DECK': 200,       // $2.00
-    'DEEP_RESEARCH': 500     // $5.00
+    'DEEP_RESEARCH': 500,    // $5.00
+    'IMAGE_GEN': 150,        // $1.50
+    'VIDEO_GEN': 1000        // $10.00
 };
 
 /**

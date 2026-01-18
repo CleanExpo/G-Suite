@@ -1,0 +1,2077 @@
+﻿----------------------------------------------------------------- REMOTE BUILD OUTPUT ------------------------------------------------------------------
+starting build "0a402ae7-4ed7-4f54-8fd0-d325aaa81d64"
+
+FETCHSOURCE
+Fetching storage object: gs://suite-pilot-app_cloudbuild/source/1768711155.326957-ee179199f3d04f39b5a855cc6411ca67.tgz#1768711162431686
+Copying gs://suite-pilot-app_cloudbuild/source/1768711155.326957-ee179199f3d04f39b5a855cc6411ca67.tgz#1768711162431686...
+/ [0 files][    0.0 B/ 90.6 KiB]                                                
+/ [1 files][ 90.6 KiB/ 90.6 KiB]                                                
+
+Operation completed over 1 objects/90.6 KiB.                                     
+BUILD
+Already have image (with digest): gcr.io/cloud-builders/docker
+Sending build context to Docker daemon  410.1kB
+
+
+Step 1/18 : FROM node:20-bullseye-slim AS base
+20-bullseye-slim: Pulling from library/node
+bd1b97a95a10: Pulling fs layer
+323680ab0dae: Pulling fs layer
+02b6490a5a22: Pulling fs layer
+59bcd15baf4d: Pulling fs layer
+41d5fe97ddd9: Pulling fs layer
+41d5fe97ddd9: Verifying Checksum
+41d5fe97ddd9: Download complete
+323680ab0dae: Verifying Checksum
+323680ab0dae: Download complete
+59bcd15baf4d: Verifying Checksum
+59bcd15baf4d: Download complete
+bd1b97a95a10: Verifying Checksum
+bd1b97a95a10: Download complete
+02b6490a5a22: Verifying Checksum
+02b6490a5a22: Download complete
+bd1b97a95a10: Pull complete
+323680ab0dae: Pull complete
+02b6490a5a22: Pull complete
+59bcd15baf4d: Pull complete
+41d5fe97ddd9: Pull complete
+Digest: sha256:d6c3903e556d4161f63af4550e76244908b6668e1a7d2983eff4873a0c2b0413
+Status: Downloaded newer image for node:20-bullseye-slim
+ ---> a1b9a46eb4fd
+Step 2/18 : RUN apt-get update && apt-get install -y     wget     gnupg     ca-certificates     procps     libxss1     fonts-ipafont-gothic     && rm -rf /var/lib/apt/lists/*
+ ---> Running in 396546bc078f
+Get:1 http://deb.debian.org/debian bullseye InRelease [75.1 kB]
+Get:2 http://deb.debian.org/debian-security bullseye-security InRelease [27.2 kB]
+Get:3 http://deb.debian.org/debian bullseye-updates InRelease [44.0 kB]
+Get:4 http://deb.debian.org/debian bullseye/main amd64 Packages [8066 kB]
+Get:5 http://deb.debian.org/debian-security bullseye-security/main amd64 Packages [440 kB]
+Get:6 http://deb.debian.org/debian bullseye-updates/main amd64 Packages [18.8 kB]
+Fetched 8671 kB in 2s (5463 kB/s)
+Reading package lists...
+Reading package lists...
+Building dependency tree...
+Reading state information...
+The following additional packages will be installed:
+  dirmngr fonts-ipafont-mincho gnupg-l10n gnupg-utils gpg gpg-agent
+  gpg-wks-client gpg-wks-server gpgconf gpgsm libassuan0 libbsd0 libgpm2
+  libksba8 libldap-2.4-2 libldap-common libmd0 libncurses6 libncursesw6
+  libnpth0 libprocps8 libpsl5 libreadline8 libsasl2-2 libsasl2-modules
+  libsasl2-modules-db libsqlite3-0 libx11-6 libx11-data libxau6 libxcb1
+  libxdmcp6 libxext6 openssl pinentry-curses psmisc publicsuffix
+  readline-common x11-common
+Suggested packages:
+  dbus-user-session libpam-systemd pinentry-gnome3 tor parcimonie xloadimage
+  scdaemon gpm libsasl2-modules-gssapi-mit | libsasl2-modules-gssapi-heimdal
+  libsasl2-modules-ldap libsasl2-modules-otp libsasl2-modules-sql pinentry-doc
+  readline-doc
+The following NEW packages will be installed:
+  ca-certificates dirmngr fonts-ipafont-gothic fonts-ipafont-mincho gnupg
+  gnupg-l10n gnupg-utils gpg gpg-agent gpg-wks-client gpg-wks-server gpgconf
+  gpgsm libassuan0 libbsd0 libgpm2 libksba8 libldap-2.4-2 libldap-common
+  libmd0 libncurses6 libncursesw6 libnpth0 libprocps8 libpsl5 libreadline8
+  libsasl2-2 libsasl2-modules libsasl2-modules-db libsqlite3-0 libx11-6
+  libx11-data libxau6 libxcb1 libxdmcp6 libxext6 libxss1 openssl
+  pinentry-curses procps psmisc publicsuffix readline-common wget x11-common
+0 upgraded, 45 newly installed, 0 to remove and 0 not upgraded.
+Need to get 22.5 MB of archives.
+After this operation, 61.6 MB of additional disk space will be used.
+Get:1 http://deb.debian.org/debian bullseye/main amd64 fonts-ipafont-gothic all 00303-21 [3515 kB]
+Get:2 http://deb.debian.org/debian bullseye/main amd64 fonts-ipafont-mincho all 00303-21 [4725 kB]
+Get:3 http://deb.debian.org/debian bullseye/main amd64 readline-common all 8.1-1 [73.7 kB]
+Get:4 http://deb.debian.org/debian bullseye/main amd64 libreadline8 amd64 8.1-1 [169 kB]
+Get:5 http://deb.debian.org/debian bullseye/main amd64 libncurses6 amd64 6.2+20201114-2+deb11u2 [102 kB]
+Get:6 http://deb.debian.org/debian bullseye/main amd64 libncursesw6 amd64 6.2+20201114-2+deb11u2 [132 kB]
+Get:7 http://deb.debian.org/debian bullseye/main amd64 libprocps8 amd64 2:3.3.17-5 [63.9 kB]
+Get:8 http://deb.debian.org/debian bullseye/main amd64 procps amd64 2:3.3.17-5 [502 kB]
+Get:9 http://deb.debian.org/debian-security bullseye-security/main amd64 openssl amd64 1.1.1w-0+deb11u4 [859 kB]
+Get:10 http://deb.debian.org/debian bullseye/main amd64 ca-certificates all 20210119 [158 kB]
+Get:11 http://deb.debian.org/debian bullseye/main amd64 libpsl5 amd64 0.21.0-1.2 [57.3 kB]
+Get:12 http://deb.debian.org/debian-security bullseye-security/main amd64 wget amd64 1.21-1+deb11u2 [964 kB]
+Get:13 http://deb.debian.org/debian bullseye/main amd64 libassuan0 amd64 2.5.3-7.1 [50.5 kB]
+Get:14 http://deb.debian.org/debian-security bullseye-security/main amd64 gpgconf amd64 2.2.27-2+deb11u3 [548 kB]
+Get:15 http://deb.debian.org/debian bullseye/main amd64 libksba8 amd64 1.5.0-3+deb11u2 [123 kB]
+Get:16 http://deb.debian.org/debian bullseye/main amd64 libsasl2-modules-db amd64 2.1.27+dfsg-2.1+deb11u1 [69.1 kB]
+Get:17 http://deb.debian.org/debian bullseye/main amd64 libsasl2-2 amd64 2.1.27+dfsg-2.1+deb11u1 [106 kB]
+Get:18 http://deb.debian.org/debian bullseye/main amd64 libldap-2.4-2 amd64 2.4.57+dfsg-3+deb11u1 [232 kB]
+Get:19 http://deb.debian.org/debian bullseye/main amd64 libnpth0 amd64 1.6-3 [19.0 kB]
+Get:20 http://deb.debian.org/debian-security bullseye-security/main amd64 dirmngr amd64 2.2.27-2+deb11u3 [763 kB]
+Get:21 http://deb.debian.org/debian-security bullseye-security/main amd64 gnupg-l10n all 2.2.27-2+deb11u3 [1084 kB]
+Get:22 http://deb.debian.org/debian-security bullseye-security/main amd64 gnupg-utils amd64 2.2.27-2+deb11u3 [905 kB]
+Get:23 http://deb.debian.org/debian-security bullseye-security/main amd64 libsqlite3-0 amd64 3.34.1-3+deb11u1 [797 kB]
+Get:24 http://deb.debian.org/debian-security bullseye-security/main amd64 gpg amd64 2.2.27-2+deb11u3 [928 kB]
+Get:25 http://deb.debian.org/debian bullseye/main amd64 pinentry-curses amd64 1.1.0-4 [64.9 kB]
+Get:26 http://deb.debian.org/debian-security bullseye-security/main amd64 gpg-agent amd64 2.2.27-2+deb11u3 [670 kB]
+Get:27 http://deb.debian.org/debian-security bullseye-security/main amd64 gpg-wks-client amd64 2.2.27-2+deb11u3 [524 kB]
+Get:28 http://deb.debian.org/debian-security bullseye-security/main amd64 gpg-wks-server amd64 2.2.27-2+deb11u3 [516 kB]
+Get:29 http://deb.debian.org/debian-security bullseye-security/main amd64 gpgsm amd64 2.2.27-2+deb11u3 [645 kB]
+Get:30 http://deb.debian.org/debian-security bullseye-security/main amd64 gnupg all 2.2.27-2+deb11u3 [825 kB]
+Get:31 http://deb.debian.org/debian bullseye/main amd64 libmd0 amd64 1.0.3-3 [28.0 kB]
+Get:32 http://deb.debian.org/debian bullseye/main amd64 libbsd0 amd64 0.11.3-1+deb11u1 [108 kB]
+Get:33 http://deb.debian.org/debian bullseye/main amd64 libgpm2 amd64 1.20.7-8 [35.6 kB]
+Get:34 http://deb.debian.org/debian bullseye/main amd64 libldap-common all 2.4.57+dfsg-3+deb11u1 [95.8 kB]
+Get:35 http://deb.debian.org/debian bullseye/main amd64 libsasl2-modules amd64 2.1.27+dfsg-2.1+deb11u1 [104 kB]
+Get:36 http://deb.debian.org/debian bullseye/main amd64 libxau6 amd64 1:1.0.9-1 [19.7 kB]
+Get:37 http://deb.debian.org/debian bullseye/main amd64 libxdmcp6 amd64 1:1.1.2-3 [26.3 kB]
+Get:38 http://deb.debian.org/debian bullseye/main amd64 libxcb1 amd64 1.14-3 [140 kB]
+Get:39 http://deb.debian.org/debian bullseye/main amd64 libx11-data all 2:1.7.2-1+deb11u2 [311 kB]
+Get:40 http://deb.debian.org/debian bullseye/main amd64 libx11-6 amd64 2:1.7.2-1+deb11u2 [772 kB]
+Get:41 http://deb.debian.org/debian bullseye/main amd64 libxext6 amd64 2:1.3.3-1.1 [52.7 kB]
+Get:42 http://deb.debian.org/debian bullseye/main amd64 x11-common all 1:7.7+22 [252 kB]
+Get:43 http://deb.debian.org/debian bullseye/main amd64 libxss1 amd64 1:1.2.3-1 [17.8 kB]
+Get:44 http://deb.debian.org/debian bullseye/main amd64 psmisc amd64 23.4-2 [198 kB]
+Get:45 http://deb.debian.org/debian bullseye/main amd64 publicsuffix all 20220811.1734-0+deb11u1 [127 kB]
+[91mdebconf: delaying package configuration, since apt-utils is not installed
+[0mFetched 22.5 MB in 0s (70.5 MB/s)
+Selecting previously unselected package fonts-ipafont-gothic.
+
+(Reading database ... 
+(Reading database ... 5%
+(Reading database ... 10%
+(Reading database ... 15%
+(Reading database ... 20%
+(Reading database ... 25%
+(Reading database ... 30%
+(Reading database ... 35%
+(Reading database ... 40%
+(Reading database ... 45%
+(Reading database ... 50%
+(Reading database ... 55%
+(Reading database ... 60%
+(Reading database ... 65%
+(Reading database ... 70%
+(Reading database ... 75%
+(Reading database ... 80%
+(Reading database ... 85%
+(Reading database ... 90%
+(Reading database ... 95%
+(Reading database ... 100%
+(Reading database ... 6673 files and directories currently installed.)
+
+Preparing to unpack .../00-fonts-ipafont-gothic_00303-21_all.deb ...
+
+Unpacking fonts-ipafont-gothic (00303-21) ...
+
+Selecting previously unselected package fonts-ipafont-mincho.
+
+Preparing to unpack .../01-fonts-ipafont-mincho_00303-21_all.deb ...
+
+Unpacking fonts-ipafont-mincho (00303-21) ...
+
+Selecting previously unselected package readline-common.
+
+Preparing to unpack .../02-readline-common_8.1-1_all.deb ...
+
+Unpacking readline-common (8.1-1) ...
+
+Selecting previously unselected package libreadline8:amd64.
+
+Preparing to unpack .../03-libreadline8_8.1-1_amd64.deb ...
+
+Unpacking libreadline8:amd64 (8.1-1) ...
+
+Selecting previously unselected package libncurses6:amd64.
+
+Preparing to unpack .../04-libncurses6_6.2+20201114-2+deb11u2_amd64.deb ...
+
+Unpacking libncurses6:amd64 (6.2+20201114-2+deb11u2) ...
+
+Selecting previously unselected package libncursesw6:amd64.
+
+Preparing to unpack .../05-libncursesw6_6.2+20201114-2+deb11u2_amd64.deb ...
+
+Unpacking libncursesw6:amd64 (6.2+20201114-2+deb11u2) ...
+
+Selecting previously unselected package libprocps8:amd64.
+
+Preparing to unpack .../06-libprocps8_2%3a3.3.17-5_amd64.deb ...
+
+Unpacking libprocps8:amd64 (2:3.3.17-5) ...
+
+Selecting previously unselected package procps.
+
+Preparing to unpack .../07-procps_2%3a3.3.17-5_amd64.deb ...
+
+Unpacking procps (2:3.3.17-5) ...
+
+Selecting previously unselected package openssl.
+
+Preparing to unpack .../08-openssl_1.1.1w-0+deb11u4_amd64.deb ...
+
+Unpacking openssl (1.1.1w-0+deb11u4) ...
+
+Selecting previously unselected package ca-certificates.
+
+Preparing to unpack .../09-ca-certificates_20210119_all.deb ...
+
+Unpacking ca-certificates (20210119) ...
+
+Selecting previously unselected package libpsl5:amd64.
+
+Preparing to unpack .../10-libpsl5_0.21.0-1.2_amd64.deb ...
+
+Unpacking libpsl5:amd64 (0.21.0-1.2) ...
+
+Selecting previously unselected package wget.
+
+Preparing to unpack .../11-wget_1.21-1+deb11u2_amd64.deb ...
+
+Unpacking wget (1.21-1+deb11u2) ...
+
+Selecting previously unselected package libassuan0:amd64.
+
+Preparing to unpack .../12-libassuan0_2.5.3-7.1_amd64.deb ...
+
+Unpacking libassuan0:amd64 (2.5.3-7.1) ...
+
+Selecting previously unselected package gpgconf.
+
+Preparing to unpack .../13-gpgconf_2.2.27-2+deb11u3_amd64.deb ...
+
+Unpacking gpgconf (2.2.27-2+deb11u3) ...
+
+Selecting previously unselected package libksba8:amd64.
+
+Preparing to unpack .../14-libksba8_1.5.0-3+deb11u2_amd64.deb ...
+
+Unpacking libksba8:amd64 (1.5.0-3+deb11u2) ...
+
+Selecting previously unselected package libsasl2-modules-db:amd64.
+
+Preparing to unpack .../15-libsasl2-modules-db_2.1.27+dfsg-2.1+deb11u1_amd64.deb ...
+
+Unpacking libsasl2-modules-db:amd64 (2.1.27+dfsg-2.1+deb11u1) ...
+
+Selecting previously unselected package libsasl2-2:amd64.
+
+Preparing to unpack .../16-libsasl2-2_2.1.27+dfsg-2.1+deb11u1_amd64.deb ...
+
+Unpacking libsasl2-2:amd64 (2.1.27+dfsg-2.1+deb11u1) ...
+
+Selecting previously unselected package libldap-2.4-2:amd64.
+
+Preparing to unpack .../17-libldap-2.4-2_2.4.57+dfsg-3+deb11u1_amd64.deb ...
+
+Unpacking libldap-2.4-2:amd64 (2.4.57+dfsg-3+deb11u1) ...
+
+Selecting previously unselected package libnpth0:amd64.
+
+Preparing to unpack .../18-libnpth0_1.6-3_amd64.deb ...
+
+Unpacking libnpth0:amd64 (1.6-3) ...
+
+Selecting previously unselected package dirmngr.
+
+Preparing to unpack .../19-dirmngr_2.2.27-2+deb11u3_amd64.deb ...
+
+Unpacking dirmngr (2.2.27-2+deb11u3) ...
+
+Selecting previously unselected package gnupg-l10n.
+
+Preparing to unpack .../20-gnupg-l10n_2.2.27-2+deb11u3_all.deb ...
+
+Unpacking gnupg-l10n (2.2.27-2+deb11u3) ...
+
+Selecting previously unselected package gnupg-utils.
+
+Preparing to unpack .../21-gnupg-utils_2.2.27-2+deb11u3_amd64.deb ...
+
+Unpacking gnupg-utils (2.2.27-2+deb11u3) ...
+
+Selecting previously unselected package libsqlite3-0:amd64.
+
+Preparing to unpack .../22-libsqlite3-0_3.34.1-3+deb11u1_amd64.deb ...
+
+Unpacking libsqlite3-0:amd64 (3.34.1-3+deb11u1) ...
+
+Selecting previously unselected package gpg.
+
+Preparing to unpack .../23-gpg_2.2.27-2+deb11u3_amd64.deb ...
+
+Unpacking gpg (2.2.27-2+deb11u3) ...
+
+Selecting previously unselected package pinentry-curses.
+
+Preparing to unpack .../24-pinentry-curses_1.1.0-4_amd64.deb ...
+
+Unpacking pinentry-curses (1.1.0-4) ...
+
+Selecting previously unselected package gpg-agent.
+
+Preparing to unpack .../25-gpg-agent_2.2.27-2+deb11u3_amd64.deb ...
+
+Unpacking gpg-agent (2.2.27-2+deb11u3) ...
+
+Selecting previously unselected package gpg-wks-client.
+
+Preparing to unpack .../26-gpg-wks-client_2.2.27-2+deb11u3_amd64.deb ...
+
+Unpacking gpg-wks-client (2.2.27-2+deb11u3) ...
+
+Selecting previously unselected package gpg-wks-server.
+
+Preparing to unpack .../27-gpg-wks-server_2.2.27-2+deb11u3_amd64.deb ...
+
+Unpacking gpg-wks-server (2.2.27-2+deb11u3) ...
+
+Selecting previously unselected package gpgsm.
+
+Preparing to unpack .../28-gpgsm_2.2.27-2+deb11u3_amd64.deb ...
+
+Unpacking gpgsm (2.2.27-2+deb11u3) ...
+
+Selecting previously unselected package gnupg.
+
+Preparing to unpack .../29-gnupg_2.2.27-2+deb11u3_all.deb ...
+
+Unpacking gnupg (2.2.27-2+deb11u3) ...
+
+Selecting previously unselected package libmd0:amd64.
+
+Preparing to unpack .../30-libmd0_1.0.3-3_amd64.deb ...
+
+Unpacking libmd0:amd64 (1.0.3-3) ...
+
+Selecting previously unselected package libbsd0:amd64.
+
+Preparing to unpack .../31-libbsd0_0.11.3-1+deb11u1_amd64.deb ...
+
+Unpacking libbsd0:amd64 (0.11.3-1+deb11u1) ...
+
+Selecting previously unselected package libgpm2:amd64.
+
+Preparing to unpack .../32-libgpm2_1.20.7-8_amd64.deb ...
+
+Unpacking libgpm2:amd64 (1.20.7-8) ...
+
+Selecting previously unselected package libldap-common.
+
+Preparing to unpack .../33-libldap-common_2.4.57+dfsg-3+deb11u1_all.deb ...
+
+Unpacking libldap-common (2.4.57+dfsg-3+deb11u1) ...
+
+Selecting previously unselected package libsasl2-modules:amd64.
+
+Preparing to unpack .../34-libsasl2-modules_2.1.27+dfsg-2.1+deb11u1_amd64.deb ...
+
+Unpacking libsasl2-modules:amd64 (2.1.27+dfsg-2.1+deb11u1) ...
+
+Selecting previously unselected package libxau6:amd64.
+
+Preparing to unpack .../35-libxau6_1%3a1.0.9-1_amd64.deb ...
+
+Unpacking libxau6:amd64 (1:1.0.9-1) ...
+
+Selecting previously unselected package libxdmcp6:amd64.
+
+Preparing to unpack .../36-libxdmcp6_1%3a1.1.2-3_amd64.deb ...
+
+Unpacking libxdmcp6:amd64 (1:1.1.2-3) ...
+
+Selecting previously unselected package libxcb1:amd64.
+
+Preparing to unpack .../37-libxcb1_1.14-3_amd64.deb ...
+
+Unpacking libxcb1:amd64 (1.14-3) ...
+
+Selecting previously unselected package libx11-data.
+
+Preparing to unpack .../38-libx11-data_2%3a1.7.2-1+deb11u2_all.deb ...
+
+Unpacking libx11-data (2:1.7.2-1+deb11u2) ...
+
+Selecting previously unselected package libx11-6:amd64.
+
+Preparing to unpack .../39-libx11-6_2%3a1.7.2-1+deb11u2_amd64.deb ...
+
+Unpacking libx11-6:amd64 (2:1.7.2-1+deb11u2) ...
+
+Selecting previously unselected package libxext6:amd64.
+
+Preparing to unpack .../40-libxext6_2%3a1.3.3-1.1_amd64.deb ...
+
+Unpacking libxext6:amd64 (2:1.3.3-1.1) ...
+
+Selecting previously unselected package x11-common.
+
+Preparing to unpack .../41-x11-common_1%3a7.7+22_all.deb ...
+
+Unpacking x11-common (1:7.7+22) ...
+
+Selecting previously unselected package libxss1:amd64.
+
+Preparing to unpack .../42-libxss1_1%3a1.2.3-1_amd64.deb ...
+
+Unpacking libxss1:amd64 (1:1.2.3-1) ...
+
+Selecting previously unselected package psmisc.
+
+Preparing to unpack .../43-psmisc_23.4-2_amd64.deb ...
+
+Unpacking psmisc (23.4-2) ...
+
+Selecting previously unselected package publicsuffix.
+
+Preparing to unpack .../44-publicsuffix_20220811.1734-0+deb11u1_all.deb ...
+
+Unpacking publicsuffix (20220811.1734-0+deb11u1) ...
+
+Setting up libksba8:amd64 (1.5.0-3+deb11u2) ...
+
+Setting up libxau6:amd64 (1:1.0.9-1) ...
+
+Setting up libpsl5:amd64 (0.21.0-1.2) ...
+
+Setting up libgpm2:amd64 (1.20.7-8) ...
+
+Setting up wget (1.21-1+deb11u2) ...
+
+Setting up psmisc (23.4-2) ...
+
+Setting up libsqlite3-0:amd64 (3.34.1-3+deb11u1) ...
+
+Setting up libsasl2-modules:amd64 (2.1.27+dfsg-2.1+deb11u1) ...
+
+Setting up x11-common (1:7.7+22) ...
+
+debconf: unable to initialize frontend: Dialog
+
+debconf: (TERM is not set, so the dialog frontend is not usable.)
+
+debconf: falling back to frontend: Readline
+
+debconf: unable to initialize frontend: Readline
+
+debconf: (Can't locate Term/ReadLine.pm in @INC (you may need to install the Term::ReadLine module) (@INC contains: /etc/perl /usr/local/lib/x86_64-linux-gnu/perl/5.32.1 /usr/local/share/perl/5.32.1 /usr/lib/x86_64-linux-gnu/perl5/5.32 /usr/share/perl5 /usr/lib/x86_64-linux-gnu/perl-base /usr/lib/x86_64-linux-gnu/perl/5.32 /usr/share/perl/5.32 /usr/local/lib/site_perl) at /usr/share/perl5/Debconf/FrontEnd/Readline.pm line 7.)
+
+debconf: falling back to frontend: Teletype
+
+invoke-rc.d: could not determine current runlevel
+
+invoke-rc.d: policy-rc.d denied execution of start.
+
+Setting up libnpth0:amd64 (1.6-3) ...
+
+Setting up libassuan0:amd64 (2.5.3-7.1) ...
+
+Setting up libldap-common (2.4.57+dfsg-3+deb11u1) ...
+
+Setting up libsasl2-modules-db:amd64 (2.1.27+dfsg-2.1+deb11u1) ...
+
+Setting up libx11-data (2:1.7.2-1+deb11u2) ...
+
+Setting up gnupg-l10n (2.2.27-2+deb11u3) ...
+
+Setting up libncurses6:amd64 (6.2+20201114-2+deb11u2) ...
+
+Setting up libncursesw6:amd64 (6.2+20201114-2+deb11u2) ...
+
+Setting up libsasl2-2:amd64 (2.1.27+dfsg-2.1+deb11u1) ...
+
+Setting up libmd0:amd64 (1.0.3-3) ...
+
+Setting up fonts-ipafont-mincho (00303-21) ...
+
+update-alternatives: using /usr/share/fonts/opentype/ipafont-mincho/ipam.ttf to provide /usr/share/fonts/truetype/fonts-japanese-mincho.ttf (fonts-japanese-mincho.ttf) in auto mode
+
+Setting up fonts-ipafont-gothic (00303-21) ...
+
+update-alternatives: using /usr/share/fonts/opentype/ipafont-gothic/ipag.ttf to provide /usr/share/fonts/truetype/fonts-japanese-gothic.ttf (fonts-japanese-gothic.ttf) in auto mode
+
+Setting up openssl (1.1.1w-0+deb11u4) ...
+
+Setting up libbsd0:amd64 (0.11.3-1+deb11u1) ...
+
+Setting up readline-common (8.1-1) ...
+
+Setting up publicsuffix (20220811.1734-0+deb11u1) ...
+
+Setting up libprocps8:amd64 (2:3.3.17-5) ...
+
+Setting up pinentry-curses (1.1.0-4) ...
+
+Setting up libxdmcp6:amd64 (1:1.1.2-3) ...
+
+Setting up libxcb1:amd64 (1.14-3) ...
+
+Setting up libreadline8:amd64 (8.1-1) ...
+
+Setting up libldap-2.4-2:amd64 (2.4.57+dfsg-3+deb11u1) ...
+
+Setting up ca-certificates (20210119) ...
+
+debconf: unable to initialize frontend: Dialog
+
+debconf: (TERM is not set, so the dialog frontend is not usable.)
+
+debconf: falling back to frontend: Readline
+
+debconf: unable to initialize frontend: Readline
+
+debconf: (Can't locate Term/ReadLine.pm in @INC (you may need to install the Term::ReadLine module) (@INC contains: /etc/perl /usr/local/lib/x86_64-linux-gnu/perl/5.32.1 /usr/local/share/perl/5.32.1 /usr/lib/x86_64-linux-gnu/perl5/5.32 /usr/share/perl5 /usr/lib/x86_64-linux-gnu/perl-base /usr/lib/x86_64-linux-gnu/perl/5.32 /usr/share/perl/5.32 /usr/local/lib/site_perl) at /usr/share/perl5/Debconf/FrontEnd/Readline.pm line 7.)
+
+debconf: falling back to frontend: Teletype
+
+Updating certificates in /etc/ssl/certs...
+
+129 added, 0 removed; done.
+
+Setting up procps (2:3.3.17-5) ...
+
+Setting up gpgconf (2.2.27-2+deb11u3) ...
+
+Setting up libx11-6:amd64 (2:1.7.2-1+deb11u2) ...
+
+Setting up gpg (2.2.27-2+deb11u3) ...
+
+Setting up gnupg-utils (2.2.27-2+deb11u3) ...
+
+Setting up gpg-agent (2.2.27-2+deb11u3) ...
+
+Setting up gpgsm (2.2.27-2+deb11u3) ...
+
+Setting up libxext6:amd64 (2:1.3.3-1.1) ...
+
+Setting up dirmngr (2.2.27-2+deb11u3) ...
+
+Setting up gpg-wks-server (2.2.27-2+deb11u3) ...
+
+Setting up libxss1:amd64 (1:1.2.3-1) ...
+
+Setting up gpg-wks-client (2.2.27-2+deb11u3) ...
+
+Setting up gnupg (2.2.27-2+deb11u3) ...
+
+Processing triggers for libc-bin (2.31-13+deb11u13) ...
+
+Processing triggers for ca-certificates (20210119) ...
+
+Updating certificates in /etc/ssl/certs...
+
+0 added, 0 removed; done.
+
+Running hooks in /etc/ca-certificates/update.d...
+
+done.
+
+Removing intermediate container 396546bc078f
+ ---> f7d77d3415d6
+Step 3/18 : RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -     && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'     && apt-get update     && apt-get install -y google-chrome-stable --no-install-recommends     && rm -rf /var/lib/apt/lists/*
+ ---> Running in d18514212b4a
+[91mWarning: apt-key is deprecated. Manage keyring files in trusted.gpg.d instead (see apt-key(8)).
+[0mOK
+Get:1 http://dl.google.com/linux/chrome/deb stable InRelease [1825 B]
+Get:2 http://dl.google.com/linux/chrome/deb stable/main amd64 Packages [1212 B]
+Get:3 http://deb.debian.org/debian bullseye InRelease [75.1 kB]
+Get:4 http://deb.debian.org/debian-security bullseye-security InRelease [27.2 kB]
+Get:5 http://deb.debian.org/debian bullseye-updates InRelease [44.0 kB]
+Get:6 http://deb.debian.org/debian bullseye/main amd64 Packages [8066 kB]
+Get:7 http://deb.debian.org/debian-security bullseye-security/main amd64 Packages [440 kB]
+Get:8 http://deb.debian.org/debian bullseye-updates/main amd64 Packages [18.8 kB]
+Fetched 8674 kB in 2s (5049 kB/s)
+Reading package lists...
+Reading package lists...
+Building dependency tree...
+Reading state information...
+The following additional packages will be installed:
+  adwaita-icon-theme dbus dbus-user-session dconf-gsettings-backend
+  dconf-service dmsetup fontconfig fontconfig-config fonts-liberation
+  glib-networking glib-networking-common glib-networking-services
+  gsettings-desktop-schemas gtk-update-icon-cache hicolor-icon-theme
+  libapparmor1 libargon2-1 libasound2 libasound2-data libatk-bridge2.0-0
+  libatk1.0-0 libatk1.0-data libatspi2.0-0 libavahi-client3
+  libavahi-common-data libavahi-common3 libbrotli1 libcairo-gobject2 libcairo2
+  libcap2 libcolord2 libcryptsetup12 libcups2 libcurl3-gnutls libdatrie1
+  libdbus-1-3 libdconf1 libdeflate0 libdevmapper1.02.1 libdrm-common libdrm2
+  libepoxy0 libexpat1 libfontconfig1 libfreetype6 libfribidi0 libgbm1
+  libgdk-pixbuf-2.0-0 libgdk-pixbuf2.0-common libglib2.0-0 libgraphite2-3
+  libgtk-3-0 libgtk-3-common libharfbuzz0b libicu67 libip4tc2 libjbig0
+  libjpeg62-turbo libjson-c5 libjson-glib-1.0-0 libjson-glib-1.0-common
+  libkmod2 liblcms2-2 libnghttp2-14 libnspr4 libnss3 libpam-systemd
+  libpango-1.0-0 libpangocairo-1.0-0 libpangoft2-1.0-0 libpixman-1-0
+  libpng16-16 libproxy1v5 librest-0.7-0 librtmp1 libsoup-gnome2.4-1
+  libsoup2.4-1 libssh2-1 libthai-data libthai0 libtiff5 libvulkan1
+  libwayland-client0 libwayland-cursor0 libwayland-egl1 libwayland-server0
+  libwebp6 libxcb-render0 libxcb-shm0 libxcomposite1 libxcursor1 libxdamage1
+  libxfixes3 libxi6 libxinerama1 libxkbcommon0 libxml2 libxrandr2 libxrender1
+  sensible-utils shared-mime-info systemd systemd-sysv ucf xdg-utils xkb-data
+Suggested packages:
+  libasound2-plugins alsa-utils colord cups-common gvfs liblcms2-utils
+  systemd-container policykit-1
+Recommended packages:
+  librsvg2-common alsa-ucm-conf alsa-topology-conf at-spi2-core
+  libgdk-pixbuf2.0-bin libglib2.0-data xdg-user-dirs libgtk-3-bin
+  mesa-vulkan-drivers | vulkan-icd systemd-timesyncd | time-daemon
+  libnss-systemd libfile-mimeinfo-perl libnet-dbus-perl libx11-protocol-perl
+  x11-utils x11-xserver-utils
+The following NEW packages will be installed:
+  adwaita-icon-theme dbus dbus-user-session dconf-gsettings-backend
+  dconf-service dmsetup fontconfig fontconfig-config fonts-liberation
+  glib-networking glib-networking-common glib-networking-services
+  google-chrome-stable gsettings-desktop-schemas gtk-update-icon-cache
+  hicolor-icon-theme libapparmor1 libargon2-1 libasound2 libasound2-data
+  libatk-bridge2.0-0 libatk1.0-0 libatk1.0-data libatspi2.0-0 libavahi-client3
+  libavahi-common-data libavahi-common3 libbrotli1 libcairo-gobject2 libcairo2
+  libcap2 libcolord2 libcryptsetup12 libcups2 libcurl3-gnutls libdatrie1
+  libdbus-1-3 libdconf1 libdeflate0 libdevmapper1.02.1 libdrm-common libdrm2
+  libepoxy0 libexpat1 libfontconfig1 libfreetype6 libfribidi0 libgbm1
+  libgdk-pixbuf-2.0-0 libgdk-pixbuf2.0-common libglib2.0-0 libgraphite2-3
+  libgtk-3-0 libgtk-3-common libharfbuzz0b libicu67 libip4tc2 libjbig0
+  libjpeg62-turbo libjson-c5 libjson-glib-1.0-0 libjson-glib-1.0-common
+  libkmod2 liblcms2-2 libnghttp2-14 libnspr4 libnss3 libpam-systemd
+  libpango-1.0-0 libpangocairo-1.0-0 libpangoft2-1.0-0 libpixman-1-0
+  libpng16-16 libproxy1v5 librest-0.7-0 librtmp1 libsoup-gnome2.4-1
+  libsoup2.4-1 libssh2-1 libthai-data libthai0 libtiff5 libvulkan1
+  libwayland-client0 libwayland-cursor0 libwayland-egl1 libwayland-server0
+  libwebp6 libxcb-render0 libxcb-shm0 libxcomposite1 libxcursor1 libxdamage1
+  libxfixes3 libxi6 libxinerama1 libxkbcommon0 libxml2 libxrandr2 libxrender1
+  sensible-utils shared-mime-info systemd systemd-sysv ucf xdg-utils xkb-data
+0 upgraded, 107 newly installed, 0 to remove and 0 not upgraded.
+Need to get 169 MB of archives.
+After this operation, 574 MB of additional disk space will be used.
+Get:1 http://dl.google.com/linux/chrome/deb stable/main amd64 google-chrome-stable amd64 144.0.7559.59-1 [119 MB]
+Get:2 http://deb.debian.org/debian bullseye/main amd64 libapparmor1 amd64 2.13.6-10 [99.3 kB]
+Get:3 http://deb.debian.org/debian-security bullseye-security/main amd64 libcap2 amd64 1:2.44-1+deb11u1 [24.2 kB]
+Get:4 http://deb.debian.org/debian bullseye/main amd64 libargon2-1 amd64 0~20171227-0.2 [19.6 kB]
+Get:5 http://deb.debian.org/debian bullseye/main amd64 dmsetup amd64 2:1.02.175-2.1 [92.1 kB]
+Get:6 http://deb.debian.org/debian bullseye/main amd64 libdevmapper1.02.1 amd64 2:1.02.175-2.1 [143 kB]
+Get:7 http://deb.debian.org/debian bullseye/main amd64 libjson-c5 amd64 0.15-2+deb11u1 [42.9 kB]
+Get:8 http://deb.debian.org/debian bullseye/main amd64 libcryptsetup12 amd64 2:2.3.7-1+deb11u1 [248 kB]
+Get:9 http://deb.debian.org/debian bullseye/main amd64 libip4tc2 amd64 1.8.7-1 [34.6 kB]
+Get:10 http://deb.debian.org/debian bullseye/main amd64 libkmod2 amd64 28-1 [55.6 kB]
+Get:11 http://deb.debian.org/debian-security bullseye-security/main amd64 systemd amd64 247.3-7+deb11u7 [4501 kB]
+Get:12 http://deb.debian.org/debian-security bullseye-security/main amd64 systemd-sysv amd64 247.3-7+deb11u7 [114 kB]
+Get:13 http://deb.debian.org/debian bullseye/main amd64 libdbus-1-3 amd64 1.12.28-0+deb11u1 [223 kB]
+Get:14 http://deb.debian.org/debian-security bullseye-security/main amd64 libexpat1 amd64 2.2.10-2+deb11u7 [99.2 kB]
+Get:15 http://deb.debian.org/debian bullseye/main amd64 dbus amd64 1.12.28-0+deb11u1 [244 kB]
+Get:16 http://deb.debian.org/debian bullseye/main amd64 fonts-liberation all 1:1.07.4-11 [828 kB]
+Get:17 http://deb.debian.org/debian bullseye/main amd64 libasound2-data all 1.2.4-1.1 [38.2 kB]
+Get:18 http://deb.debian.org/debian bullseye/main amd64 libasound2 amd64 1.2.4-1.1 [356 kB]
+Get:19 http://deb.debian.org/debian-security bullseye-security/main amd64 libglib2.0-0 amd64 2.66.8-1+deb11u7 [1377 kB]
+Get:20 http://deb.debian.org/debian bullseye/main amd64 libatk1.0-data all 2.36.0-2 [149 kB]
+Get:21 http://deb.debian.org/debian bullseye/main amd64 libatk1.0-0 amd64 2.36.0-2 [52.2 kB]
+Get:22 http://deb.debian.org/debian bullseye/main amd64 libatspi2.0-0 amd64 2.38.0-4+deb11u1 [72.4 kB]
+Get:23 http://deb.debian.org/debian bullseye/main amd64 libatk-bridge2.0-0 amd64 2.38.0-1 [64.6 kB]
+Get:24 http://deb.debian.org/debian bullseye/main amd64 libbrotli1 amd64 1.0.9-2+b2 [279 kB]
+Get:25 http://deb.debian.org/debian-security bullseye-security/main amd64 libpng16-16 amd64 1.6.37-3+deb11u1 [295 kB]
+Get:26 http://deb.debian.org/debian-security bullseye-security/main amd64 libfreetype6 amd64 2.10.4+dfsg-1+deb11u2 [418 kB]
+Get:27 http://deb.debian.org/debian bullseye/main amd64 sensible-utils all 0.0.14 [14.8 kB]
+Get:28 http://deb.debian.org/debian-security bullseye-security/main amd64 ucf all 3.0043+deb11u2 [74.3 kB]
+Get:29 http://deb.debian.org/debian bullseye/main amd64 fontconfig-config all 2.13.1-4.2 [281 kB]
+Get:30 http://deb.debian.org/debian bullseye/main amd64 libfontconfig1 amd64 2.13.1-4.2 [347 kB]
+Get:31 http://deb.debian.org/debian bullseye/main amd64 libpixman-1-0 amd64 0.40.0-1.1~deb11u1 [543 kB]
+Get:32 http://deb.debian.org/debian bullseye/main amd64 libxcb-render0 amd64 1.14-3 [111 kB]
+Get:33 http://deb.debian.org/debian bullseye/main amd64 libxcb-shm0 amd64 1.14-3 [101 kB]
+Get:34 http://deb.debian.org/debian bullseye/main amd64 libxrender1 amd64 1:0.9.10-1 [33.0 kB]
+Get:35 http://deb.debian.org/debian bullseye/main amd64 libcairo2 amd64 1.16.0-5 [694 kB]
+Get:36 http://deb.debian.org/debian-security bullseye-security/main amd64 libavahi-common-data amd64 0.8-5+deb11u3 [124 kB]
+Get:37 http://deb.debian.org/debian-security bullseye-security/main amd64 libavahi-common3 amd64 0.8-5+deb11u3 [59.0 kB]
+Get:38 http://deb.debian.org/debian-security bullseye-security/main amd64 libavahi-client3 amd64 0.8-5+deb11u3 [62.7 kB]
+Get:39 http://deb.debian.org/debian-security bullseye-security/main amd64 libcups2 amd64 2.3.3op2-3+deb11u10 [351 kB]
+Get:40 http://deb.debian.org/debian-security bullseye-security/main amd64 libnghttp2-14 amd64 1.43.0-1+deb11u2 [77.0 kB]
+Get:41 http://deb.debian.org/debian bullseye/main amd64 librtmp1 amd64 2.4+20151223.gitfa8646d.1-2+b2 [60.8 kB]
+Get:42 http://deb.debian.org/debian bullseye/main amd64 libssh2-1 amd64 1.9.0-2+deb11u1 [156 kB]
+Get:43 http://deb.debian.org/debian-security bullseye-security/main amd64 libcurl3-gnutls amd64 7.74.0-1.3+deb11u16 [344 kB]
+Get:44 http://deb.debian.org/debian bullseye/main amd64 libdrm-common all 2.4.104-1 [14.9 kB]
+Get:45 http://deb.debian.org/debian bullseye/main amd64 libdrm2 amd64 2.4.104-1 [41.5 kB]
+Get:46 http://deb.debian.org/debian bullseye/main amd64 libwayland-server0 amd64 1.18.0-2~exp1.1 [34.4 kB]
+Get:47 http://deb.debian.org/debian bullseye/main amd64 libgbm1 amd64 20.3.5-1 [73.5 kB]
+Get:48 http://deb.debian.org/debian bullseye/main amd64 hicolor-icon-theme all 0.17-2 [11.4 kB]
+Get:49 http://deb.debian.org/debian-security bullseye-security/main amd64 libgdk-pixbuf2.0-common all 2.42.2+dfsg-1+deb11u4 [321 kB]
+Get:50 http://deb.debian.org/debian-security bullseye-security/main amd64 libicu67 amd64 67.1-7+deb11u1 [8624 kB]
+Get:51 http://deb.debian.org/debian-security bullseye-security/main amd64 libxml2 amd64 2.9.10+dfsg-6.7+deb11u9 [694 kB]
+Get:52 http://deb.debian.org/debian bullseye/main amd64 shared-mime-info amd64 2.0-1 [701 kB]
+Get:53 http://deb.debian.org/debian bullseye/main amd64 libjpeg62-turbo amd64 1:2.0.6-4 [151 kB]
+Get:54 http://deb.debian.org/debian bullseye/main amd64 libdeflate0 amd64 1.7-1 [53.1 kB]
+Get:55 http://deb.debian.org/debian bullseye/main amd64 libjbig0 amd64 2.1-3.1+b2 [31.0 kB]
+Get:56 http://deb.debian.org/debian bullseye/main amd64 libwebp6 amd64 0.6.1-2.1+deb11u2 [259 kB]
+Get:57 http://deb.debian.org/debian-security bullseye-security/main amd64 libtiff5 amd64 4.2.0-1+deb11u7 [291 kB]
+Get:58 http://deb.debian.org/debian-security bullseye-security/main amd64 libgdk-pixbuf-2.0-0 amd64 2.42.2+dfsg-1+deb11u4 [147 kB]
+Get:59 http://deb.debian.org/debian bullseye/main amd64 gtk-update-icon-cache amd64 3.24.24-4+deb11u4 [88.4 kB]
+Get:60 http://deb.debian.org/debian bullseye/main amd64 adwaita-icon-theme all 3.38.0-1 [10.9 MB]
+Get:61 http://deb.debian.org/debian bullseye/main amd64 libcairo-gobject2 amd64 1.16.0-5 [125 kB]
+Get:62 http://deb.debian.org/debian bullseye/main amd64 liblcms2-2 amd64 2.12~rc1-2 [150 kB]
+Get:63 http://deb.debian.org/debian bullseye/main amd64 libcolord2 amd64 1.4.5-3 [144 kB]
+Get:64 http://deb.debian.org/debian bullseye/main amd64 libepoxy0 amd64 1.5.5-1 [193 kB]
+Get:65 http://deb.debian.org/debian bullseye/main amd64 libfribidi0 amd64 1.0.8-2+deb11u1 [64.9 kB]
+Get:66 http://deb.debian.org/debian bullseye/main amd64 libgraphite2-3 amd64 1.3.14-1 [81.2 kB]
+Get:67 http://deb.debian.org/debian bullseye/main amd64 libharfbuzz0b amd64 2.7.4-1 [1471 kB]
+Get:68 http://deb.debian.org/debian bullseye/main amd64 libjson-glib-1.0-common all 1.6.2-1 [56.9 kB]
+Get:69 http://deb.debian.org/debian bullseye/main amd64 libjson-glib-1.0-0 amd64 1.6.2-1 [65.4 kB]
+Get:70 http://deb.debian.org/debian bullseye/main amd64 fontconfig amd64 2.13.1-4.2 [417 kB]
+Get:71 http://deb.debian.org/debian bullseye/main amd64 libthai-data all 0.1.28-3 [170 kB]
+Get:72 http://deb.debian.org/debian bullseye/main amd64 libdatrie1 amd64 0.2.13-1 [42.7 kB]
+Get:73 http://deb.debian.org/debian bullseye/main amd64 libthai0 amd64 0.1.28-3 [54.2 kB]
+Get:74 http://deb.debian.org/debian bullseye/main amd64 libpango-1.0-0 amd64 1.46.2-3 [191 kB]
+Get:75 http://deb.debian.org/debian bullseye/main amd64 libpangoft2-1.0-0 amd64 1.46.2-3 [62.2 kB]
+Get:76 http://deb.debian.org/debian bullseye/main amd64 libpangocairo-1.0-0 amd64 1.46.2-3 [50.6 kB]
+Get:77 http://deb.debian.org/debian bullseye/main amd64 libproxy1v5 amd64 0.4.17-1 [59.5 kB]
+Get:78 http://deb.debian.org/debian bullseye/main amd64 glib-networking-common all 2.66.0-2 [68.1 kB]
+Get:79 http://deb.debian.org/debian bullseye/main amd64 glib-networking-services amd64 2.66.0-2 [17.5 kB]
+Get:80 http://deb.debian.org/debian-security bullseye-security/main amd64 libpam-systemd amd64 247.3-7+deb11u7 [284 kB]
+Get:81 http://deb.debian.org/debian bullseye/main amd64 dbus-user-session amd64 1.12.28-0+deb11u1 [100 kB]
+Get:82 http://deb.debian.org/debian bullseye/main amd64 libdconf1 amd64 0.38.0-2 [43.5 kB]
+Get:83 http://deb.debian.org/debian bullseye/main amd64 dconf-service amd64 0.38.0-2 [37.4 kB]
+Get:84 http://deb.debian.org/debian bullseye/main amd64 dconf-gsettings-backend amd64 0.38.0-2 [30.6 kB]
+Get:85 http://deb.debian.org/debian bullseye/main amd64 gsettings-desktop-schemas all 3.38.0-2 [588 kB]
+Get:86 http://deb.debian.org/debian bullseye/main amd64 glib-networking amd64 2.66.0-2 [67.6 kB]
+Get:87 http://deb.debian.org/debian-security bullseye-security/main amd64 libsoup2.4-1 amd64 2.72.0-2+deb11u3 [283 kB]
+Get:88 http://deb.debian.org/debian-security bullseye-security/main amd64 libsoup-gnome2.4-1 amd64 2.72.0-2+deb11u3 [24.1 kB]
+Get:89 http://deb.debian.org/debian bullseye/main amd64 librest-0.7-0 amd64 0.8.1-1.1 [33.8 kB]
+Get:90 http://deb.debian.org/debian bullseye/main amd64 libwayland-client0 amd64 1.18.0-2~exp1.1 [26.9 kB]
+Get:91 http://deb.debian.org/debian bullseye/main amd64 libwayland-cursor0 amd64 1.18.0-2~exp1.1 [14.6 kB]
+Get:92 http://deb.debian.org/debian bullseye/main amd64 libwayland-egl1 amd64 1.18.0-2~exp1.1 [8448 B]
+Get:93 http://deb.debian.org/debian bullseye/main amd64 libxcomposite1 amd64 1:0.4.5-1 [16.6 kB]
+Get:94 http://deb.debian.org/debian bullseye/main amd64 libxfixes3 amd64 1:5.0.3-2 [22.1 kB]
+Get:95 http://deb.debian.org/debian bullseye/main amd64 libxcursor1 amd64 1:1.2.0-2 [37.3 kB]
+Get:96 http://deb.debian.org/debian bullseye/main amd64 libxdamage1 amd64 1:1.1.5-2 [15.7 kB]
+Get:97 http://deb.debian.org/debian bullseye/main amd64 libxi6 amd64 2:1.7.10-1 [83.4 kB]
+Get:98 http://deb.debian.org/debian bullseye/main amd64 libxinerama1 amd64 2:1.1.4-2 [17.7 kB]
+Get:99 http://deb.debian.org/debian bullseye/main amd64 xkb-data all 2.29-2 [655 kB]
+Get:100 http://deb.debian.org/debian bullseye/main amd64 libxkbcommon0 amd64 1.0.3-2 [101 kB]
+Get:101 http://deb.debian.org/debian bullseye/main amd64 libxrandr2 amd64 2:1.5.1-1 [37.5 kB]
+Get:102 http://deb.debian.org/debian bullseye/main amd64 libgtk-3-common all 3.24.24-4+deb11u4 [3757 kB]
+Get:103 http://deb.debian.org/debian bullseye/main amd64 libgtk-3-0 amd64 3.24.24-4+deb11u4 [2715 kB]
+Get:104 http://deb.debian.org/debian bullseye/main amd64 libnspr4 amd64 2:4.29-1 [112 kB]
+Get:105 http://deb.debian.org/debian-security bullseye-security/main amd64 libnss3 amd64 2:3.61-1+deb11u4 [1304 kB]
+Get:106 http://deb.debian.org/debian bullseye/main amd64 libvulkan1 amd64 1.2.162.0-1 [103 kB]
+Get:107 http://deb.debian.org/debian bullseye/main amd64 xdg-utils all 1.1.3-4.1 [75.5 kB]
+[91mdebconf: delaying package configuration, since apt-utils is not installed
+[0mFetched 169 MB in 2s (102 MB/s)
+Selecting previously unselected package libapparmor1:amd64.
+
+(Reading database ... 
+(Reading database ... 5%
+(Reading database ... 10%
+(Reading database ... 15%
+(Reading database ... 20%
+(Reading database ... 25%
+(Reading database ... 30%
+(Reading database ... 35%
+(Reading database ... 40%
+(Reading database ... 45%
+(Reading database ... 50%
+(Reading database ... 55%
+(Reading database ... 60%
+(Reading database ... 65%
+(Reading database ... 70%
+(Reading database ... 75%
+(Reading database ... 80%
+(Reading database ... 85%
+(Reading database ... 90%
+(Reading database ... 95%
+(Reading database ... 100%
+(Reading database ... 8042 files and directories currently installed.)
+
+Preparing to unpack .../0-libapparmor1_2.13.6-10_amd64.deb ...
+
+Unpacking libapparmor1:amd64 (2.13.6-10) ...
+
+Selecting previously unselected package libcap2:amd64.
+
+Preparing to unpack .../1-libcap2_1%3a2.44-1+deb11u1_amd64.deb ...
+
+Unpacking libcap2:amd64 (1:2.44-1+deb11u1) ...
+
+Selecting previously unselected package libargon2-1:amd64.
+
+Preparing to unpack .../2-libargon2-1_0~20171227-0.2_amd64.deb ...
+
+Unpacking libargon2-1:amd64 (0~20171227-0.2) ...
+
+Selecting previously unselected package dmsetup.
+
+Preparing to unpack .../3-dmsetup_2%3a1.02.175-2.1_amd64.deb ...
+
+Unpacking dmsetup (2:1.02.175-2.1) ...
+
+Selecting previously unselected package libdevmapper1.02.1:amd64.
+
+Preparing to unpack .../4-libdevmapper1.02.1_2%3a1.02.175-2.1_amd64.deb ...
+
+Unpacking libdevmapper1.02.1:amd64 (2:1.02.175-2.1) ...
+
+Selecting previously unselected package libjson-c5:amd64.
+
+Preparing to unpack .../5-libjson-c5_0.15-2+deb11u1_amd64.deb ...
+
+Unpacking libjson-c5:amd64 (0.15-2+deb11u1) ...
+
+Selecting previously unselected package libcryptsetup12:amd64.
+
+Preparing to unpack .../6-libcryptsetup12_2%3a2.3.7-1+deb11u1_amd64.deb ...
+
+Unpacking libcryptsetup12:amd64 (2:2.3.7-1+deb11u1) ...
+
+Selecting previously unselected package libip4tc2:amd64.
+
+Preparing to unpack .../7-libip4tc2_1.8.7-1_amd64.deb ...
+
+Unpacking libip4tc2:amd64 (1.8.7-1) ...
+
+Selecting previously unselected package libkmod2:amd64.
+
+Preparing to unpack .../8-libkmod2_28-1_amd64.deb ...
+
+Unpacking libkmod2:amd64 (28-1) ...
+
+Selecting previously unselected package systemd.
+
+Preparing to unpack .../9-systemd_247.3-7+deb11u7_amd64.deb ...
+
+Unpacking systemd (247.3-7+deb11u7) ...
+
+Setting up libapparmor1:amd64 (2.13.6-10) ...
+
+Setting up libcap2:amd64 (1:2.44-1+deb11u1) ...
+
+Setting up libargon2-1:amd64 (0~20171227-0.2) ...
+
+Setting up libjson-c5:amd64 (0.15-2+deb11u1) ...
+
+Setting up libip4tc2:amd64 (1.8.7-1) ...
+
+Setting up libkmod2:amd64 (28-1) ...
+
+Setting up libdevmapper1.02.1:amd64 (2:1.02.175-2.1) ...
+
+Setting up libcryptsetup12:amd64 (2:2.3.7-1+deb11u1) ...
+
+Setting up systemd (247.3-7+deb11u7) ...
+
+Created symlink /etc/systemd/system/getty.target.wants/getty@tty1.service ? /lib/systemd/system/getty@.service.
+
+Created symlink /etc/systemd/system/multi-user.target.wants/remote-fs.target ? /lib/systemd/system/remote-fs.target.
+
+Created symlink /etc/systemd/system/sysinit.target.wants/systemd-pstore.service ? /lib/systemd/system/systemd-pstore.service.
+
+Initializing machine ID from KVM UUID.
+
+Setting up dmsetup (2:1.02.175-2.1) ...
+
+Selecting previously unselected package systemd-sysv.
+
+(Reading database ... 
+(Reading database ... 5%
+(Reading database ... 10%
+(Reading database ... 15%
+(Reading database ... 20%
+(Reading database ... 25%
+(Reading database ... 30%
+(Reading database ... 35%
+(Reading database ... 40%
+(Reading database ... 45%
+(Reading database ... 50%
+(Reading database ... 55%
+(Reading database ... 60%
+(Reading database ... 65%
+(Reading database ... 70%
+(Reading database ... 75%
+(Reading database ... 80%
+(Reading database ... 85%
+(Reading database ... 90%
+(Reading database ... 95%
+(Reading database ... 100%
+(Reading database ... 8894 files and directories currently installed.)
+
+Preparing to unpack .../00-systemd-sysv_247.3-7+deb11u7_amd64.deb ...
+
+Unpacking systemd-sysv (247.3-7+deb11u7) ...
+
+Selecting previously unselected package libdbus-1-3:amd64.
+
+Preparing to unpack .../01-libdbus-1-3_1.12.28-0+deb11u1_amd64.deb ...
+
+Unpacking libdbus-1-3:amd64 (1.12.28-0+deb11u1) ...
+
+Selecting previously unselected package libexpat1:amd64.
+
+Preparing to unpack .../02-libexpat1_2.2.10-2+deb11u7_amd64.deb ...
+
+Unpacking libexpat1:amd64 (2.2.10-2+deb11u7) ...
+
+Selecting previously unselected package dbus.
+
+Preparing to unpack .../03-dbus_1.12.28-0+deb11u1_amd64.deb ...
+
+Unpacking dbus (1.12.28-0+deb11u1) ...
+
+Selecting previously unselected package fonts-liberation.
+
+Preparing to unpack .../04-fonts-liberation_1%3a1.07.4-11_all.deb ...
+
+Unpacking fonts-liberation (1:1.07.4-11) ...
+
+Selecting previously unselected package libasound2-data.
+
+Preparing to unpack .../05-libasound2-data_1.2.4-1.1_all.deb ...
+
+Unpacking libasound2-data (1.2.4-1.1) ...
+
+Selecting previously unselected package libasound2:amd64.
+
+Preparing to unpack .../06-libasound2_1.2.4-1.1_amd64.deb ...
+
+Unpacking libasound2:amd64 (1.2.4-1.1) ...
+
+Selecting previously unselected package libglib2.0-0:amd64.
+
+Preparing to unpack .../07-libglib2.0-0_2.66.8-1+deb11u7_amd64.deb ...
+
+Unpacking libglib2.0-0:amd64 (2.66.8-1+deb11u7) ...
+
+Selecting previously unselected package libatk1.0-data.
+
+Preparing to unpack .../08-libatk1.0-data_2.36.0-2_all.deb ...
+
+Unpacking libatk1.0-data (2.36.0-2) ...
+
+Selecting previously unselected package libatk1.0-0:amd64.
+
+Preparing to unpack .../09-libatk1.0-0_2.36.0-2_amd64.deb ...
+
+Unpacking libatk1.0-0:amd64 (2.36.0-2) ...
+
+Selecting previously unselected package libatspi2.0-0:amd64.
+
+Preparing to unpack .../10-libatspi2.0-0_2.38.0-4+deb11u1_amd64.deb ...
+
+Unpacking libatspi2.0-0:amd64 (2.38.0-4+deb11u1) ...
+
+Selecting previously unselected package libatk-bridge2.0-0:amd64.
+
+Preparing to unpack .../11-libatk-bridge2.0-0_2.38.0-1_amd64.deb ...
+
+Unpacking libatk-bridge2.0-0:amd64 (2.38.0-1) ...
+
+Selecting previously unselected package libbrotli1:amd64.
+
+Preparing to unpack .../12-libbrotli1_1.0.9-2+b2_amd64.deb ...
+
+Unpacking libbrotli1:amd64 (1.0.9-2+b2) ...
+
+Selecting previously unselected package libpng16-16:amd64.
+
+Preparing to unpack .../13-libpng16-16_1.6.37-3+deb11u1_amd64.deb ...
+
+Unpacking libpng16-16:amd64 (1.6.37-3+deb11u1) ...
+
+Selecting previously unselected package libfreetype6:amd64.
+
+Preparing to unpack .../14-libfreetype6_2.10.4+dfsg-1+deb11u2_amd64.deb ...
+
+Unpacking libfreetype6:amd64 (2.10.4+dfsg-1+deb11u2) ...
+
+Selecting previously unselected package sensible-utils.
+
+Preparing to unpack .../15-sensible-utils_0.0.14_all.deb ...
+
+Unpacking sensible-utils (0.0.14) ...
+
+Selecting previously unselected package ucf.
+
+Preparing to unpack .../16-ucf_3.0043+deb11u2_all.deb ...
+
+Moving old data out of the way
+
+Unpacking ucf (3.0043+deb11u2) ...
+
+Selecting previously unselected package fontconfig-config.
+
+Preparing to unpack .../17-fontconfig-config_2.13.1-4.2_all.deb ...
+
+Unpacking fontconfig-config (2.13.1-4.2) ...
+
+Selecting previously unselected package libfontconfig1:amd64.
+
+Preparing to unpack .../18-libfontconfig1_2.13.1-4.2_amd64.deb ...
+
+Unpacking libfontconfig1:amd64 (2.13.1-4.2) ...
+
+Selecting previously unselected package libpixman-1-0:amd64.
+
+Preparing to unpack .../19-libpixman-1-0_0.40.0-1.1~deb11u1_amd64.deb ...
+
+Unpacking libpixman-1-0:amd64 (0.40.0-1.1~deb11u1) ...
+
+Selecting previously unselected package libxcb-render0:amd64.
+
+Preparing to unpack .../20-libxcb-render0_1.14-3_amd64.deb ...
+
+Unpacking libxcb-render0:amd64 (1.14-3) ...
+
+Selecting previously unselected package libxcb-shm0:amd64.
+
+Preparing to unpack .../21-libxcb-shm0_1.14-3_amd64.deb ...
+
+Unpacking libxcb-shm0:amd64 (1.14-3) ...
+
+Selecting previously unselected package libxrender1:amd64.
+
+Preparing to unpack .../22-libxrender1_1%3a0.9.10-1_amd64.deb ...
+
+Unpacking libxrender1:amd64 (1:0.9.10-1) ...
+
+Selecting previously unselected package libcairo2:amd64.
+
+Preparing to unpack .../23-libcairo2_1.16.0-5_amd64.deb ...
+
+Unpacking libcairo2:amd64 (1.16.0-5) ...
+
+Selecting previously unselected package libavahi-common-data:amd64.
+
+Preparing to unpack .../24-libavahi-common-data_0.8-5+deb11u3_amd64.deb ...
+
+Unpacking libavahi-common-data:amd64 (0.8-5+deb11u3) ...
+
+Selecting previously unselected package libavahi-common3:amd64.
+
+Preparing to unpack .../25-libavahi-common3_0.8-5+deb11u3_amd64.deb ...
+
+Unpacking libavahi-common3:amd64 (0.8-5+deb11u3) ...
+
+Selecting previously unselected package libavahi-client3:amd64.
+
+Preparing to unpack .../26-libavahi-client3_0.8-5+deb11u3_amd64.deb ...
+
+Unpacking libavahi-client3:amd64 (0.8-5+deb11u3) ...
+
+Selecting previously unselected package libcups2:amd64.
+
+Preparing to unpack .../27-libcups2_2.3.3op2-3+deb11u10_amd64.deb ...
+
+Unpacking libcups2:amd64 (2.3.3op2-3+deb11u10) ...
+
+Selecting previously unselected package libnghttp2-14:amd64.
+
+Preparing to unpack .../28-libnghttp2-14_1.43.0-1+deb11u2_amd64.deb ...
+
+Unpacking libnghttp2-14:amd64 (1.43.0-1+deb11u2) ...
+
+Selecting previously unselected package librtmp1:amd64.
+
+Preparing to unpack .../29-librtmp1_2.4+20151223.gitfa8646d.1-2+b2_amd64.deb ...
+
+Unpacking librtmp1:amd64 (2.4+20151223.gitfa8646d.1-2+b2) ...
+
+Selecting previously unselected package libssh2-1:amd64.
+
+Preparing to unpack .../30-libssh2-1_1.9.0-2+deb11u1_amd64.deb ...
+
+Unpacking libssh2-1:amd64 (1.9.0-2+deb11u1) ...
+
+Selecting previously unselected package libcurl3-gnutls:amd64.
+
+Preparing to unpack .../31-libcurl3-gnutls_7.74.0-1.3+deb11u16_amd64.deb ...
+
+Unpacking libcurl3-gnutls:amd64 (7.74.0-1.3+deb11u16) ...
+
+Selecting previously unselected package libdrm-common.
+
+Preparing to unpack .../32-libdrm-common_2.4.104-1_all.deb ...
+
+Unpacking libdrm-common (2.4.104-1) ...
+
+Selecting previously unselected package libdrm2:amd64.
+
+Preparing to unpack .../33-libdrm2_2.4.104-1_amd64.deb ...
+
+Unpacking libdrm2:amd64 (2.4.104-1) ...
+
+Selecting previously unselected package libwayland-server0:amd64.
+
+Preparing to unpack .../34-libwayland-server0_1.18.0-2~exp1.1_amd64.deb ...
+
+Unpacking libwayland-server0:amd64 (1.18.0-2~exp1.1) ...
+
+Selecting previously unselected package libgbm1:amd64.
+
+Preparing to unpack .../35-libgbm1_20.3.5-1_amd64.deb ...
+
+Unpacking libgbm1:amd64 (20.3.5-1) ...
+
+Selecting previously unselected package hicolor-icon-theme.
+
+Preparing to unpack .../36-hicolor-icon-theme_0.17-2_all.deb ...
+
+Unpacking hicolor-icon-theme (0.17-2) ...
+
+Selecting previously unselected package libgdk-pixbuf2.0-common.
+
+Preparing to unpack .../37-libgdk-pixbuf2.0-common_2.42.2+dfsg-1+deb11u4_all.deb ...
+
+Unpacking libgdk-pixbuf2.0-common (2.42.2+dfsg-1+deb11u4) ...
+
+Selecting previously unselected package libicu67:amd64.
+
+Preparing to unpack .../38-libicu67_67.1-7+deb11u1_amd64.deb ...
+
+Unpacking libicu67:amd64 (67.1-7+deb11u1) ...
+
+Selecting previously unselected package libxml2:amd64.
+
+Preparing to unpack .../39-libxml2_2.9.10+dfsg-6.7+deb11u9_amd64.deb ...
+
+Unpacking libxml2:amd64 (2.9.10+dfsg-6.7+deb11u9) ...
+
+Selecting previously unselected package shared-mime-info.
+
+Preparing to unpack .../40-shared-mime-info_2.0-1_amd64.deb ...
+
+Unpacking shared-mime-info (2.0-1) ...
+
+Selecting previously unselected package libjpeg62-turbo:amd64.
+
+Preparing to unpack .../41-libjpeg62-turbo_1%3a2.0.6-4_amd64.deb ...
+
+Unpacking libjpeg62-turbo:amd64 (1:2.0.6-4) ...
+
+Selecting previously unselected package libdeflate0:amd64.
+
+Preparing to unpack .../42-libdeflate0_1.7-1_amd64.deb ...
+
+Unpacking libdeflate0:amd64 (1.7-1) ...
+
+Selecting previously unselected package libjbig0:amd64.
+
+Preparing to unpack .../43-libjbig0_2.1-3.1+b2_amd64.deb ...
+
+Unpacking libjbig0:amd64 (2.1-3.1+b2) ...
+
+Selecting previously unselected package libwebp6:amd64.
+
+Preparing to unpack .../44-libwebp6_0.6.1-2.1+deb11u2_amd64.deb ...
+
+Unpacking libwebp6:amd64 (0.6.1-2.1+deb11u2) ...
+
+Selecting previously unselected package libtiff5:amd64.
+
+Preparing to unpack .../45-libtiff5_4.2.0-1+deb11u7_amd64.deb ...
+
+Unpacking libtiff5:amd64 (4.2.0-1+deb11u7) ...
+
+Selecting previously unselected package libgdk-pixbuf-2.0-0:amd64.
+
+Preparing to unpack .../46-libgdk-pixbuf-2.0-0_2.42.2+dfsg-1+deb11u4_amd64.deb ...
+
+Unpacking libgdk-pixbuf-2.0-0:amd64 (2.42.2+dfsg-1+deb11u4) ...
+
+Selecting previously unselected package gtk-update-icon-cache.
+
+Preparing to unpack .../47-gtk-update-icon-cache_3.24.24-4+deb11u4_amd64.deb ...
+
+Unpacking gtk-update-icon-cache (3.24.24-4+deb11u4) ...
+
+Selecting previously unselected package adwaita-icon-theme.
+
+Preparing to unpack .../48-adwaita-icon-theme_3.38.0-1_all.deb ...
+
+Unpacking adwaita-icon-theme (3.38.0-1) ...
+
+Selecting previously unselected package libcairo-gobject2:amd64.
+
+Preparing to unpack .../49-libcairo-gobject2_1.16.0-5_amd64.deb ...
+
+Unpacking libcairo-gobject2:amd64 (1.16.0-5) ...
+
+Selecting previously unselected package liblcms2-2:amd64.
+
+Preparing to unpack .../50-liblcms2-2_2.12~rc1-2_amd64.deb ...
+
+Unpacking liblcms2-2:amd64 (2.12~rc1-2) ...
+
+Selecting previously unselected package libcolord2:amd64.
+
+Preparing to unpack .../51-libcolord2_1.4.5-3_amd64.deb ...
+
+Unpacking libcolord2:amd64 (1.4.5-3) ...
+
+Selecting previously unselected package libepoxy0:amd64.
+
+Preparing to unpack .../52-libepoxy0_1.5.5-1_amd64.deb ...
+
+Unpacking libepoxy0:amd64 (1.5.5-1) ...
+
+Selecting previously unselected package libfribidi0:amd64.
+
+Preparing to unpack .../53-libfribidi0_1.0.8-2+deb11u1_amd64.deb ...
+
+Unpacking libfribidi0:amd64 (1.0.8-2+deb11u1) ...
+
+Selecting previously unselected package libgraphite2-3:amd64.
+
+Preparing to unpack .../54-libgraphite2-3_1.3.14-1_amd64.deb ...
+
+Unpacking libgraphite2-3:amd64 (1.3.14-1) ...
+
+Selecting previously unselected package libharfbuzz0b:amd64.
+
+Preparing to unpack .../55-libharfbuzz0b_2.7.4-1_amd64.deb ...
+
+Unpacking libharfbuzz0b:amd64 (2.7.4-1) ...
+
+Selecting previously unselected package libjson-glib-1.0-common.
+
+Preparing to unpack .../56-libjson-glib-1.0-common_1.6.2-1_all.deb ...
+
+Unpacking libjson-glib-1.0-common (1.6.2-1) ...
+
+Selecting previously unselected package libjson-glib-1.0-0:amd64.
+
+Preparing to unpack .../57-libjson-glib-1.0-0_1.6.2-1_amd64.deb ...
+
+Unpacking libjson-glib-1.0-0:amd64 (1.6.2-1) ...
+
+Selecting previously unselected package fontconfig.
+
+Preparing to unpack .../58-fontconfig_2.13.1-4.2_amd64.deb ...
+
+Unpacking fontconfig (2.13.1-4.2) ...
+
+Selecting previously unselected package libthai-data.
+
+Preparing to unpack .../59-libthai-data_0.1.28-3_all.deb ...
+
+Unpacking libthai-data (0.1.28-3) ...
+
+Selecting previously unselected package libdatrie1:amd64.
+
+Preparing to unpack .../60-libdatrie1_0.2.13-1_amd64.deb ...
+
+Unpacking libdatrie1:amd64 (0.2.13-1) ...
+
+Selecting previously unselected package libthai0:amd64.
+
+Preparing to unpack .../61-libthai0_0.1.28-3_amd64.deb ...
+
+Unpacking libthai0:amd64 (0.1.28-3) ...
+
+Selecting previously unselected package libpango-1.0-0:amd64.
+
+Preparing to unpack .../62-libpango-1.0-0_1.46.2-3_amd64.deb ...
+
+Unpacking libpango-1.0-0:amd64 (1.46.2-3) ...
+
+Selecting previously unselected package libpangoft2-1.0-0:amd64.
+
+Preparing to unpack .../63-libpangoft2-1.0-0_1.46.2-3_amd64.deb ...
+
+Unpacking libpangoft2-1.0-0:amd64 (1.46.2-3) ...
+
+Selecting previously unselected package libpangocairo-1.0-0:amd64.
+
+Preparing to unpack .../64-libpangocairo-1.0-0_1.46.2-3_amd64.deb ...
+
+Unpacking libpangocairo-1.0-0:amd64 (1.46.2-3) ...
+
+Selecting previously unselected package libproxy1v5:amd64.
+
+Preparing to unpack .../65-libproxy1v5_0.4.17-1_amd64.deb ...
+
+Unpacking libproxy1v5:amd64 (0.4.17-1) ...
+
+Selecting previously unselected package glib-networking-common.
+
+Preparing to unpack .../66-glib-networking-common_2.66.0-2_all.deb ...
+
+Unpacking glib-networking-common (2.66.0-2) ...
+
+Selecting previously unselected package glib-networking-services.
+
+Preparing to unpack .../67-glib-networking-services_2.66.0-2_amd64.deb ...
+
+Unpacking glib-networking-services (2.66.0-2) ...
+
+Selecting previously unselected package libpam-systemd:amd64.
+
+Preparing to unpack .../68-libpam-systemd_247.3-7+deb11u7_amd64.deb ...
+
+Unpacking libpam-systemd:amd64 (247.3-7+deb11u7) ...
+
+Selecting previously unselected package dbus-user-session.
+
+Preparing to unpack .../69-dbus-user-session_1.12.28-0+deb11u1_amd64.deb ...
+
+Unpacking dbus-user-session (1.12.28-0+deb11u1) ...
+
+Selecting previously unselected package libdconf1:amd64.
+
+Preparing to unpack .../70-libdconf1_0.38.0-2_amd64.deb ...
+
+Unpacking libdconf1:amd64 (0.38.0-2) ...
+
+Selecting previously unselected package dconf-service.
+
+Preparing to unpack .../71-dconf-service_0.38.0-2_amd64.deb ...
+
+Unpacking dconf-service (0.38.0-2) ...
+
+Selecting previously unselected package dconf-gsettings-backend:amd64.
+
+Preparing to unpack .../72-dconf-gsettings-backend_0.38.0-2_amd64.deb ...
+
+Unpacking dconf-gsettings-backend:amd64 (0.38.0-2) ...
+
+Selecting previously unselected package gsettings-desktop-schemas.
+
+Preparing to unpack .../73-gsettings-desktop-schemas_3.38.0-2_all.deb ...
+
+Unpacking gsettings-desktop-schemas (3.38.0-2) ...
+
+Selecting previously unselected package glib-networking:amd64.
+
+Preparing to unpack .../74-glib-networking_2.66.0-2_amd64.deb ...
+
+Unpacking glib-networking:amd64 (2.66.0-2) ...
+
+Selecting previously unselected package libsoup2.4-1:amd64.
+
+Preparing to unpack .../75-libsoup2.4-1_2.72.0-2+deb11u3_amd64.deb ...
+
+Unpacking libsoup2.4-1:amd64 (2.72.0-2+deb11u3) ...
+
+Selecting previously unselected package libsoup-gnome2.4-1:amd64.
+
+Preparing to unpack .../76-libsoup-gnome2.4-1_2.72.0-2+deb11u3_amd64.deb ...
+
+Unpacking libsoup-gnome2.4-1:amd64 (2.72.0-2+deb11u3) ...
+
+Selecting previously unselected package librest-0.7-0:amd64.
+
+Preparing to unpack .../77-librest-0.7-0_0.8.1-1.1_amd64.deb ...
+
+Unpacking librest-0.7-0:amd64 (0.8.1-1.1) ...
+
+Selecting previously unselected package libwayland-client0:amd64.
+
+Preparing to unpack .../78-libwayland-client0_1.18.0-2~exp1.1_amd64.deb ...
+
+Unpacking libwayland-client0:amd64 (1.18.0-2~exp1.1) ...
+
+Selecting previously unselected package libwayland-cursor0:amd64.
+
+Preparing to unpack .../79-libwayland-cursor0_1.18.0-2~exp1.1_amd64.deb ...
+
+Unpacking libwayland-cursor0:amd64 (1.18.0-2~exp1.1) ...
+
+Selecting previously unselected package libwayland-egl1:amd64.
+
+Preparing to unpack .../80-libwayland-egl1_1.18.0-2~exp1.1_amd64.deb ...
+
+Unpacking libwayland-egl1:amd64 (1.18.0-2~exp1.1) ...
+
+Selecting previously unselected package libxcomposite1:amd64.
+
+Preparing to unpack .../81-libxcomposite1_1%3a0.4.5-1_amd64.deb ...
+
+Unpacking libxcomposite1:amd64 (1:0.4.5-1) ...
+
+Selecting previously unselected package libxfixes3:amd64.
+
+Preparing to unpack .../82-libxfixes3_1%3a5.0.3-2_amd64.deb ...
+
+Unpacking libxfixes3:amd64 (1:5.0.3-2) ...
+
+Selecting previously unselected package libxcursor1:amd64.
+
+Preparing to unpack .../83-libxcursor1_1%3a1.2.0-2_amd64.deb ...
+
+Unpacking libxcursor1:amd64 (1:1.2.0-2) ...
+
+Selecting previously unselected package libxdamage1:amd64.
+
+Preparing to unpack .../84-libxdamage1_1%3a1.1.5-2_amd64.deb ...
+
+Unpacking libxdamage1:amd64 (1:1.1.5-2) ...
+
+Selecting previously unselected package libxi6:amd64.
+
+Preparing to unpack .../85-libxi6_2%3a1.7.10-1_amd64.deb ...
+
+Unpacking libxi6:amd64 (2:1.7.10-1) ...
+
+Selecting previously unselected package libxinerama1:amd64.
+
+Preparing to unpack .../86-libxinerama1_2%3a1.1.4-2_amd64.deb ...
+
+Unpacking libxinerama1:amd64 (2:1.1.4-2) ...
+
+Selecting previously unselected package xkb-data.
+
+Preparing to unpack .../87-xkb-data_2.29-2_all.deb ...
+
+Unpacking xkb-data (2.29-2) ...
+
+Selecting previously unselected package libxkbcommon0:amd64.
+
+Preparing to unpack .../88-libxkbcommon0_1.0.3-2_amd64.deb ...
+
+Unpacking libxkbcommon0:amd64 (1.0.3-2) ...
+
+Selecting previously unselected package libxrandr2:amd64.
+
+Preparing to unpack .../89-libxrandr2_2%3a1.5.1-1_amd64.deb ...
+
+Unpacking libxrandr2:amd64 (2:1.5.1-1) ...
+
+Selecting previously unselected package libgtk-3-common.
+
+Preparing to unpack .../90-libgtk-3-common_3.24.24-4+deb11u4_all.deb ...
+
+Unpacking libgtk-3-common (3.24.24-4+deb11u4) ...
+
+Selecting previously unselected package libgtk-3-0:amd64.
+
+Preparing to unpack .../91-libgtk-3-0_3.24.24-4+deb11u4_amd64.deb ...
+
+Unpacking libgtk-3-0:amd64 (3.24.24-4+deb11u4) ...
+
+Selecting previously unselected package libnspr4:amd64.
+
+Preparing to unpack .../92-libnspr4_2%3a4.29-1_amd64.deb ...
+
+Unpacking libnspr4:amd64 (2:4.29-1) ...
+
+Selecting previously unselected package libnss3:amd64.
+
+Preparing to unpack .../93-libnss3_2%3a3.61-1+deb11u4_amd64.deb ...
+
+Unpacking libnss3:amd64 (2:3.61-1+deb11u4) ...
+
+Selecting previously unselected package libvulkan1:amd64.
+
+Preparing to unpack .../94-libvulkan1_1.2.162.0-1_amd64.deb ...
+
+Unpacking libvulkan1:amd64 (1.2.162.0-1) ...
+
+Selecting previously unselected package xdg-utils.
+
+Preparing to unpack .../95-xdg-utils_1.1.3-4.1_all.deb ...
+
+Unpacking xdg-utils (1.1.3-4.1) ...
+
+Selecting previously unselected package google-chrome-stable.
+
+Preparing to unpack .../96-google-chrome-stable_144.0.7559.59-1_amd64.deb ...
+
+Unpacking google-chrome-stable (144.0.7559.59-1) ...
+
+Setting up libexpat1:amd64 (2.2.10-2+deb11u7) ...
+
+Setting up libgraphite2-3:amd64 (1.3.14-1) ...
+
+Setting up liblcms2-2:amd64 (2.12~rc1-2) ...
+
+Setting up libpixman-1-0:amd64 (0.40.0-1.1~deb11u1) ...
+
+Setting up libwayland-server0:amd64 (1.18.0-2~exp1.1) ...
+
+Setting up systemd-sysv (247.3-7+deb11u7) ...
+
+Setting up libproxy1v5:amd64 (0.4.17-1) ...
+
+Setting up libxdamage1:amd64 (1:1.1.5-2) ...
+
+Setting up hicolor-icon-theme (0.17-2) ...
+
+Setting up libxi6:amd64 (2:1.7.10-1) ...
+
+Setting up libxrender1:amd64 (1:0.9.10-1) ...
+
+Setting up libicu67:amd64 (67.1-7+deb11u1) ...
+
+Setting up libdatrie1:amd64 (0.2.13-1) ...
+
+Setting up libxcb-render0:amd64 (1.14-3) ...
+
+Setting up libglib2.0-0:amd64 (2.66.8-1+deb11u7) ...
+
+Setting up libbrotli1:amd64 (1.0.9-2+b2) ...
+
+Setting up libgdk-pixbuf2.0-common (2.42.2+dfsg-1+deb11u4) ...
+
+Setting up libnghttp2-14:amd64 (1.43.0-1+deb11u2) ...
+
+Setting up libdeflate0:amd64 (1.7-1) ...
+
+Setting up xkb-data (2.29-2) ...
+
+Setting up libxcb-shm0:amd64 (1.14-3) ...
+
+Setting up libjbig0:amd64 (2.1-3.1+b2) ...
+
+Setting up libcolord2:amd64 (1.4.5-3) ...
+
+Setting up libdconf1:amd64 (0.38.0-2) ...
+
+Setting up libasound2-data (1.2.4-1.1) ...
+
+Setting up libjpeg62-turbo:amd64 (1:2.0.6-4) ...
+
+Setting up libepoxy0:amd64 (1.5.5-1) ...
+
+Setting up libnspr4:amd64 (2:4.29-1) ...
+
+Setting up libxfixes3:amd64 (1:5.0.3-2) ...
+
+Setting up librtmp1:amd64 (2.4+20151223.gitfa8646d.1-2+b2) ...
+
+Setting up libavahi-common-data:amd64 (0.8-5+deb11u3) ...
+
+Setting up libdbus-1-3:amd64 (1.12.28-0+deb11u1) ...
+
+Setting up dbus (1.12.28-0+deb11u1) ...
+
+invoke-rc.d: could not determine current runlevel
+
+invoke-rc.d: policy-rc.d denied execution of start.
+
+Setting up libfribidi0:amd64 (1.0.8-2+deb11u1) ...
+
+Setting up libxinerama1:amd64 (2:1.1.4-2) ...
+
+Setting up libpng16-16:amd64 (1.6.37-3+deb11u1) ...
+
+Setting up libxrandr2:amd64 (2:1.5.1-1) ...
+
+Setting up libwebp6:amd64 (0.6.1-2.1+deb11u2) ...
+
+Setting up libvulkan1:amd64 (1.2.162.0-1) ...
+
+Setting up libatk1.0-data (2.36.0-2) ...
+
+Setting up sensible-utils (0.0.14) ...
+
+Setting up libasound2:amd64 (1.2.4-1.1) ...
+
+Setting up fonts-liberation (1:1.07.4-11) ...
+
+Setting up libpam-systemd:amd64 (247.3-7+deb11u7) ...
+
+debconf: unable to initialize frontend: Dialog
+
+debconf: (TERM is not set, so the dialog frontend is not usable.)
+
+debconf: falling back to frontend: Readline
+
+debconf: unable to initialize frontend: Readline
+
+debconf: (Can't locate Term/ReadLine.pm in @INC (you may need to install the Term::ReadLine module) (@INC contains: /etc/perl /usr/local/lib/x86_64-linux-gnu/perl/5.32.1 /usr/local/share/perl/5.32.1 /usr/lib/x86_64-linux-gnu/perl5/5.32 /usr/share/perl5 /usr/lib/x86_64-linux-gnu/perl-base /usr/lib/x86_64-linux-gnu/perl/5.32 /usr/share/perl/5.32 /usr/local/lib/site_perl) at /usr/share/perl5/Debconf/FrontEnd/Readline.pm line 7.)
+
+debconf: falling back to frontend: Teletype
+
+Setting up libthai-data (0.1.28-3) ...
+
+Setting up libssh2-1:amd64 (1.9.0-2+deb11u1) ...
+
+Setting up libjson-glib-1.0-common (1.6.2-1) ...
+
+Setting up libatk1.0-0:amd64 (2.36.0-2) ...
+
+Setting up libtiff5:amd64 (4.2.0-1+deb11u7) ...
+
+Setting up libwayland-egl1:amd64 (1.18.0-2~exp1.1) ...
+
+Setting up glib-networking-common (2.66.0-2) ...
+
+Setting up libdrm-common (2.4.104-1) ...
+
+Setting up libxcomposite1:amd64 (1:0.4.5-1) ...
+
+Setting up libxml2:amd64 (2.9.10+dfsg-6.7+deb11u9) ...
+
+Setting up xdg-utils (1.1.3-4.1) ...
+
+update-alternatives: using /usr/bin/xdg-open to provide /usr/bin/open (open) in auto mode
+
+update-alternatives: warning: skip creation of /usr/share/man/man1/open.1.gz because associated file /usr/share/man/man1/xdg-open.1.gz (of link group open) doesn't exist
+
+Setting up libxkbcommon0:amd64 (1.0.3-2) ...
+
+Setting up libwayland-client0:amd64 (1.18.0-2~exp1.1) ...
+
+Setting up glib-networking-services (2.66.0-2) ...
+
+Setting up libxcursor1:amd64 (1:1.2.0-2) ...
+
+Setting up libavahi-common3:amd64 (0.8-5+deb11u3) ...
+
+Setting up libcurl3-gnutls:amd64 (7.74.0-1.3+deb11u16) ...
+
+Setting up libnss3:amd64 (2:3.61-1+deb11u4) ...
+
+Setting up libatspi2.0-0:amd64 (2.38.0-4+deb11u1) ...
+
+Setting up libjson-glib-1.0-0:amd64 (1.6.2-1) ...
+
+Setting up libatk-bridge2.0-0:amd64 (2.38.0-1) ...
+
+Setting up libthai0:amd64 (0.1.28-3) ...
+
+Setting up dbus-user-session (1.12.28-0+deb11u1) ...
+
+Setting up libfreetype6:amd64 (2.10.4+dfsg-1+deb11u2) ...
+
+Setting up shared-mime-info (2.0-1) ...
+
+Setting up ucf (3.0043+deb11u2) ...
+
+debconf: unable to initialize frontend: Dialog
+
+debconf: (TERM is not set, so the dialog frontend is not usable.)
+
+debconf: falling back to frontend: Readline
+
+debconf: unable to initialize frontend: Readline
+
+debconf: (Can't locate Term/ReadLine.pm in @INC (you may need to install the Term::ReadLine module) (@INC contains: /etc/perl /usr/local/lib/x86_64-linux-gnu/perl/5.32.1 /usr/local/share/perl/5.32.1 /usr/lib/x86_64-linux-gnu/perl5/5.32 /usr/share/perl5 /usr/lib/x86_64-linux-gnu/perl-base /usr/lib/x86_64-linux-gnu/perl/5.32 /usr/share/perl/5.32 /usr/local/lib/site_perl) at /usr/share/perl5/Debconf/FrontEnd/Readline.pm line 7.)
+
+debconf: falling back to frontend: Teletype
+
+Setting up libdrm2:amd64 (2.4.104-1) ...
+
+Setting up libwayland-cursor0:amd64 (1.18.0-2~exp1.1) ...
+
+Setting up libharfbuzz0b:amd64 (2.7.4-1) ...
+
+Setting up libgdk-pixbuf-2.0-0:amd64 (2.42.2+dfsg-1+deb11u4) ...
+
+Setting up libavahi-client3:amd64 (0.8-5+deb11u3) ...
+
+Setting up gtk-update-icon-cache (3.24.24-4+deb11u4) ...
+
+Setting up libgbm1:amd64 (20.3.5-1) ...
+
+Setting up fontconfig-config (2.13.1-4.2) ...
+
+debconf: unable to initialize frontend: Dialog
+
+debconf: (TERM is not set, so the dialog frontend is not usable.)
+
+debconf: falling back to frontend: Readline
+
+debconf: unable to initialize frontend: Readline
+
+debconf: (Can't locate Term/ReadLine.pm in @INC (you may need to install the Term::ReadLine module) (@INC contains: /etc/perl /usr/local/lib/x86_64-linux-gnu/perl/5.32.1 /usr/local/share/perl/5.32.1 /usr/lib/x86_64-linux-gnu/perl5/5.32 /usr/share/perl5 /usr/lib/x86_64-linux-gnu/perl-base /usr/lib/x86_64-linux-gnu/perl/5.32 /usr/share/perl/5.32 /usr/local/lib/site_perl) at /usr/share/perl5/Debconf/FrontEnd/Readline.pm line 7.)
+
+debconf: falling back to frontend: Teletype
+
+Setting up dconf-service (0.38.0-2) ...
+
+Setting up adwaita-icon-theme (3.38.0-1) ...
+
+update-alternatives: using /usr/share/icons/Adwaita/cursor.theme to provide /usr/share/icons/default/index.theme (x-cursor-theme) in auto mode
+
+Setting up libcups2:amd64 (2.3.3op2-3+deb11u10) ...
+
+Setting up libfontconfig1:amd64 (2.13.1-4.2) ...
+
+Setting up fontconfig (2.13.1-4.2) ...
+
+Regenerating fonts cache... done.
+
+Setting up dconf-gsettings-backend:amd64 (0.38.0-2) ...
+
+Setting up libpango-1.0-0:amd64 (1.46.2-3) ...
+
+Setting up libcairo2:amd64 (1.16.0-5) ...
+
+Setting up libcairo-gobject2:amd64 (1.16.0-5) ...
+
+Setting up libpangoft2-1.0-0:amd64 (1.46.2-3) ...
+
+Setting up libgtk-3-common (3.24.24-4+deb11u4) ...
+
+Setting up libpangocairo-1.0-0:amd64 (1.46.2-3) ...
+
+Setting up gsettings-desktop-schemas (3.38.0-2) ...
+
+Setting up glib-networking:amd64 (2.66.0-2) ...
+
+Setting up libsoup2.4-1:amd64 (2.72.0-2+deb11u3) ...
+
+Setting up libsoup-gnome2.4-1:amd64 (2.72.0-2+deb11u3) ...
+
+Setting up librest-0.7-0:amd64 (0.8.1-1.1) ...
+
+Setting up libgtk-3-0:amd64 (3.24.24-4+deb11u4) ...
+
+Setting up google-chrome-stable (144.0.7559.59-1) ...
+
+update-alternatives: using /usr/bin/google-chrome-stable to provide /usr/bin/x-www-browser (x-www-browser) in auto mode
+
+update-alternatives: using /usr/bin/google-chrome-stable to provide /usr/bin/gnome-www-browser (gnome-www-browser) in auto mode
+
+update-alternatives: using /usr/bin/google-chrome-stable to provide /usr/bin/google-chrome (google-chrome) in auto mode
+
+Processing triggers for libc-bin (2.31-13+deb11u13) ...
+
+Removing intermediate container d18514212b4a
+ ---> f0c5509da649
+Step 4/18 : WORKDIR /app
+ ---> Running in a6f8158f816b
+Removing intermediate container a6f8158f816b
+ ---> 6bd7beabb6d4
+Step 5/18 : COPY package.json package-lock.json ./
+ ---> 5484b2fe741a
+Step 6/18 : ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ ---> Running in 29b179708aa2
+Removing intermediate container 29b179708aa2
+ ---> 6b0f0365bd17
+Step 7/18 : ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
+ ---> Running in 3ec8bbf061f7
+Removing intermediate container 3ec8bbf061f7
+ ---> 64bcc64aebbb
+Step 8/18 : ARG NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_c2F2ZWQtYnV6emFyZC0xNy5jbGVyay5hY2NvdW50cy5kZXYk
+ ---> Running in e1c87f979366
+Removing intermediate container e1c87f979366
+ ---> 86007f4344f8
+Step 9/18 : ENV NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=$NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+ ---> Running in 0bde5a2e4b72
+Removing intermediate container 0bde5a2e4b72
+ ---> af3ca105eb96
+Step 10/18 : ENV NODE_OPTIONS="--max-old-space-size=4096"
+ ---> Running in 60f789520598
+Removing intermediate container 60f789520598
+ ---> de81c784793e
+Step 11/18 : RUN npm ci
+ ---> Running in 433cac99a400
+[91mnpm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead
+[0m
+added 512 packages, and audited 513 packages in 36s
+
+79 packages are looking for funding
+  run `npm fund` for details
+
+2 low severity vulnerabilities
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+[91mnpm notice
+npm notice New major version of npm available! 10.8.2 -> 11.7.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.7.0
+npm notice To update run: npm install -g npm@11.7.0
+npm notice
+[0mRemoving intermediate container 433cac99a400
+ ---> 1cbe5b1b5cb6
+Step 12/18 : COPY . .
+ ---> 6f0aa7238ae6
+Step 13/18 : COPY prisma ./prisma/
+ ---> bade2905f6a6
+Step 14/18 : RUN npx prisma generate
+ ---> Running in 54de4c85c68d
+Prisma schema loaded from prisma/schema.prisma
+
+? Generated Prisma Client (v6.4.1) to ./node_modules/@prisma/client in 85ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Interested in query caching in just a few lines of code? Try Accelerate today! https://pris.ly/tip-3-accelerate
+
+Removing intermediate container 54de4c85c68d
+ ---> fc396fa12b73
+Step 15/18 : RUN npm run build
+ ---> Running in ca0e0998928b
+
+> suitepilot@1.0.0 build
+> next build
+
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+? Next.js 16.1.3 (Turbopack)
+
+  Creating an optimized production build ...
+? Compiled successfully in 73s
+  Running TypeScript ...
+  Collecting page data using 1 worker ...
+  Generating static pages using 1 worker (0/5) ...
+  Generating static pages using 1 worker (1/5) 
+
+  Generating static pages using 1 worker (2/5) 
+
+  Generating static pages using 1 worker (3/5) 
+
+? Generating static pages using 1 worker (5/5) in 213.9ms
+  Finalizing page optimization ...
+
+Route (app)
+? ? /
+? ? /_not-found
+? ? /api/mission
+? ? /api/webhooks/stripe
+
+
+? Proxy (Middleware)
+
+?  (Dynamic)  server-rendered on demand
+
+Removing intermediate container ca0e0998928b
+ ---> 6a57dbb78a8c
+Step 16/18 : EXPOSE 8080
+ ---> Running in eb21fd7e3542
+Removing intermediate container eb21fd7e3542
+ ---> fdbb5199f807
+Step 17/18 : ENV PORT 8080
+ ---> Running in 3fc439a001af
+Removing intermediate container 3fc439a001af
+ ---> b9aabc678236
+Step 18/18 : CMD ["npm", "start"]
+ ---> Running in 8b0a3682ec8a
+Removing intermediate container 8b0a3682ec8a
+ ---> 56dd6c5f86dc
+Successfully built 56dd6c5f86dc
+Successfully tagged gcr.io/suite-pilot-app/suitepilot:latest
+PUSH
+Pushing gcr.io/suite-pilot-app/suitepilot
+The push refers to repository [gcr.io/suite-pilot-app/suitepilot]
+3fe9bcacf7f6: Preparing
+b80ef9203f28: Preparing
+db4362fe16d5: Preparing
+933053c6c9c5: Preparing
+07cc85142df7: Preparing
+5a521413029c: Preparing
+af1d42b3c4c2: Preparing
+0bb5b71f6dce: Preparing
+8fd11e9a05dd: Preparing
+f3c0427dc2a6: Preparing
+75eabd7e7249: Preparing
+43aaa7243437: Preparing
+9f2e2be689c2: Preparing
+aed2ed915054: Preparing
+75eabd7e7249: Waiting
+43aaa7243437: Waiting
+9f2e2be689c2: Waiting
+aed2ed915054: Waiting
+denied: gcr.io repo does not exist. Creating on push requires the artifactregistry.repositories.createOnPush permission
+Pushing gcr.io/suite-pilot-app/suitepilot
+The push refers to repository [gcr.io/suite-pilot-app/suitepilot]
+3fe9bcacf7f6: Preparing
+b80ef9203f28: Preparing
+3fe9bcacf7f6: Waiting
+db4362fe16d5: Preparing
+933053c6c9c5: Preparing
+07cc85142df7: Preparing
+5a521413029c: Preparing
+af1d42b3c4c2: Preparing
+0bb5b71f6dce: Preparing
+af1d42b3c4c2: Waiting
+8fd11e9a05dd: Preparing
+f3c0427dc2a6: Preparing
+0bb5b71f6dce: Waiting
+8fd11e9a05dd: Waiting
+75eabd7e7249: Preparing
+75eabd7e7249: Waiting
+43aaa7243437: Preparing
+43aaa7243437: Waiting
+9f2e2be689c2: Preparing
+aed2ed915054: Preparing
+aed2ed915054: Waiting
+denied: gcr.io repo does not exist. Creating on push requires the artifactregistry.repositories.createOnPush permission
+Pushing gcr.io/suite-pilot-app/suitepilot
+The push refers to repository [gcr.io/suite-pilot-app/suitepilot]
+3fe9bcacf7f6: Preparing
+b80ef9203f28: Preparing
+db4362fe16d5: Preparing
+933053c6c9c5: Preparing
+07cc85142df7: Preparing
+5a521413029c: Preparing
+af1d42b3c4c2: Preparing
+0bb5b71f6dce: Preparing
+8fd11e9a05dd: Preparing
+f3c0427dc2a6: Preparing
+75eabd7e7249: Preparing
+43aaa7243437: Preparing
+0bb5b71f6dce: Waiting
+8fd11e9a05dd: Waiting
+f3c0427dc2a6: Waiting
+75eabd7e7249: Waiting
+9f2e2be689c2: Preparing
+43aaa7243437: Waiting
+aed2ed915054: Preparing
+denied: gcr.io repo does not exist. Creating on push requires the artifactregistry.repositories.createOnPush permission
+Pushing gcr.io/suite-pilot-app/suitepilot
+The push refers to repository [gcr.io/suite-pilot-app/suitepilot]
+3fe9bcacf7f6: Preparing
+b80ef9203f28: Preparing
+db4362fe16d5: Preparing
+933053c6c9c5: Preparing
+07cc85142df7: Preparing
+5a521413029c: Preparing
+af1d42b3c4c2: Preparing
+0bb5b71f6dce: Preparing
+0bb5b71f6dce: Waiting
+933053c6c9c5: Waiting
+07cc85142df7: Waiting
+5a521413029c: Waiting
+af1d42b3c4c2: Waiting
+8fd11e9a05dd: Preparing
+8fd11e9a05dd: Waiting
+0bb5b71f6dce: Waiting
+f3c0427dc2a6: Preparing
+f3c0427dc2a6: Waiting
+8fd11e9a05dd: Waiting
+75eabd7e7249: Preparing
+75eabd7e7249: Waiting
+43aaa7243437: Preparing
+9f2e2be689c2: Preparing
+aed2ed915054: Preparing
+denied: gcr.io repo does not exist. Creating on push requires the artifactregistry.repositories.createOnPush permission
+Pushing gcr.io/suite-pilot-app/suitepilot
+The push refers to repository [gcr.io/suite-pilot-app/suitepilot]
+3fe9bcacf7f6: Preparing
+b80ef9203f28: Preparing
+db4362fe16d5: Preparing
+933053c6c9c5: Preparing
+07cc85142df7: Preparing
+5a521413029c: Preparing
+af1d42b3c4c2: Preparing
+0bb5b71f6dce: Preparing
+8fd11e9a05dd: Preparing
+f3c0427dc2a6: Preparing
+75eabd7e7249: Preparing
+af1d42b3c4c2: Waiting
+0bb5b71f6dce: Waiting
+8fd11e9a05dd: Waiting
+f3c0427dc2a6: Waiting
+43aaa7243437: Preparing
+75eabd7e7249: Waiting
+9f2e2be689c2: Preparing
+43aaa7243437: Waiting
+aed2ed915054: Preparing
+9f2e2be689c2: Waiting
+aed2ed915054: Waiting
+denied: gcr.io repo does not exist. Creating on push requires the artifactregistry.repositories.createOnPush permission
+Pushing gcr.io/suite-pilot-app/suitepilot
+The push refers to repository [gcr.io/suite-pilot-app/suitepilot]
+3fe9bcacf7f6: Preparing
+b80ef9203f28: Preparing
+db4362fe16d5: Preparing
+933053c6c9c5: Preparing
+07cc85142df7: Preparing
+5a521413029c: Preparing
+af1d42b3c4c2: Preparing
+0bb5b71f6dce: Preparing
+8fd11e9a05dd: Preparing
+07cc85142df7: Waiting
+8fd11e9a05dd: Waiting
+af1d42b3c4c2: Waiting
+0bb5b71f6dce: Waiting
+5a521413029c: Waiting
+f3c0427dc2a6: Preparing
+f3c0427dc2a6: Waiting
+8fd11e9a05dd: Waiting
+75eabd7e7249: Preparing
+75eabd7e7249: Waiting
+43aaa7243437: Preparing
+43aaa7243437: Waiting
+9f2e2be689c2: Preparing
+9f2e2be689c2: Waiting
+aed2ed915054: Preparing
+denied: gcr.io repo does not exist. Creating on push requires the artifactregistry.repositories.createOnPush permission
+Pushing gcr.io/suite-pilot-app/suitepilot
+The push refers to repository [gcr.io/suite-pilot-app/suitepilot]
+3fe9bcacf7f6: Preparing
+b80ef9203f28: Preparing
+db4362fe16d5: Preparing
+933053c6c9c5: Preparing
+07cc85142df7: Preparing
+5a521413029c: Preparing
+af1d42b3c4c2: Preparing
+0bb5b71f6dce: Preparing
+8fd11e9a05dd: Preparing
+f3c0427dc2a6: Preparing
+75eabd7e7249: Preparing
+43aaa7243437: Preparing
+f3c0427dc2a6: Waiting
+75eabd7e7249: Waiting
+0bb5b71f6dce: Waiting
+8fd11e9a05dd: Waiting
+9f2e2be689c2: Preparing
+43aaa7243437: Waiting
+aed2ed915054: Preparing
+9f2e2be689c2: Waiting
+aed2ed915054: Waiting
+denied: gcr.io repo does not exist. Creating on push requires the artifactregistry.repositories.createOnPush permission
+Pushing gcr.io/suite-pilot-app/suitepilot
+The push refers to repository [gcr.io/suite-pilot-app/suitepilot]
+3fe9bcacf7f6: Preparing
+b80ef9203f28: Preparing
+db4362fe16d5: Preparing
+933053c6c9c5: Preparing
+07cc85142df7: Preparing
+5a521413029c: Preparing
+af1d42b3c4c2: Preparing
+0bb5b71f6dce: Preparing
+8fd11e9a05dd: Preparing
+f3c0427dc2a6: Preparing
+f3c0427dc2a6: Waiting
+5a521413029c: Waiting
+af1d42b3c4c2: Waiting
+0bb5b71f6dce: Waiting
+8fd11e9a05dd: Waiting
+75eabd7e7249: Preparing
+75eabd7e7249: Waiting
+f3c0427dc2a6: Waiting
+43aaa7243437: Preparing
+43aaa7243437: Waiting
+9f2e2be689c2: Preparing
+9f2e2be689c2: Waiting
+aed2ed915054: Preparing
+aed2ed915054: Waiting
+denied: gcr.io repo does not exist. Creating on push requires the artifactregistry.repositories.createOnPush permission
+Pushing gcr.io/suite-pilot-app/suitepilot
+The push refers to repository [gcr.io/suite-pilot-app/suitepilot]
+3fe9bcacf7f6: Preparing
+b80ef9203f28: Preparing
+db4362fe16d5: Preparing
+933053c6c9c5: Preparing
+07cc85142df7: Preparing
+5a521413029c: Preparing
+af1d42b3c4c2: Preparing
+0bb5b71f6dce: Preparing
+8fd11e9a05dd: Preparing
+f3c0427dc2a6: Preparing
+75eabd7e7249: Preparing
+43aaa7243437: Preparing
+9f2e2be689c2: Preparing
+8fd11e9a05dd: Waiting
+f3c0427dc2a6: Waiting
+75eabd7e7249: Waiting
+43aaa7243437: Waiting
+aed2ed915054: Preparing
+9f2e2be689c2: Waiting
+aed2ed915054: Waiting
+denied: gcr.io repo does not exist. Creating on push requires the artifactregistry.repositories.createOnPush permission
+Pushing gcr.io/suite-pilot-app/suitepilot
+The push refers to repository [gcr.io/suite-pilot-app/suitepilot]
+3fe9bcacf7f6: Preparing
+b80ef9203f28: Preparing
+db4362fe16d5: Preparing
+933053c6c9c5: Preparing
+07cc85142df7: Preparing
+5a521413029c: Preparing
+af1d42b3c4c2: Preparing
+0bb5b71f6dce: Preparing
+8fd11e9a05dd: Preparing
+f3c0427dc2a6: Preparing
+f3c0427dc2a6: Waiting
+5a521413029c: Waiting
+af1d42b3c4c2: Waiting
+0bb5b71f6dce: Waiting
+8fd11e9a05dd: Waiting
+75eabd7e7249: Preparing
+75eabd7e7249: Waiting
+43aaa7243437: Preparing
+9f2e2be689c2: Preparing
+9f2e2be689c2: Waiting
+aed2ed915054: Preparing
+aed2ed915054: Waiting
+denied: gcr.io repo does not exist. Creating on push requires the artifactregistry.repositories.createOnPush permission
+ERROR: failed to push because we ran out of retries.
+ERROR
+ERROR: error pushing image "gcr.io/suite-pilot-app/suitepilot": retry budget exhausted (10 attempts): step exited with non-zero status: 1
+--------------------------------------------------------------------------------------------------------------------------------------------------------
