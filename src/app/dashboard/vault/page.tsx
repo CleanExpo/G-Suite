@@ -138,7 +138,6 @@ export default function VaultPage() {
 
           {/* Main Vault Form */}
           <motion.div
-            layout
             className="bg-white dark:bg-[#161b22] border border-gray-100 dark:border-white/5 rounded-[4rem] shadow-2xl p-12 lg:p-16 relative overflow-hidden"
           >
             {/* Background Aura */}

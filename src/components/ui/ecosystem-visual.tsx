@@ -83,7 +83,7 @@ export function EcosystemVisual() {
                                     rotateY: { duration: 5, repeat: Infinity, ease: "easeInOut" },
                                     rotateX: { duration: 6, repeat: Infinity, ease: "easeInOut" }
                                 }}
-                                className="absolute w-32 h-32 rounded-full bg-white/5 dark:bg-[#1d232a]/40 backdrop-blur-md border-2 border-white/20 dark:border-white/10 flex flex-col items-center justify-center shadow-[0_20px_50px_rgba(0,0,0,0.3)] group perspective-[1000px] overflow-hidden transition-all duration-500 hover:shadow-blue-500/20"
+                                className="absolute w-32 h-32 rounded-full bg-white/5 dark:bg-[#1d232a]/40 backdrop-blur-md border-2 border-white/20 dark:border-white/10 flex flex-col items-center justify-center shadow-[0_20px_50px_rgba(0,0,0,0.3)] group perspective-[1000px] overflow-hidden hover:shadow-blue-500/20"
                                 style={{ transformStyle: 'preserve-3d' }}
                             >
                                 {/* Center Masked Image */}

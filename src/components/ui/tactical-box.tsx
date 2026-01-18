@@ -31,7 +31,8 @@ export function TacticalBox({
       initial={{ opacity: 0, scale: 0.95 }}
       whileInView={{ opacity: 1, scale: 1 }}
       viewport={{ once: true }}
-      className={`group p-12 rounded-[4.5rem] bg-white dark:bg-white/[0.02] border border-gray-100 dark:border-white/5 transition-all hover:shadow-[0_40px_100px_rgba(0,0,0,0.1)] dark:hover:shadow-black/50 hover:border-blue-500/30 relative overflow-hidden perspective-[2000px] ${className}`}
+      whileHover={{ boxShadow: '0 40px 100px rgba(0,0,0,0.1)' }}
+      className={`group p-12 rounded-[4.5rem] bg-white dark:bg-white/[0.02] border border-gray-100 dark:border-white/5 hover:border-blue-500/30 relative overflow-hidden perspective-[2000px] ${className}`}
     >
       {/* 3D Depth Backdrop */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
@@ -41,7 +42,7 @@ export function TacticalBox({
         {image && (
           <motion.div
             whileHover={{ translateZ: 50, scale: 1.1 }}
-            className="w-32 h-32 relative mx-auto mb-6 transform-style-3d group-hover:drop-shadow-[0_20px_40px_rgba(37,99,235,0.3)] transition-all duration-700"
+            className="w-32 h-32 relative mx-auto mb-6 transform-style-3d group-hover:drop-shadow-[0_20px_40px_rgba(37,99,235,0.3)]"
           >
             {/* Circular Glass Medallion Ring */}
             <div className="absolute inset-0 rounded-full border-2 border-white/20 dark:border-white/10 bg-gradient-to-br from-white/10 to-transparent backdrop-blur-md shadow-xl" />

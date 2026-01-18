@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Github, Twitter, Linkedin, ExternalLink } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export function Footer() {
   return (
