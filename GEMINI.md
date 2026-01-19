@@ -13,10 +13,11 @@ To provide an autonomous AI orchestration layer for elite founders, leveraging G
 - **Engine**: Next.js 16 (Turbopack)
 - **Reasoning**: LangChain + LangGraph (Gemini 2.0 Flash)
 - **Infrastructure**: Google Cloud Run + Firebase Admin
-- **Identity**: Clerk (Dark Mode Native)
+- **Identity**: Supabase Auth (OAuth + Email/Password)
 - **Ledger**: Stripe + BullMQ Transactional Hooks
 
 ## 📜 Active Frameworks
 - `ARCH.md`: Technical Architecture & Backend Protocols
+- `AGENTS.md`: Multi-Agent Orchestration Framework
 - `STANDARDS.md`: v8.1 Design System & UI/UX Mandates
 - `KNOWLEDGE.md`: Intelligence Library & Capability Matrix

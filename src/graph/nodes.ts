@@ -9,6 +9,7 @@ import { z } from 'zod';
 
 const SpecSchema = z.object({
   tool: z.enum([
+    // Core tools
     'google_slides_storyboard',
     'notebook_lm_research',
     'image_generation',
@@ -18,6 +19,11 @@ const SpecSchema = z.object({
     'shopify_sync',
     'social_blast',
     'web_mastery_audit',
+    // Agent routing tools
+    'agent:marketing-strategist',
+    'agent:seo-analyst',
+    'agent:social-commander',
+    'agent:content-orchestrator',
   ]),
   payload: z.any(),
   reasoning: z.string().optional(), // Architect's "Chain of Thought"
@@ -153,6 +159,37 @@ export async function executorNode(state: ProjectStateType) {
     } else if (state.spec.tool === 'web_mastery_audit') {
       const { performWebMasteryAudit } = await import('../tools/webMasteryAudit.js');
       results.push(await performWebMasteryAudit(state.spec.payload.url));
+    }
+    // Agent Routing - Specialized Agent Execution
+    else if (state.spec.tool.startsWith('agent:')) {
+      const agentName = state.spec.tool.replace('agent:', '');
+      console.log(`🤖 Routing to Agent: ${agentName}`);
+
+      const { AgentRegistry, initializeAgents } = await import('../agents');
+      await initializeAgents();
+
+      const agent = AgentRegistry.get(agentName);
+      if (agent) {
+        const context = {
+          userId: state.userId,
+          mission: state.userRequest,
+          config: state.spec.payload
+        };
+
+        // Execute agent in all modes
+        const plan = await agent.plan(context);
+        const result = await agent.execute(plan, context);
+        const verification = await agent.verify(result, context);
+
+        results.push({
+          agent: agentName,
+          plan,
+          result,
+          verification
+        });
+      } else {
+        results.push({ error: `Agent '${agentName}' not found` });
+      }
     }
 
     return { results, status: 'COMPLETED' };
