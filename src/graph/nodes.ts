@@ -27,6 +27,13 @@ const SpecSchema = z.object({
     'agent:mission-overseer',
     'agent:genesis-architect',
     'agent:browser-agent',
+    'agent:ui-auditor',
+    // Google API Enhanced Skills
+    'deep_research',
+    'veo_31_generate',
+    'veo_31_upsample',
+    'document_ai_extract',
+    'gemini_3_flash',
   ]),
   payload: z.any(),
   reasoning: z.string().optional(), // Architect's "Chain of Thought"
@@ -193,6 +200,27 @@ export async function executorNode(state: ProjectStateType) {
       } else {
         results.push({ error: `Agent '${agentName}' not found` });
       }
+    }
+    // Google API Enhanced Skills
+    else if (state.spec.tool === 'deep_research') {
+      const { deepResearch } = await import('../tools/googleAPISkills');
+      results.push(await deepResearch(state.userId, state.spec.payload.topic, state.spec.payload.options));
+    }
+    else if (state.spec.tool === 'veo_31_generate') {
+      const { veo31Generate } = await import('../tools/googleAPISkills');
+      results.push(await veo31Generate(state.userId, state.spec.payload.prompt, state.spec.payload.options));
+    }
+    else if (state.spec.tool === 'veo_31_upsample') {
+      const { veo31Upsample } = await import('../tools/googleAPISkills');
+      results.push(await veo31Upsample(state.userId, state.spec.payload.videoUrl, state.spec.payload.resolution));
+    }
+    else if (state.spec.tool === 'document_ai_extract') {
+      const { documentAIExtract } = await import('../tools/googleAPISkills');
+      results.push(await documentAIExtract(state.userId, state.spec.payload.documentUrl, state.spec.payload.options));
+    }
+    else if (state.spec.tool === 'gemini_3_flash') {
+      const { gemini3Flash } = await import('../tools/googleAPISkills');
+      results.push(await gemini3Flash(state.userId, state.spec.payload.prompt, state.spec.payload.options));
     }
 
     return { results, status: 'COMPLETED' };

@@ -51,11 +51,22 @@ interface IGPilotAgent {
 |-------|--------|----------------|
 | **Genesis Architect** | Meta-Orchestration | Agent/skill generation, pattern learning |
 | **Mission Overseer** | Orchestration | All agents, quality gates |
+| **UI Auditor** | Visual QA | vision_analyze, screenshot_capture, code_edit |
 | **Browser Agent** | Web Automation | puppeteer_navigate, screenshot, extract |
 | **Marketing Strategist** | Campaign Planning | web_intel, image_generation |
 | **SEO Analyst** | Search Optimization | web_mastery_audit, search_console_audit |
 | **Social Commander** | Social Distribution | social_blast, web_intel |
 | **Content Orchestrator** | Content Creation | google_slides_storyboard, notebook_lm_research |
+
+## 🔧 Enhanced Google API Skills
+
+| Skill | API | Description |
+|-------|-----|-------------|
+| `gemini_3_flash` | Gemini 3.0 | PhD-level reasoning, faster responses |
+| `deep_research` | Deep Research | Automated research synthesis |
+| `veo_31_generate` | Veo 3.1 | Video generation (4-8s, 9:16, 4K) |
+| `veo_31_upsample` | Veo 3.1 | Upscale to 1080p/4K |
+| `document_ai_extract` | Document AI | PDF/OCR extraction |
 
 ## 📂 Agent Locations
 
