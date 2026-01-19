@@ -28,12 +28,21 @@ const SpecSchema = z.object({
     'agent:genesis-architect',
     'agent:browser-agent',
     'agent:ui-auditor',
+    'agent:web-scraper',
+    'agent:data-collector',
     // Google API Enhanced Skills
     'deep_research',
     'veo_31_generate',
     'veo_31_upsample',
     'document_ai_extract',
     'gemini_3_flash',
+    // Web Intelligence Skills
+    'web_unlocker',
+    'serp_collector',
+    'web_crawler',
+    'structured_scraper',
+    'data_archive',
+    'deep_lookup',
   ]),
   payload: z.any(),
   reasoning: z.string().optional(), // Architect's "Chain of Thought"
@@ -221,6 +230,31 @@ export async function executorNode(state: ProjectStateType) {
     else if (state.spec.tool === 'gemini_3_flash') {
       const { gemini3Flash } = await import('../tools/googleAPISkills');
       results.push(await gemini3Flash(state.userId, state.spec.payload.prompt, state.spec.payload.options));
+    }
+    // Web Intelligence Skills
+    else if (state.spec.tool === 'web_unlocker') {
+      const { web_unlocker } = await import('../tools/webIntelligenceSkills');
+      results.push(await web_unlocker(state.userId, state.spec.payload.url, state.spec.payload.options));
+    }
+    else if (state.spec.tool === 'serp_collector') {
+      const { serp_collector } = await import('../tools/webIntelligenceSkills');
+      results.push(await serp_collector(state.userId, state.spec.payload.query, state.spec.payload.options));
+    }
+    else if (state.spec.tool === 'web_crawler') {
+      const { web_crawler } = await import('../tools/webIntelligenceSkills');
+      results.push(await web_crawler(state.userId, state.spec.payload.startUrl, state.spec.payload.options));
+    }
+    else if (state.spec.tool === 'structured_scraper') {
+      const { structured_scraper } = await import('../tools/webIntelligenceSkills');
+      results.push(await structured_scraper(state.userId, state.spec.payload.domain, state.spec.payload.options));
+    }
+    else if (state.spec.tool === 'data_archive') {
+      const { data_archive } = await import('../tools/webIntelligenceSkills');
+      results.push(await data_archive(state.userId, state.spec.payload.data, state.spec.payload.options));
+    }
+    else if (state.spec.tool === 'deep_lookup') {
+      const { deep_lookup } = await import('../tools/webIntelligenceSkills');
+      results.push(await deep_lookup(state.userId, state.spec.payload.entityId, state.spec.payload.options));
     }
 
     return { results, status: 'COMPLETED' };

@@ -52,11 +52,13 @@ interface IGPilotAgent {
 | **Genesis Architect** | Meta-Orchestration | Agent/skill generation, pattern learning |
 | **Mission Overseer** | Orchestration | All agents, quality gates |
 | **UI Auditor** | Visual QA | vision_analyze, screenshot_capture, code_edit |
+| **Web Scraper** | Web Scraping | web_unlocker, web_crawler, structured_scraper |
+| **Data Collector** | Data Feeds | serp_collector, data_archive, deep_lookup |
 | **Browser Agent** | Web Automation | puppeteer_navigate, screenshot, extract |
-| **Marketing Strategist** | Campaign Planning | web_intel, image_generation |
-| **SEO Analyst** | Search Optimization | web_mastery_audit, search_console_audit |
-| **Social Commander** | Social Distribution | social_blast, web_intel |
-| **Content Orchestrator** | Content Creation | google_slides_storyboard, notebook_lm_research |
+| **Marketing Strategist** | Campaign Planning | deep_research, veo_31_generate |
+| **SEO Analyst** | Search Optimization | deep_research, document_ai_extract |
+| **Social Commander** | Social Distribution | gemini_3_flash, veo_31_generate |
+| **Content Orchestrator** | Content Creation | deep_research, veo_31_generate |
 
 ## 🔧 Enhanced Google API Skills
 

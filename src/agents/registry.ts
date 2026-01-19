@@ -123,6 +123,8 @@ export async function initializeAgents(): Promise<void> {
         const { GenesisArchitectAgent } = await import('./genesis-architect');
         const { BrowserAgent } = await import('./browser-agent');
         const { UIAuditorAgent } = await import('./ui-auditor');
+        const { WebScraperAgent } = await import('./web-scraper');
+        const { DataCollectorAgent } = await import('./data-collector');
 
         AgentRegistry.registerClass('marketing-strategist', MarketingStrategistAgent);
         AgentRegistry.registerClass('seo-analyst', SEOAnalystAgent);
@@ -132,6 +134,8 @@ export async function initializeAgents(): Promise<void> {
         AgentRegistry.registerClass('genesis-architect', GenesisArchitectAgent);
         AgentRegistry.registerClass('browser-agent', BrowserAgent);
         AgentRegistry.registerClass('ui-auditor', UIAuditorAgent);
+        AgentRegistry.registerClass('web-scraper', WebScraperAgent);
+        AgentRegistry.registerClass('data-collector', DataCollectorAgent);
 
         console.log(`✅ ${AgentRegistry.getAvailableAgents().length} agents initialized`);
     } catch (error) {

@@ -8,3 +8,5 @@ export { MissionOverseerAgent } from './mission-overseer';
 export { GenesisArchitectAgent } from './genesis-architect';
 export { BrowserAgent } from './browser-agent';
 export { UIAuditorAgent } from './ui-auditor';
+export { WebScraperAgent } from './web-scraper';
+export { DataCollectorAgent } from './data-collector';
