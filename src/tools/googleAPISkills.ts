@@ -372,7 +372,15 @@ export const googleAPISkills = {
     documentAIExtract,
 
     // Live
-    createLiveSession
+    createLiveSession,
+
+    // GEO Marketing (Synthex Apex Architecture)
+    // Note: Core GEO skills are implemented within geo-marketing-agent.ts
+    // These stubs allow external invocation if needed
+    geoCitationAnalyzer: gemini3Flash,     // Uses Gemini 3 Flash for analysis
+    authorityScorer: gemini3Flash,          // Uses Gemini 3 Flash for scoring
+    contentHumanizer: gemini3Flash,         // Forensic stylistic layer
+    llmVisibilityAudit: deepResearch        // Uses deep research for visibility
 };
 
 export default googleAPISkills;
