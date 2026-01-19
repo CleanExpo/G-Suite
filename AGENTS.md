@@ -49,6 +49,7 @@ interface IGPilotAgent {
 
 | Agent | Domain | Primary Skills |
 |-------|--------|----------------|
+| **Genesis Architect** | Meta-Orchestration | Agent/skill generation, pattern learning |
 | **Mission Overseer** | Orchestration | All agents, quality gates |
 | **Marketing Strategist** | Campaign Planning | web_intel, image_generation |
 | **SEO Analyst** | Search Optimization | web_mastery_audit, search_console_audit |

@@ -5,3 +5,4 @@ export { SEOAnalystAgent } from './seo-analyst';
 export { SocialCommanderAgent } from './social-commander';
 export { ContentOrchestratorAgent } from './content-orchestrator';
 export { MissionOverseerAgent } from './mission-overseer';
+export { GenesisArchitectAgent } from './genesis-architect';

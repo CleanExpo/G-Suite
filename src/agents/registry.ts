@@ -120,12 +120,14 @@ export async function initializeAgents(): Promise<void> {
         const { SocialCommanderAgent } = await import('./social-commander');
         const { ContentOrchestratorAgent } = await import('./content-orchestrator');
         const { MissionOverseerAgent } = await import('./mission-overseer');
+        const { GenesisArchitectAgent } = await import('./genesis-architect');
 
         AgentRegistry.registerClass('marketing-strategist', MarketingStrategistAgent);
         AgentRegistry.registerClass('seo-analyst', SEOAnalystAgent);
         AgentRegistry.registerClass('social-commander', SocialCommanderAgent);
         AgentRegistry.registerClass('content-orchestrator', ContentOrchestratorAgent);
         AgentRegistry.registerClass('mission-overseer', MissionOverseerAgent);
+        AgentRegistry.registerClass('genesis-architect', GenesisArchitectAgent);
 
         console.log(`✅ ${AgentRegistry.getAvailableAgents().length} agents initialized`);
     } catch (error) {
