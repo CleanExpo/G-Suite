@@ -49,6 +49,7 @@ interface IGPilotAgent {
 
 | Agent | Domain | Primary Skills |
 |-------|--------|----------------|
+| **Mission Overseer** | Orchestration | All agents, quality gates |
 | **Marketing Strategist** | Campaign Planning | web_intel, image_generation |
 | **SEO Analyst** | Search Optimization | web_mastery_audit, search_console_audit |
 | **Social Commander** | Social Distribution | social_blast, web_intel |

@@ -24,6 +24,7 @@ const SpecSchema = z.object({
     'agent:seo-analyst',
     'agent:social-commander',
     'agent:content-orchestrator',
+    'agent:mission-overseer',
   ]),
   payload: z.any(),
   reasoning: z.string().optional(), // Architect's "Chain of Thought"
