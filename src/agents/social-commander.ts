@@ -2,6 +2,7 @@
  * Social Commander Agent
  * 
  * Specialized agent for multi-platform social media orchestration.
+ * Enhanced with Gemini 3 Flash for AI-powered content creation.
  */
 
 import {
@@ -11,23 +12,44 @@ import {
     AgentResult,
     VerificationReport
 } from './base';
+import { GoogleGenerativeAI } from '@google/generative-ai';
+
+const genAI = new GoogleGenerativeAI(
+    process.env.GOOGLE_AI_STUDIO_API_KEY || process.env.GOOGLE_API_KEY || ''
+);
 
 export class SocialCommanderAgent extends BaseAgent {
     readonly name = 'social-commander';
-    readonly description = 'Multi-platform social media orchestration and swarm distribution agent';
+    readonly description = 'Multi-platform social media orchestration with Gemini 3 content AI';
     readonly capabilities = [
         'multi_platform_posting',
         'swarm_distribution',
         'engagement_tracking',
-        'thread_building'
+        'thread_building',
+        'ai_copywriting',         // NEW
+        'trend_analysis',         // NEW
+        'video_shorts'            // NEW: Veo 3.1 shorts
     ];
-    readonly requiredSkills = ['social_blast', 'web_intel', 'image_generation'];
+    readonly requiredSkills = [
+        'social_blast',
+        'web_intel',
+        'image_generation',
+        'gemini_3_flash',         // NEW
+        'deep_research',          // NEW
+        'veo_31_generate'         // NEW
+    ];
 
-    private readonly platforms = ['x', 'linkedin', 'reddit'] as const;
+    private readonly platforms = ['x', 'linkedin', 'reddit', 'instagram', 'tiktok'] as const;
+
+    // Gemini 3 Flash for social content
+    private readonly model = genAI.getGenerativeModel({
+        model: 'gemini-3-flash',
+        systemInstruction: 'You are a viral social media strategist. Create engaging, platform-optimized content that drives engagement.'
+    });
 
     async plan(context: AgentContext): Promise<AgentPlan> {
         this.mode = 'PLANNING';
-        this.log('Planning social campaign...', context.mission);
+        this.log('📱 Gemini 3: Planning social campaign...', context.mission);
 
         // Determine which platforms to target
         const configPlatforms = context.config?.platforms as string[] | undefined;
@@ -36,29 +58,68 @@ export class SocialCommanderAgent extends BaseAgent {
             configPlatforms?.includes(p)
         );
 
-        const platforms = targetPlatforms.length > 0 ? targetPlatforms : this.platforms;
+        const platforms = targetPlatforms.length > 0 ? targetPlatforms : ['x', 'linkedin'];
+        const wantsVideo = /video|reel|short|tiktok/i.test(context.mission);
 
         const steps = [
+            // Deep research on trends first
             {
-                id: 'research',
+                id: 'trend_research',
                 action: 'Research trending topics and hashtags',
-                tool: 'web_intel',
-                payload: { query: `trending topics ${platforms.join(' ')} ${context.mission}` }
+                tool: 'deep_research',
+                payload: { topic: `trending ${platforms.join(' ')} topics for: ${context.mission}`, depth: 'moderate' }
             },
-            ...platforms.map((platform, i) => ({
+            // Generate platform-specific copy with Gemini 3
+            {
+                id: 'content_gen',
+                action: 'Generate AI-optimized social content',
+                tool: 'gemini_3_flash',
+                payload: {
+                    prompt: `Create engaging social media posts for ${platforms.join(', ')} about: ${context.mission}. Include hashtags, hooks, and CTAs optimized for each platform.`
+                },
+                dependencies: ['trend_research']
+            },
+            // Generate visuals
+            {
+                id: 'visuals',
+                action: 'Generate social media visuals',
+                tool: 'image_generation',
+                payload: { prompt: `Social media graphic for: ${context.mission}` },
+                dependencies: ['content_gen']
+            }
+        ];
+
+        // Add video if requested
+        if (wantsVideo) {
+            steps.push({
+                id: 'video_short',
+                action: 'Generate video short with Veo 3.1',
+                tool: 'veo_31_generate',
+                payload: {
+                    prompt: `Engaging social video for: ${context.mission}`,
+                    duration: 4,
+                    aspectRatio: '9:16'
+                },
+                dependencies: ['content_gen']
+            });
+        }
+
+        // Platform-specific posts
+        platforms.forEach(platform => {
+            steps.push({
                 id: `post_${platform}`,
-                action: `Create and schedule ${platform} content`,
+                action: `Schedule ${platform} content`,
                 tool: 'social_blast',
                 payload: { platform, content: context.mission },
-                dependencies: ['research']
-            }))
-        ];
+                dependencies: ['visuals', ...(wantsVideo ? ['video_short'] : [])]
+            });
+        });
 
         return {
             steps,
-            estimatedCost: 25 * platforms.length + 25, // 25 per platform + research
+            estimatedCost: 50 + (25 * platforms.length) + (wantsVideo ? 100 : 0),
             requiredSkills: this.requiredSkills,
-            reasoning: `Multi-platform distribution across ${platforms.join(', ')} with optimized content for each`
+            reasoning: `Gemini 3 social campaign: Trends → AI Copy → Visuals${wantsVideo ? ' + Video' : ''} → ${platforms.join(', ')}`
         };
     }
 

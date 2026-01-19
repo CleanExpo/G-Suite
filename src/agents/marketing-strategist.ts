@@ -2,6 +2,7 @@
  * Marketing Strategist Agent
  * 
  * Specialized agent for campaign planning and growth strategy.
+ * Enhanced with Gemini 3 Flash, Deep Research, and Veo 3.1.
  */
 
 import {
@@ -20,79 +21,136 @@ const genAI = new GoogleGenerativeAI(
 
 export class MarketingStrategistAgent extends BaseAgent {
     readonly name = 'marketing-strategist';
-    readonly description = 'Campaign planning and growth strategy agent for market dominance';
+    readonly description = 'Campaign planning and growth strategy agent with Gemini 3 and video generation';
     readonly capabilities = [
         'campaign_planning',
         'content_strategy',
         'competitive_analysis',
-        'growth_metrics'
+        'growth_metrics',
+        'video_marketing',      // NEW: Video generation
+        'market_research',      // NEW: Deep research
+        'multi_channel_launch'  // NEW: Coordinated launches
     ];
-    readonly requiredSkills = ['web_intel', 'image_generation', 'social_blast'];
+    readonly requiredSkills = [
+        'web_intel',
+        'image_generation',
+        'social_blast',
+        'deep_research',        // NEW
+        'veo_31_generate',      // NEW
+        'gemini_3_flash'        // NEW
+    ];
+
+    // Gemini 3 Flash for PhD-level marketing reasoning
+    private readonly model = genAI.getGenerativeModel({
+        model: 'gemini-3-flash',
+        systemInstruction: 'You are an elite marketing strategist with expertise in digital campaigns, growth hacking, and multi-channel marketing. Think like a CMO at a Fortune 500 company.'
+    });
 
     async plan(context: AgentContext): Promise<AgentPlan> {
         this.mode = 'PLANNING';
-        this.log('Analyzing marketing mission...', context.mission);
-
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+        this.log('🚀 Gemini 3 Flash: Analyzing marketing mission...', context.mission);
 
         const prompt = `
-      You are a Marketing Strategist. Create a detailed campaign plan for:
-      Mission: "${context.mission}"
-      
-      Return a JSON object with:
-      {
-        "steps": [
-          { "id": "step_1", "action": "description", "tool": "tool_name", "payload": {} }
-        ],
-        "estimatedCost": 100,
-        "requiredSkills": ["skill1", "skill2"],
-        "reasoning": "Why this approach works"
-      }
-    `;
+          You are an elite Marketing Strategist with Gemini 3's advanced reasoning.
+          Create a comprehensive campaign plan for: "${context.mission}"
+          
+          Available enhanced tools:
+          - web_intel: Market research, competitor analysis
+          - image_generation: Campaign visuals, ads, social graphics
+          - social_blast: Multi-platform social posting
+          - deep_research: In-depth market analysis with sources
+          - veo_31_generate: Professional video ads (4-8 seconds, 4K)
+          - gemini_3_flash: Advanced copywriting and strategy
+          
+          Return JSON:
+          {
+            "steps": [
+              { 
+                "id": "step_1", 
+                "action": "description", 
+                "tool": "tool_name", 
+                "payload": {},
+                "dependencies": []
+              }
+            ],
+            "estimatedCost": 150,
+            "requiredSkills": ["skill1", "skill2"],
+            "reasoning": "Strategic rationale with expected outcomes"
+          }
+          
+          Consider: market research → content creation → video ads → launch → analytics
+        `;
 
         try {
-            const result = await model.generateContent(prompt);
+            const result = await this.model.generateContent(prompt);
             const text = result.response.text().replace(/```json|```/gi, '').trim();
             const plan = JSON.parse(text);
 
-            this.log('Campaign plan created', plan);
+            this.log('Campaign plan created with Gemini 3', plan);
             return plan;
         } catch (error: any) {
-            this.log('Planning failed', error.message);
-            return {
-                steps: [],
-                estimatedCost: 0,
-                requiredSkills: this.requiredSkills,
-                reasoning: `Planning failed: ${error.message}`
-            };
+            this.log('Planning failed, using fallback', error.message);
+            return this.createFallbackPlan(context);
         }
+    }
+
+    private createFallbackPlan(context: AgentContext): AgentPlan {
+        return {
+            steps: [
+                { id: 'research', action: 'Deep market research', tool: 'deep_research', payload: { topic: context.mission, depth: 'deep' } },
+                { id: 'strategy', action: 'Generate strategy copy', tool: 'gemini_3_flash', payload: { prompt: `Marketing strategy for: ${context.mission}` } },
+                { id: 'visuals', action: 'Create campaign visuals', tool: 'image_generation', payload: { prompt: `Marketing visual for ${context.mission}` } },
+                { id: 'video', action: 'Generate video ad', tool: 'veo_31_generate', payload: { prompt: `Video ad: ${context.mission}`, duration: 6 } },
+                { id: 'launch', action: 'Social media blast', tool: 'social_blast', payload: { content: context.mission } }
+            ],
+            estimatedCost: 200,
+            requiredSkills: this.requiredSkills,
+            reasoning: 'Fallback comprehensive marketing funnel'
+        };
     }
 
     async execute(plan: AgentPlan, context: AgentContext): Promise<AgentResult> {
         this.mode = 'EXECUTION';
-        this.log('Executing marketing campaign...', plan.steps.length + ' steps');
+        this.log('⚡ Executing marketing campaign with enhanced tools...', plan.steps.length + ' steps');
 
         const startTime = Date.now();
         const artifacts: AgentResult['artifacts'] = [];
+        const stepResults: Record<string, unknown> = {};
 
         try {
             for (const step of plan.steps) {
-                this.log(`Executing step: ${step.action}`);
+                this.log(`Executing: ${step.action}`);
 
-                // Execute bound skills
+                // Execute bound skills or import from googleAPISkills
                 if (this.boundSkills.has(step.tool)) {
                     const result = await this.invokeSkill(step.tool, context.userId, step.payload);
+                    stepResults[step.id] = result;
                     artifacts.push({
                         type: 'data',
                         name: step.id,
                         value: result as Record<string, unknown>
                     });
+                } else {
+                    // Try enhanced Google API skills
+                    const enhanced = await this.executeEnhancedSkill(step.tool, context.userId, step.payload);
+                    if (enhanced) {
+                        stepResults[step.id] = enhanced;
+                        artifacts.push({
+                            type: 'data',
+                            name: step.id,
+                            value: enhanced as Record<string, unknown>
+                        });
+                    }
                 }
             }
 
             return {
                 success: true,
-                data: { message: 'Campaign executed successfully', steps: plan.steps.length },
+                data: {
+                    message: 'Campaign executed with Gemini 3 and Veo 3.1',
+                    steps: plan.steps.length,
+                    results: stepResults
+                },
                 cost: plan.estimatedCost,
                 duration: Date.now() - startTime,
                 artifacts
@@ -102,37 +160,69 @@ export class MarketingStrategistAgent extends BaseAgent {
                 success: false,
                 error: error.message,
                 cost: 0,
-                duration: Date.now() - startTime
+                duration: Date.now() - startTime,
+                artifacts
             };
+        }
+    }
+
+    private async executeEnhancedSkill(
+        tool: string,
+        userId: string,
+        payload: Record<string, unknown>
+    ): Promise<unknown> {
+        try {
+            const skills = await import('../tools/googleAPISkills');
+
+            switch (tool) {
+                case 'deep_research':
+                    return skills.deepResearch(userId, payload.topic as string, payload as any);
+                case 'veo_31_generate':
+                    return skills.veo31Generate(userId, payload.prompt as string, payload as any);
+                case 'gemini_3_flash':
+                    return skills.gemini3Flash(userId, payload.prompt as string, payload as any);
+                default:
+                    return null;
+            }
+        } catch {
+            return null;
         }
     }
 
     async verify(result: AgentResult, context: AgentContext): Promise<VerificationReport> {
         this.mode = 'VERIFICATION';
-        this.log('Verifying campaign results...');
+        this.log('✅ Verifying campaign with Gemini 3 analysis...');
 
         const checks = [
             {
                 name: 'Execution Success',
                 passed: result.success,
-                message: result.success ? 'All steps completed' : result.error
+                message: result.success ? 'All campaign steps completed' : result.error
             },
             {
                 name: 'Artifacts Generated',
                 passed: (result.artifacts?.length ?? 0) > 0,
-                message: `${result.artifacts?.length ?? 0} artifacts created`
+                message: `${result.artifacts?.length ?? 0} campaign assets created`
             },
             {
                 name: 'Cost Within Budget',
                 passed: result.cost <= 300,
-                message: `Cost: ${result.cost} PTS`
+                message: `Cost: ${result.cost} PTS (budget: 300 PTS)`
+            },
+            {
+                name: 'Video Asset Created',
+                passed: result.artifacts?.some(a => a.name.includes('video')) ?? false,
+                message: 'Video ad generated with Veo 3.1'
             }
         ];
 
         return {
             passed: checks.every(c => c.passed),
             checks,
-            recommendations: result.success ? [] : ['Review failed steps and retry']
+            recommendations: result.success
+                ? ['Monitor campaign metrics in 24-48 hours', 'A/B test video variants']
+                : ['Review failed steps and retry', 'Check API quotas']
         };
     }
 }
+

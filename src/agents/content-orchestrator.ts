@@ -2,6 +2,7 @@
  * Content Orchestrator Agent
  * 
  * Specialized agent for content creation and presentation orchestration.
+ * Enhanced with Gemini 3 Flash, Deep Research, and Veo 3.1.
  */
 
 import {
@@ -11,26 +12,43 @@ import {
     AgentResult,
     VerificationReport
 } from './base';
+import { GoogleGenerativeAI } from '@google/generative-ai';
+
+const genAI = new GoogleGenerativeAI(
+    process.env.GOOGLE_AI_STUDIO_API_KEY || process.env.GOOGLE_API_KEY || ''
+);
 
 export class ContentOrchestratorAgent extends BaseAgent {
     readonly name = 'content-orchestrator';
-    readonly description = 'Content creation and presentation orchestration agent';
+    readonly description = 'Content creation and presentation orchestration with Gemini 3 and Veo 3.1';
     readonly capabilities = [
         'research_synthesis',
         'presentation_building',
         'content_structuring',
-        'asset_coordination'
+        'asset_coordination',
+        'deep_research',          // NEW
+        'video_production',       // NEW: Veo 3.1
+        'ai_content_writing'      // NEW: Gemini 3 writing
     ];
     readonly requiredSkills = [
         'notebook_lm_research',
         'google_slides_storyboard',
         'image_generation',
-        'video_generation'
+        'video_generation',
+        'deep_research',          // NEW
+        'veo_31_generate',        // NEW
+        'gemini_3_flash'          // NEW
     ];
+
+    // Gemini 3 Flash for content planning and writing
+    private readonly model = genAI.getGenerativeModel({
+        model: 'gemini-3-flash',
+        systemInstruction: 'You are a content strategist and creative director. Create compelling narratives and visual stories that captivate audiences.'
+    });
 
     async plan(context: AgentContext): Promise<AgentPlan> {
         this.mode = 'PLANNING';
-        this.log('Planning content creation...', context.mission);
+        this.log('🎬 Gemini 3: Planning content creation...', context.mission);
 
         // Determine output type from mission
         const wantsPresentation = /presentation|slides|deck/i.test(context.mission);
@@ -39,12 +57,23 @@ export class ContentOrchestratorAgent extends BaseAgent {
 
         const steps = [];
 
-        // Always start with research
+        // Always start with deep research (enhanced)
         steps.push({
             id: 'research',
             action: 'Deep research and synthesis',
-            tool: 'notebook_lm_research',
-            payload: { query: context.mission }
+            tool: 'deep_research',
+            payload: { topic: context.mission, depth: 'deep' }
+        });
+
+        // Generate content strategy with Gemini 3
+        steps.push({
+            id: 'content_strategy',
+            action: 'AI content strategy and outline',
+            tool: 'gemini_3_flash',
+            payload: {
+                prompt: `Create a content strategy and outline for: ${context.mission}. Include key messages, target audience insights, and narrative structure.`
+            },
+            dependencies: ['research']
         });
 
         if (wantsPresentation) {
@@ -53,7 +82,7 @@ export class ContentOrchestratorAgent extends BaseAgent {
                 action: 'Generate presentation visuals',
                 tool: 'image_generation',
                 payload: { prompt: `Professional presentation visuals for: ${context.mission}` },
-                dependencies: ['research']
+                dependencies: ['content_strategy']
             });
 
             steps.push({
@@ -61,30 +90,36 @@ export class ContentOrchestratorAgent extends BaseAgent {
                 action: 'Build Google Slides presentation',
                 tool: 'google_slides_storyboard',
                 payload: { topic: context.mission },
-                dependencies: ['research', 'visuals']
+                dependencies: ['visuals']
             });
         }
 
         if (wantsVideo) {
+            // Use Veo 3.1 for video
             steps.push({
                 id: 'video',
-                action: 'Generate motion graphics',
-                tool: 'video_generation',
-                payload: { prompt: `Motion graphic for: ${context.mission}` },
-                dependencies: ['research']
+                action: 'Generate video with Veo 3.1',
+                tool: 'veo_31_generate',
+                payload: {
+                    prompt: `Professional video for: ${context.mission}`,
+                    duration: 6,
+                    resolution: '4k',
+                    aspectRatio: '16:9'
+                },
+                dependencies: ['content_strategy']
             });
         }
 
         // Estimate cost based on outputs
-        let cost = 50; // Base research
+        let cost = 75; // Base research + strategy
         if (wantsPresentation) cost += 100;
-        if (wantsVideo) cost += 150;
+        if (wantsVideo) cost += 175;
 
         return {
             steps,
             estimatedCost: cost,
             requiredSkills: this.requiredSkills,
-            reasoning: `Content pipeline: Research → ${wantsPresentation ? 'Slides' : ''}${wantsVideo ? ' Video' : ''}`
+            reasoning: `Gemini 3 content pipeline: Deep Research → Strategy → ${wantsPresentation ? 'Slides' : ''}${wantsVideo ? ' + Veo 3.1 Video' : ''}`
         };
     }
 
