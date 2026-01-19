@@ -51,6 +51,7 @@ interface IGPilotAgent {
 |-------|--------|----------------|
 | **Genesis Architect** | Meta-Orchestration | Agent/skill generation, pattern learning |
 | **Mission Overseer** | Orchestration | All agents, quality gates |
+| **Browser Agent** | Web Automation | puppeteer_navigate, screenshot, extract |
 | **Marketing Strategist** | Campaign Planning | web_intel, image_generation |
 | **SEO Analyst** | Search Optimization | web_mastery_audit, search_console_audit |
 | **Social Commander** | Social Distribution | social_blast, web_intel |

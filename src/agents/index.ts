@@ -6,3 +6,4 @@ export { SocialCommanderAgent } from './social-commander';
 export { ContentOrchestratorAgent } from './content-orchestrator';
 export { MissionOverseerAgent } from './mission-overseer';
 export { GenesisArchitectAgent } from './genesis-architect';
+export { BrowserAgent } from './browser-agent';
