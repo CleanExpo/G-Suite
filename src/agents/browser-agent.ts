@@ -292,7 +292,7 @@ export class BrowserAgent extends BaseAgent {
             id: `op_${index}_${op.action}`,
             action: this.describeOperation(op),
             tool: `browser:${op.action}`,
-            payload: op
+            payload: op as unknown as Record<string, unknown>
         }));
 
         // Estimate cost based on operation count
@@ -338,7 +338,7 @@ export class BrowserAgent extends BaseAgent {
 
         try {
             for (const step of plan.steps) {
-                const operation = step.payload as BrowserOperation;
+                const operation = step.payload as unknown as BrowserOperation;
                 const result = await this.executeOperation(operation);
 
                 operationResults.push({

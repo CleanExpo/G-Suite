@@ -345,7 +345,7 @@ export class WebScraperAgent extends BaseAgent {
                         artifacts.push({
                             type: 'data',
                             name: `extracted_${pageIndex}`,
-                            value: item
+                            value: item as unknown as Record<string, unknown>
                         });
                     }
                 }
@@ -398,7 +398,7 @@ export class WebScraperAgent extends BaseAgent {
         this.log('✅ Web Scraper: Validating results...');
 
         const data = result.data as Record<string, unknown> | undefined;
-        const stats = data?.stats as typeof this.currentJob.stats | undefined;
+        const stats = data?.stats as ScrapeJobResult['stats'] | undefined;
         const items = data?.items as ExtractedItem[] | undefined;
 
         return {

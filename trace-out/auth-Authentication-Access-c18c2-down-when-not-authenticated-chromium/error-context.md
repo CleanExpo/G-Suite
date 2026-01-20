@@ -1,0 +1,115 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e4]:
+      - generic [ref=e5]:
+        - img [ref=e6]
+        - text: Insight™
+      - paragraph [ref=e9]: Meet Orbital Strategy — the first agentic 1:1 mission audit tool for world-class founders.
+      - link "Learn More" [ref=e10] [cursor=pointer]:
+        - /url: /intel
+        - text: Learn More
+        - img [ref=e11]
+    - generic [ref=e14]:
+      - generic [ref=e15]:
+        - link "G-PILOT" [ref=e16] [cursor=pointer]:
+          - /url: /
+          - heading "G-PILOT" [level=1] [ref=e17]
+        - heading "Welcome back, Commander" [level=2] [ref=e18]
+        - paragraph [ref=e19]: Sign in to access your mission control
+      - generic [ref=e20]:
+        - generic [ref=e21]:
+          - button "Continue with Google" [ref=e22]:
+            - img [ref=e23]
+            - text: Continue with Google
+          - button "Continue with GitHub" [ref=e28]:
+            - img [ref=e29]
+            - text: Continue with GitHub
+        - generic [ref=e33]: or continue with email
+        - generic [ref=e35]:
+          - generic [ref=e36]:
+            - generic [ref=e37]: Email address
+            - textbox "Email address" [ref=e38]:
+              - /placeholder: commander@example.com
+          - generic [ref=e39]:
+            - generic [ref=e40]: Password
+            - textbox "Password" [ref=e41]:
+              - /placeholder: ••••••••
+          - button "Sign In" [ref=e42]
+        - paragraph [ref=e43]:
+          - text: Don't have an account?
+          - link "Create one" [ref=e44] [cursor=pointer]:
+            - /url: /sign-up
+      - paragraph [ref=e45]: 🔒 Secured by Supabase Auth with enterprise-grade encryption
+    - contentinfo [ref=e46]:
+      - generic [ref=e47]:
+        - generic [ref=e48]:
+          - link "G-Pilot G-PILOT Gemini Node" [ref=e49] [cursor=pointer]:
+            - /url: /
+            - img "G-Pilot" [ref=e51]
+            - generic [ref=e52]:
+              - generic [ref=e53]: G-PILOT
+              - generic [ref=e54]: Gemini Node
+          - paragraph [ref=e55]: "\"Orchestrating the future of autonomous agent intelligence. Built for world-class founders and the teams that support them.\""
+          - generic [ref=e56]:
+            - link [ref=e57] [cursor=pointer]:
+              - /url: "#"
+              - img [ref=e58]
+            - link [ref=e60] [cursor=pointer]:
+              - /url: "#"
+              - img [ref=e61]
+            - link [ref=e64] [cursor=pointer]:
+              - /url: "#"
+              - img [ref=e65]
+        - generic [ref=e69]:
+          - heading "Platform" [level=4] [ref=e70]
+          - list [ref=e71]:
+            - listitem [ref=e72]:
+              - link "Infrastructure" [ref=e73] [cursor=pointer]:
+                - /url: /platform
+            - listitem [ref=e74]:
+              - link "Vault Security" [ref=e75] [cursor=pointer]:
+                - /url: /platform/security
+            - listitem [ref=e76]:
+              - link "Codex" [ref=e77] [cursor=pointer]:
+                - /url: /abilities
+            - listitem [ref=e78]:
+              - link "Pricing" [ref=e79] [cursor=pointer]:
+                - /url: /pricing
+        - generic [ref=e80]:
+          - heading "Solutions" [level=4] [ref=e81]
+          - list [ref=e82]:
+            - listitem [ref=e83]:
+              - link "Agent Fleets" [ref=e84] [cursor=pointer]:
+                - /url: /solutions/agents
+            - listitem [ref=e85]:
+              - link "Smarter Workflows" [ref=e86] [cursor=pointer]:
+                - /url: /solutions/workflows
+            - listitem [ref=e87]:
+              - link "Intelligence Library" [ref=e88] [cursor=pointer]:
+                - /url: /intel
+        - generic [ref=e89]:
+          - heading "Legal" [level=4] [ref=e90]
+          - list [ref=e91]:
+            - listitem [ref=e92]:
+              - link "Privacy & Sharing" [ref=e93] [cursor=pointer]:
+                - /url: /privacy
+            - listitem [ref=e94]:
+              - link "Terms of Service" [ref=e95] [cursor=pointer]:
+                - /url: /privacy
+            - listitem [ref=e96]:
+              - link "Google TOS" [ref=e97] [cursor=pointer]:
+                - /url: "#"
+                - text: Google TOS
+                - img [ref=e98]
+      - generic [ref=e102]:
+        - generic [ref=e103]: © 2026 G-Pilot App. All Rights Reserved.
+        - generic [ref=e104]:
+          - generic [ref=e105]: "System Status: Operational"
+          - generic [ref=e106]: v4.2.0-spatial
+  - button "Open Next.js Dev Tools" [ref=e112] [cursor=pointer]:
+    - img [ref=e113]
+  - alert [ref=e116]
+```

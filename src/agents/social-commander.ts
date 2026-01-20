@@ -10,7 +10,8 @@ import {
     AgentContext,
     AgentPlan,
     AgentResult,
-    VerificationReport
+    VerificationReport,
+    PlanStep
 } from './base';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
@@ -61,7 +62,7 @@ export class SocialCommanderAgent extends BaseAgent {
         const platforms = targetPlatforms.length > 0 ? targetPlatforms : ['x', 'linkedin'];
         const wantsVideo = /video|reel|short|tiktok/i.test(context.mission);
 
-        const steps = [
+        const steps: PlanStep[] = [
             // Deep research on trends first
             {
                 id: 'trend_research',

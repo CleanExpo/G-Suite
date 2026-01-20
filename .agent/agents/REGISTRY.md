@@ -10,6 +10,7 @@ This directory contains global agent specifications that are available across al
 | SEO Analyst | `seo-analyst/` | Active |
 | Social Commander | `social-commander/` | Active |
 | Content Orchestrator | `content-orchestrator/` | Active |
+| Agent Scout | `agent-scout/` | Active |
 
 ## Agent Discovery
 

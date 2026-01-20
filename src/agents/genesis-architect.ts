@@ -251,7 +251,7 @@ export class GenesisArchitectAgent extends BaseAgent {
         const result: CapabilityMatch = {
             covered: gaps.length === 0 && matchingAgents.length > 0,
             agents: matchingAgents,
-            skills: [...new Set(matchingSkills)],
+            skills: Array.from(new Set(matchingSkills)),
             gaps
         };
 
@@ -261,21 +261,99 @@ export class GenesisArchitectAgent extends BaseAgent {
 
     /**
      * Layer 4: SYNTHESIS - Generate new agents/skills for gaps
+     * 
+     * Enhanced with Agent Scout integration:
+     * 1. First, scout external ecosystem for existing solutions
+     * 2. If suitable agents found, recommend integration
+     * 3. Only generate new agents/skills if nothing suitable exists
      */
     private async synthesizeCapabilities(
         understanding: DeepUnderstanding,
         gaps: string[]
-    ): Promise<{ agents: GeneratedAgent[]; skills: GeneratedSkill[] }> {
+    ): Promise<{ agents: GeneratedAgent[]; skills: GeneratedSkill[]; scoutedAgents?: unknown[] }> {
         this.log('⚡ Layer 4: Capability Synthesis...');
 
         const newAgents: GeneratedAgent[] = [];
         const newSkills: GeneratedSkill[] = [];
+        let scoutedAgents: unknown[] = [];
 
         if (gaps.length === 0) {
             this.log('No gaps to fill');
             return { agents: newAgents, skills: newSkills };
         }
 
+        // Phase 1: Scout external ecosystem for existing solutions
+        this.log('🔭 Engaging Agent Scout for external reconnaissance...');
+
+        try {
+            const scout = AgentRegistry.get('agent-scout');
+            if (scout) {
+                const scoutPlan = await scout.plan({
+                    userId: 'genesis-architect',
+                    mission: `Find agents for: ${gaps.join(', ')}`,
+                    config: { missionType: 'quick_scan' }
+                });
+
+                const scoutResult = await scout.execute(scoutPlan, {
+                    userId: 'genesis-architect',
+                    mission: `Find agents for: ${gaps.join(', ')}`
+                });
+
+                if (scoutResult.success && scoutResult.artifacts) {
+                    const recommendedArtifact = scoutResult.artifacts.find(
+                        a => a.name === 'recommended_agents'
+                    );
+
+                    if (recommendedArtifact && typeof recommendedArtifact.value === 'object') {
+                        const value = recommendedArtifact.value as Record<string, unknown>;
+                        scoutedAgents = (value.agents as unknown[]) || [];
+
+                        if (scoutedAgents.length > 0) {
+                            this.log(`Agent Scout found ${scoutedAgents.length} potential solutions from external ecosystem`);
+
+                            // Check if scouted agents can fill the gaps
+                            const filledGaps: string[] = [];
+                            for (const agent of scoutedAgents) {
+                                const agentData = agent as { capabilities?: string[]; name?: string };
+                                if (agentData.capabilities) {
+                                    for (const gap of gaps) {
+                                        const gapKeyword = gap.toLowerCase().split(' ')[0];
+                                        if (agentData.capabilities.some(c => c.toLowerCase().includes(gapKeyword))) {
+                                            filledGaps.push(gap);
+                                            this.log(`Gap "${gap}" can be filled by scouted agent: ${agentData.name}`);
+                                        }
+                                    }
+                                }
+                            }
+
+                            // Remove gaps that can be filled by scouted agents
+                            const remainingGaps = gaps.filter(g => !filledGaps.includes(g));
+
+                            if (remainingGaps.length < gaps.length) {
+                                this.log(`${filledGaps.length} gap(s) can be addressed by external agents`);
+                            }
+
+                            // Only generate for remaining gaps
+                            if (remainingGaps.length === 0) {
+                                this.log('All gaps can be filled with scouted agents - skipping generation');
+                                return { agents: newAgents, skills: newSkills, scoutedAgents };
+                            }
+
+                            // Continue with reduced gap list
+                            gaps.length = 0;
+                            gaps.push(...remainingGaps);
+                        }
+                    }
+                }
+            } else {
+                this.log('Agent Scout not available - proceeding with internal generation');
+            }
+        } catch (scoutError: any) {
+            this.log(`Agent Scout failed: ${scoutError.message} - proceeding with internal generation`);
+        }
+
+        // Phase 2: Generate new agents/skills for remaining gaps
+        this.log(`Generating capabilities for ${gaps.length} remaining gap(s)...`);
         const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
 
         for (const gap of gaps) {
@@ -296,7 +374,7 @@ export class GenesisArchitectAgent extends BaseAgent {
             }
         }
 
-        return { agents: newAgents, skills: newSkills };
+        return { agents: newAgents, skills: newSkills, scoutedAgents };
     }
 
     /**
@@ -470,7 +548,12 @@ export class GenesisArchitectAgent extends BaseAgent {
         const capabilities = await this.discoverCapabilities(understanding);
 
         // Layer 4: Synthesis if needed
-        let synthesized = { agents: [] as GeneratedAgent[], skills: [] as GeneratedSkill[] };
+        let synthesized: {
+            agents: GeneratedAgent[];
+            skills: GeneratedSkill[];
+            scoutedAgents?: any[]
+        } = { agents: [], skills: [] };
+
         if (!capabilities.covered && capabilities.gaps.length > 0) {
             synthesized = await this.synthesizeCapabilities(understanding, capabilities.gaps);
         }
@@ -486,6 +569,23 @@ export class GenesisArchitectAgent extends BaseAgent {
                 tool: `agent:${agentName}`,
                 payload: { understanding, originalContext: context }
             });
+        }
+
+        // Step 1.5: Recommendation for Scouted external agents
+        if (synthesized.scoutedAgents && synthesized.scoutedAgents.length > 0) {
+            for (const agent of synthesized.scoutedAgents) {
+                steps.push({
+                    id: `scouted_${agent.name?.replace(/\s+/g, '_')}`,
+                    action: `Review and potentially integrate external agent: ${agent.name}`,
+                    tool: 'genesis:external_scout_recommendation',
+                    payload: {
+                        agentName: agent.name,
+                        source: agent.source,
+                        capabilities: agent.capabilities,
+                        compatibility: agent.compatibility
+                    }
+                });
+            }
         }
 
         // Step 2: Deploy generated agents

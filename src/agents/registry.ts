@@ -55,7 +55,7 @@ class AgentRegistryClass {
     getAvailableAgents(): string[] {
         const instanceNames = Array.from(this.agents.keys());
         const classNames = Array.from(this.constructors.keys());
-        return [...new Set([...instanceNames, ...classNames])];
+        return Array.from(new Set([...instanceNames, ...classNames]));
     }
 
     /**
@@ -126,6 +126,7 @@ export async function initializeAgents(): Promise<void> {
         const { WebScraperAgent } = await import('./web-scraper');
         const { DataCollectorAgent } = await import('./data-collector');
         const { GeoMarketingAgent } = await import('./geo-marketing-agent');
+        const { AgentScoutAgent } = await import('./agent-scout');
 
         AgentRegistry.registerClass('marketing-strategist', MarketingStrategistAgent);
         AgentRegistry.registerClass('seo-analyst', SEOAnalystAgent);
@@ -138,6 +139,7 @@ export async function initializeAgents(): Promise<void> {
         AgentRegistry.registerClass('web-scraper', WebScraperAgent);
         AgentRegistry.registerClass('data-collector', DataCollectorAgent);
         AgentRegistry.registerClass('geo-marketing-agent', GeoMarketingAgent);
+        AgentRegistry.registerClass('agent-scout', AgentScoutAgent);
 
         console.log(`✅ ${AgentRegistry.getAvailableAgents().length} agents initialized`);
     } catch (error) {

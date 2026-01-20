@@ -257,27 +257,27 @@ export async function structured_scraper(
         const items = Array.from({ length: Math.min(limit, 5) }, (_, i) => {
             const item: Record<string, unknown> = { id: `item_${i + 1}` };
             for (const field of fields) {
-                item[field] = `[${field.toUpperCase()]_${ i + 1 } `;
-      }
-      return item;
-    });
-    
-    return {
-      success: true,
-      domain,
-      items,
-      schema: fields,
-      extractionMethod: options.selectors ? 'css' : 'ai'
-    };
-  } catch (error: any) {
-    return {
-      success: false,
-      domain,
-      items: [],
-      schema: fields,
-      extractionMethod: 'ai'
-    };
-  }
+                item[field] = `[${field.toUpperCase()}]_${i + 1}`;
+            }
+            return item;
+        });
+
+        return {
+            success: true,
+            domain,
+            items,
+            schema: fields,
+            extractionMethod: options.selectors ? 'css' : 'ai'
+        };
+    } catch (error: any) {
+        return {
+            success: false,
+            domain,
+            items: [],
+            schema: fields,
+            extractionMethod: 'ai'
+        };
+    }
 }
 
 // =============================================================================
@@ -285,92 +285,92 @@ export async function structured_scraper(
 // =============================================================================
 
 interface ArchiveResult {
-  success: boolean;
-  archiveId: string;
-  itemCount: number;
-  format: 'json' | 'csv' | 'jsonl' | 'parquet';
-  sizeBytes: number;
-  expiresAt: number;
-  downloadUrl?: string;
+    success: boolean;
+    archiveId: string;
+    itemCount: number;
+    format: 'json' | 'csv' | 'jsonl' | 'parquet';
+    sizeBytes: number;
+    expiresAt: number;
+    downloadUrl?: string;
 }
 
 /**
  * Archive data to storage
  */
 export async function data_archive(
-  userId: string,
-  data: unknown[],
-  options: {
-    format?: 'json' | 'csv' | 'jsonl' | 'parquet';
-    ttlDays?: number;
-    name?: string;
-  } = {}
+    userId: string,
+    data: unknown[],
+    options: {
+        format?: 'json' | 'csv' | 'jsonl' | 'parquet';
+        ttlDays?: number;
+        name?: string;
+    } = {}
 ): Promise<ArchiveResult> {
-  console.log(`[data_archive] Archiving ${ data.length } items for user ${ userId }`);
-  
-  const format = options.format || 'json';
-  const ttlDays = options.ttlDays || 30;
-  const archiveId = `archive_${ Date.now() } `;
-  
-  try {
-    // Simulate archiving
-    await new Promise(resolve => setTimeout(resolve, 200));
-    
-    return {
-      success: true,
-      archiveId,
-      itemCount: data.length,
-      format,
-      sizeBytes: JSON.stringify(data).length,
-      expiresAt: Date.now() + (ttlDays * 24 * 60 * 60 * 1000),
-      downloadUrl: `https://storage.gpilot.io/archives/${archiveId}.${format}`
-    };
-        } catch (error: any) {
-            return {
-                success: false,
-                archiveId,
-                itemCount: 0,
-                format,
-                sizeBytes: 0,
-                expiresAt: 0
-            };
-        }
+    console.log(`[data_archive] Archiving ${data.length} items for user ${userId}`);
+
+    const format = options.format || 'json';
+    const ttlDays = options.ttlDays || 30;
+    const archiveId = `archive_${Date.now()} `;
+
+    try {
+        // Simulate archiving
+        await new Promise(resolve => setTimeout(resolve, 200));
+
+        return {
+            success: true,
+            archiveId,
+            itemCount: data.length,
+            format,
+            sizeBytes: JSON.stringify(data).length,
+            expiresAt: Date.now() + (ttlDays * 24 * 60 * 60 * 1000),
+            downloadUrl: `https://storage.gpilot.io/archives/${archiveId}.${format}`
+        };
+    } catch (error: any) {
+        return {
+            success: false,
+            archiveId,
+            itemCount: 0,
+            format,
+            sizeBytes: 0,
+            expiresAt: 0
+        };
     }
+}
 
 // =============================================================================
 // DEEP LOOKUP - Entity enrichment
 // =============================================================================
 
 interface LookupResult {
-        success: boolean;
-        entityId: string;
-        entityType: 'company' | 'person' | 'product' | 'place' | 'unknown';
-        enrichedData: Record<string, unknown>;
-        sources: string[];
-        confidence: number;
-    }
+    success: boolean;
+    entityId: string;
+    entityType: 'company' | 'person' | 'product' | 'place' | 'unknown';
+    enrichedData: Record<string, unknown>;
+    sources: string[];
+    confidence: number;
+}
 
-    /**
-     * Enrich an entity with data from multiple sources
-     */
-    export async function deep_lookup(
-        userId: string,
-        entityId: string,
-        options: {
-            entityType?: 'company' | 'person' | 'product' | 'place';
-            sources?: string[];
-            fields?: string[];
-        } = {}
-    ): Promise<LookupResult> {
-        console.log(`[deep_lookup] Enriching ${entityId} for user ${userId}`);
+/**
+ * Enrich an entity with data from multiple sources
+ */
+export async function deep_lookup(
+    userId: string,
+    entityId: string,
+    options: {
+        entityType?: 'company' | 'person' | 'product' | 'place';
+        sources?: string[];
+        fields?: string[];
+    } = {}
+): Promise<LookupResult> {
+    console.log(`[deep_lookup] Enriching ${entityId} for user ${userId}`);
 
-        const entityType = options.entityType || 'unknown';
+    const entityType = options.entityType || 'unknown';
 
-        // Use Gemini to generate enrichment data
-        const model = genAI.getGenerativeModel({ model: 'gemini-3-flash' });
+    // Use Gemini to generate enrichment data
+    const model = genAI.getGenerativeModel({ model: 'gemini-3-flash' });
 
-        try {
-            const result = await model.generateContent(`
+    try {
+        const result = await model.generateContent(`
       Generate enriched data for entity: ${entityId}
       Type: ${entityType}
       
@@ -380,46 +380,46 @@ interface LookupResult {
       For products: name, brand, category, price_range, rating
     `);
 
-            const text = result.response.text();
-            let enrichedData: Record<string, unknown> = {};
+        const text = result.response.text();
+        let enrichedData: Record<string, unknown> = {};
 
-            try {
-                enrichedData = JSON.parse(text.replace(/```json|```/gi, '').trim());
-            } catch {
-                enrichedData = { raw: text };
-            }
-
-            return {
-                success: true,
-                entityId,
-                entityType,
-                enrichedData,
-                sources: ['linkedin', 'crunchbase', 'google_knowledge_graph'],
-                confidence: 0.85
-            };
-        } catch (error: any) {
-            return {
-                success: false,
-                entityId,
-                entityType,
-                enrichedData: {},
-                sources: [],
-                confidence: 0
-            };
+        try {
+            enrichedData = JSON.parse(text.replace(/```json|```/gi, '').trim());
+        } catch {
+            enrichedData = { raw: text };
         }
+
+        return {
+            success: true,
+            entityId,
+            entityType,
+            enrichedData,
+            sources: ['linkedin', 'crunchbase', 'google_knowledge_graph'],
+            confidence: 0.85
+        };
+    } catch (error: any) {
+        return {
+            success: false,
+            entityId,
+            entityType,
+            enrichedData: {},
+            sources: [],
+            confidence: 0
+        };
     }
+}
 
-    // =============================================================================
-    // SKILL REGISTRY - Export all skills
-    // =============================================================================
+// =============================================================================
+// SKILL REGISTRY - Export all skills
+// =============================================================================
 
-    export const webIntelligenceSkills = {
-        web_unlocker,
-        serp_collector,
-        web_crawler,
-        structured_scraper,
-        data_archive,
-        deep_lookup
-    };
+export const webIntelligenceSkills = {
+    web_unlocker,
+    serp_collector,
+    web_crawler,
+    structured_scraper,
+    data_archive,
+    deep_lookup
+};
 
-    export default webIntelligenceSkills;
+export default webIntelligenceSkills;

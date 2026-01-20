@@ -135,7 +135,7 @@ export class DataCollectorAgent extends BaseAgent {
      * Find matching scraper for a domain
      */
     private findScraper(input: string): DomainScraper | null {
-        for (const [key, scraper] of this.scrapers) {
+        for (const [key, scraper] of Array.from(this.scrapers)) {
             if (input.toLowerCase().includes(key) || input.toLowerCase().includes(scraper.domain)) {
                 return scraper;
             }
@@ -157,7 +157,7 @@ export class DataCollectorAgent extends BaseAgent {
         const entityIds: string[] = [];
 
         // Find matching scrapers
-        for (const [key, scraper] of this.scrapers) {
+        for (const [key, scraper] of Array.from(this.scrapers)) {
             if (mission.includes(key) || mission.includes(scraper.domain)) {
                 scrapers.push(scraper);
             }
@@ -373,7 +373,7 @@ export class DataCollectorAgent extends BaseAgent {
                     artifacts.push({
                         type: 'data',
                         name: 'serp_results',
-                        value: serpData
+                        value: serpData as unknown as Record<string, unknown>
                     });
                 }
                 else if (step.tool === 'deep_lookup') {
@@ -394,7 +394,7 @@ export class DataCollectorAgent extends BaseAgent {
                     artifacts.push({
                         type: 'data',
                         name: 'enriched_entities',
-                        value: enriched
+                        value: enriched as unknown as Record<string, unknown>
                     });
                 }
                 else if (step.tool === 'data_archive') {
@@ -443,7 +443,7 @@ export class DataCollectorAgent extends BaseAgent {
         this.log('✅ Data Collector: Validating results...');
 
         const data = result.data as Record<string, unknown> | undefined;
-        const validation = data?.validation as typeof this.currentCollection.validation | undefined;
+        const validation = data?.validation as CollectionResult['validation'] | undefined;
         const items = data?.items as DataFeedItem[] | undefined;
 
         const validationRate = validation
