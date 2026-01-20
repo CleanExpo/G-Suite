@@ -1,6 +1,6 @@
 import { google } from 'googleapis';
 import { getGoogleAuth } from '@/lib/google';
-import { billingGate } from '../middleware/costGate';
+import { billingGate } from '../billing/costGate';
 
 /**
  * searchConsoleAudit

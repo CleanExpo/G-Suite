@@ -1,7 +1,7 @@
 import puppeteer from 'puppeteer';
 // import puppeteer from 'puppeteer-extra';
 // import StealthPlugin from 'puppeteer-extra-plugin-stealth';
-import { billingGate } from '../middleware/costGate';
+import { billingGate } from '../billing/costGate';
 
 // Note: Standard puppeteer used to avoid "utils.typeOf" bundling errors in Next.js 15
 

@@ -1,6 +1,6 @@
 import { google } from 'googleapis';
 import { z } from 'zod';
-import { billingGate } from '../middleware/costGate';
+import { billingGate } from '../billing/costGate';
 import { getGoogleAuth } from '@/lib/google';
 
 // Schema for the Slides Storyboard

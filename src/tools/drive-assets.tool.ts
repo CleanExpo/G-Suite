@@ -1,5 +1,5 @@
 import { google } from 'googleapis';
-import { billingGate } from '../middleware/costGate';
+import { billingGate } from '../billing/costGate';
 
 // The ID of the folder where the client drops their logos/marketing pics
 const ASSETS_FOLDER_ID = process.env.GOOGLE_ASSETS_FOLDER_ID;

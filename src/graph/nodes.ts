@@ -1,6 +1,6 @@
 import { ProjectStateType } from './state';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { billingGate } from '../middleware/costGate';
+import { billingGate } from '../billing/costGate';
 import { createSlidesStoryboard } from '../tools/googleSlides';
 import { runNotebookLMAgent } from '../agents/notebookLM';
 import { generateImage, generateVideo, webIntel } from '../tools/mediaEngine';
