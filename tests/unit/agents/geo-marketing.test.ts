@@ -15,21 +15,17 @@ vi.mock('@google/generative-ai', () => ({
                 generateContent: async () => ({
                     response: {
                         text: () => JSON.stringify({
-                            citationVector: {
-                                primaryAuthority: 0.85,
-                                contentOriginality: 0.92,
-                                expertiseDemonstration: 0.78
-                            },
-                            llmVisibility: {
-                                perplexity: 'high',
-                                chatgpt: 'medium',
-                                claude: 'high'
-                            },
-                            recommendations: [
-                                'Increase first-person expert quotes',
-                                'Add more structured data',
-                                'Improve source attribution'
-                            ]
+                            steps: [
+                                { id: 'citation_analysis', action: 'Analyze Citation Vector signals', tool: 'geo_citation_analyzer', payload: {} },
+                                { id: 'authority_research', action: 'Deep research on topical authority', tool: 'deep_research', payload: {} },
+                                { id: 'llm_visibility', action: 'Audit visibility across LLM platforms', tool: 'llm_visibility_audit', payload: {} },
+                                { id: 'authority_scoring', action: 'Calculate Primary Authority Score', tool: 'authority_scorer', payload: {} },
+                                { id: 'content_optimization', action: 'Generate citation-worthy content recommendations', tool: 'gemini_3_flash', payload: {} },
+                                { id: 'forensic_layer', action: 'Apply Forensic Stylistic Layer validation', tool: 'content_humanizer', payload: {} }
+                            ],
+                            estimatedCost: 250,
+                            requiredSkills: ['gemini_3_flash', 'deep_research', 'web_intel'],
+                            reasoning: 'Comprehensive Synthex Apex Architecture GEO audit'
                         }),
                         usageMetadata: { totalTokenCount: 200 }
                     }

@@ -16,12 +16,20 @@ vi.mock('@google/generative-ai', () => ({
                     response: {
                         text: () => JSON.stringify({
                             missionType: 'content_creation',
+                            complexity: 'medium',
                             suggestedAgents: ['content-orchestrator', 'seo-analyst'],
+                            estimatedCost: 100,
+                            reasoning: 'Test mission classification',
                             taskBreakdown: [
                                 { task: 'Research topic', agent: 'content-orchestrator', priority: 1 },
                                 { task: 'SEO optimization', agent: 'seo-analyst', priority: 2 }
                             ],
-                            estimatedDuration: '15 minutes'
+                            estimatedDuration: '15 minutes',
+                            // For plan generation
+                            steps: [
+                                { id: 'invoke_content-orchestrator', action: 'Execute content-orchestrator', tool: 'agent:content-orchestrator', payload: {} }
+                            ],
+                            requiredSkills: []
                         }),
                         usageMetadata: { totalTokenCount: 150 }
                     }
@@ -112,13 +120,16 @@ describe('Mission Overseer Agent', () => {
             const result = {
                 success: true,
                 data: {
+                    agentsCoordinated: ['content-orchestrator', 'seo-analyst'],
                     agentsUsed: ['content-orchestrator', 'seo-analyst'],
                     tasksCompleted: 3,
                     overallStatus: 'complete'
                 },
                 cost: 200,
                 duration: 30000,
-                artifacts: []
+                artifacts: [
+                    { type: 'data', name: 'mission_report', value: { status: 'complete' } }
+                ]
             };
 
             const report = await agent.verify(result, {

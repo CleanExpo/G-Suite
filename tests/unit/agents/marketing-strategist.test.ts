@@ -109,7 +109,10 @@ describe('Marketing Strategist Agent', () => {
                 },
                 cost: 75,
                 duration: 5000,
-                artifacts: []
+                artifacts: [
+                    { type: 'data', name: 'strategy', value: { objective: 'Growth' } },
+                    { type: 'data', name: 'video_ad', value: { url: 'https://test.com/video.mp4' } }
+                ]
             };
 
             const report = await agent.verify(result, {

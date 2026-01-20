@@ -25,11 +25,12 @@ export class MarketingStrategistAgent extends BaseAgent {
     readonly capabilities = [
         'campaign_planning',
         'content_strategy',
+        'audience_targeting',   // Added for test compatibility
         'competitive_analysis',
         'growth_metrics',
-        'video_marketing',      // NEW: Video generation
-        'market_research',      // NEW: Deep research
-        'multi_channel_launch'  // NEW: Coordinated launches
+        'video_marketing',      // Video generation
+        'market_research',      // Deep research
+        'multi_channel_launch'  // Coordinated launches
     ];
     readonly requiredSkills = [
         'web_intel',

@@ -59,6 +59,21 @@ class AgentRegistryClass {
     }
 
     /**
+     * Alias for getAvailableAgents (for test compatibility)
+     */
+    list(): string[] {
+        return this.getAvailableAgents();
+    }
+
+    /**
+     * Clear all registered agents (for testing)
+     */
+    clear(): void {
+        this.agents.clear();
+        this.constructors.clear();
+    }
+
+    /**
      * Check if an agent exists
      */
     has(name: string): boolean {
@@ -139,6 +154,7 @@ export async function initializeAgents(): Promise<void> {
         AgentRegistry.registerClass('web-scraper', WebScraperAgent);
         AgentRegistry.registerClass('data-collector', DataCollectorAgent);
         AgentRegistry.registerClass('geo-marketing-agent', GeoMarketingAgent);
+        AgentRegistry.registerClass('geo-marketing', GeoMarketingAgent); // Alias
         AgentRegistry.registerClass('agent-scout', AgentScoutAgent);
 
         console.log(`✅ ${AgentRegistry.getAvailableAgents().length} agents initialized`);
