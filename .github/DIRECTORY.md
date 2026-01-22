@@ -28,6 +28,7 @@ This directory contains GitHub-specific configuration, workflows, and documentat
 ### First Time Setup
 
 1. **Add Required Secrets**:
+
    ```
    See: SECRETS-QUICK-START.md
    ```
@@ -40,11 +41,13 @@ This directory contains GitHub-specific configuration, workflows, and documentat
 ### Running Workflows
 
 **Automatic Triggers**:
+
 - Push to `main` → CI, Security, Advanced Testing
 - Pull Requests → CI, Security, Advanced Testing, Agent Validation
 - Weekly (Sundays) → Security, Advanced Testing, Performance Testing
 
 **Manual Triggers**:
+
 ```bash
 gh workflow run ci.yml
 gh workflow run security.yml
@@ -55,11 +58,13 @@ gh workflow run performance-testing.yml
 ## 📊 Workflows Overview
 
 ### 1. CI Workflow (`ci.yml`)
+
 **Purpose**: Main continuous integration pipeline
 
 **Runs On**: Every push, every PR
 
 **Jobs**:
+
 - Backend tests (pytest + coverage)
 - Frontend tests (vitest + coverage)
 - E2E tests (Playwright)
@@ -70,11 +75,13 @@ gh workflow run performance-testing.yml
 ---
 
 ### 2. Security Workflow (`security.yml`)
+
 **Purpose**: Automated vulnerability scanning
 
 **Runs On**: Push, PR, Weekly (Sundays), Manual
 
 **Jobs**:
+
 - Snyk frontend scan
 - Snyk backend scan
 - NPM audit
@@ -86,11 +93,13 @@ gh workflow run performance-testing.yml
 ---
 
 ### 3. Advanced Testing Workflow (`advanced-testing.yml`)
+
 **Purpose**: Contract, visual regression, and performance testing
 
 **Runs On**: Push to main/develop, PRs, Weekly (Sundays), Manual
 
 **Jobs**:
+
 - Contract tests (Pact)
 - Visual regression (Percy)
 - Performance tests (Lighthouse CI)
@@ -98,6 +107,7 @@ gh workflow run performance-testing.yml
 **Expected Duration**: 8-12 minutes
 
 **Required Secrets**:
+
 - `PERCY_TOKEN`
 - `PACT_BROKER_BASE_URL`
 - `PACT_BROKER_TOKEN`
@@ -106,11 +116,13 @@ gh workflow run performance-testing.yml
 ---
 
 ### 4. Performance Testing Workflow (`performance-testing.yml`)
+
 **Purpose**: Load testing and penetration testing
 
 **Runs On**: Weekly (Sundays), Manual only
 
 **Jobs**:
+
 - k6 load tests (baseline, load, stress)
 - k6 spike test (manual only)
 - OWASP ZAP baseline scan
@@ -123,11 +135,13 @@ gh workflow run performance-testing.yml
 ---
 
 ### 5. Agent PR Validation (`agent-pr-checks.yml`)
+
 **Purpose**: Validate agent-generated pull requests
 
 **Runs On**: Pull requests only
 
 **Jobs**:
+
 - Detect agent PRs
 - Metadata validation
 - Quality checks
@@ -139,16 +153,19 @@ gh workflow run performance-testing.yml
 ---
 
 ### 6. Deploy Backend (`deploy-backend.yml`)
+
 **Purpose**: Deploy backend to DigitalOcean
 
 **Runs On**: Push to main (when backend changes)
 
 **Required Secrets**:
+
 - `DIGITALOCEAN_ACCESS_TOKEN`
 
 ---
 
 ### 7. Deploy Frontend (`deploy-frontend.yml`)
+
 **Purpose**: Deploy frontend to Vercel
 
 **Runs On**: Push to main (when frontend changes)
@@ -162,21 +179,25 @@ gh workflow run performance-testing.yml
 See `SECRETS-QUICK-START.md` for setup instructions.
 
 **Priority 1 (Required for testing)**:
+
 - `PERCY_TOKEN`
 - `PACT_BROKER_BASE_URL`
 - `PACT_BROKER_TOKEN`
 - `CODECOV_TOKEN`
 
 **Priority 2 (Optional - Security)**:
+
 - `SNYK_TOKEN`
 
 **Priority 3 (Optional - Deployment)**:
+
 - `DIGITALOCEAN_ACCESS_TOKEN`
 - `VERCEL_TOKEN`
 
 ## 📈 Workflow Status
 
 Check workflow status:
+
 ```
 https://github.com/CleanExpo/NodeJS-Starter-V1/actions
 ```
@@ -186,6 +207,7 @@ https://github.com/CleanExpo/NodeJS-Starter-V1/actions
 Some workflows can be tested locally:
 
 **Security scanning**:
+
 ```bash
 # Snyk
 npx snyk test
@@ -195,12 +217,14 @@ npm audit
 ```
 
 **Load testing**:
+
 ```bash
 # k6
 k6 run tests/performance/baseline-test.js
 ```
 
 **Penetration testing**:
+
 ```bash
 # OWASP ZAP
 docker run -v ${PWD}:/zap/wrk/:rw -t ghcr.io/zaproxy/zaproxy:stable \
@@ -219,18 +243,22 @@ When modifying workflows:
 ## 🆘 Troubleshooting
 
 **Workflow fails with "Secret not found"**:
+
 - Add required secrets (see SECRETS-QUICK-START.md)
 
 **Workflow fails with "Permission denied"**:
+
 - Check repository permissions
 - Ensure workflows have write access
 
 **Tests fail in CI but pass locally**:
+
 - Check environment differences
 - Verify all dependencies installed
 - Review workflow logs for specifics
 
 **Deployment fails**:
+
 - Verify deployment secrets are set
 - Check service status (DigitalOcean/Vercel)
 - Review deployment logs
@@ -245,6 +273,7 @@ When modifying workflows:
 ## 🔄 Maintenance
 
 **Regular tasks**:
+
 - Review workflow runs weekly
 - Rotate secrets every 90 days
 - Update action versions quarterly
@@ -253,6 +282,7 @@ When modifying workflows:
 ## ✅ Success Criteria
 
 Workflows are working correctly when:
+
 - ✅ CI passes on every push
 - ✅ Security scans complete without critical issues
 - ✅ Advanced tests pass (contract, visual, performance)
