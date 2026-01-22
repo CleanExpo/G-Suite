@@ -1,10 +1,10 @@
 <div align="center">
 
-<!-- HERO BANNER - Replace with your own GIF/image -->
+<!-- HERO BANNER -->
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/CleanExpo/NodeJS-Starter-V1/main/.github/assets/banner-dark.gif">
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/CleanExpo/NodeJS-Starter-V1/main/.github/assets/banner-light.gif">
-  <img alt="NodeJS-Starter-V1 Banner" src="https://via.placeholder.com/1200x400/1a1a2e/16213e?text=NodeJS-Starter-V1+%7C+AI-Powered+Starter+Template" width="100%">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/CleanExpo/NodeJS-Starter-V1/main/.github/assets/banner-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/CleanExpo/NodeJS-Starter-V1/main/.github/assets/banner-light.svg">
+  <img alt="NodeJS-Starter-V1 Banner" src="https://raw.githubusercontent.com/CleanExpo/NodeJS-Starter-V1/main/.github/assets/banner-dark.svg" width="100%">
 </picture>
 
 <br/>
