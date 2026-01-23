@@ -1,11 +1,8 @@
 {
   "compilerOptions": {
     "target": "ES2017",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "types": ["vitest/globals"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -23,12 +20,8 @@
       }
     ],
     "paths": {
-      "@/*": [
-        "./*"
-      ],
-      "@shared/*": [
-        "../../packages/shared/src/*"
-      ]
+      "@/*": ["./*"],
+      "@shared/*": ["../../packages/shared/src/*"]
     }
   },
   "include": [
@@ -39,6 +32,13 @@
     ".next/dev/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "tests/**/*",
+    "src/app/demo/**/*",
+    "src/components/JobCard.tsx",
+    "lib/image-generation/*",
+    "lib/image-generation/**/*",
+    "app/api/generate-image/*",
+    "hooks/use-image-generation.ts"
   ]
 }

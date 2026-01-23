@@ -40,7 +40,7 @@ export interface AgentRun {
   error?: string;
   metadata?: Record<string, unknown>;
   verification_attempts?: number;
-  verification_evidence?: string;
+  verification_evidence?: Array<Record<string, unknown>>;
   started_at: string;
   completed_at?: string;
   updated_at: string;

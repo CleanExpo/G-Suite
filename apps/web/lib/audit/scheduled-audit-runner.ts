@@ -8,11 +8,11 @@
  * - Alert triggering
  */
 
-import { v4 as uuidv4 } from "uuid";
-import { UserJourneyRunner, COMMON_JOURNEYS, type JourneyResult } from "./user-journey-runner";
-import { UXFrictionDetector, type FrictionAnalysis } from "./ux-friction-detector";
-import { EvidenceCollector } from "./evidence-collector";
-import { APIRouteAuditor, type AuditReport } from "./api-route-auditor";
+import { v4 as uuidv4 } from 'uuid';
+import { UserJourneyRunner, COMMON_JOURNEYS, type JourneyResult } from './user-journey-runner';
+import { UXFrictionDetector, type FrictionAnalysis } from './ux-friction-detector';
+import { EvidenceCollector } from './evidence-collector';
+import { APIRouteAuditor, type AuditReport } from './api-route-auditor';
 
 // ============================================================================
 // Types
@@ -30,11 +30,11 @@ export interface AuditSchedule {
 }
 
 export type AuditType =
-  | "health_check"
-  | "journey_run"
-  | "route_audit"
-  | "friction_analysis"
-  | "full_audit";
+  | 'health_check'
+  | 'journey_run'
+  | 'route_audit'
+  | 'friction_analysis'
+  | 'full_audit';
 
 export interface AuditConfig {
   journeys?: string[];
@@ -50,7 +50,7 @@ export interface ScheduledAuditResult {
   type: AuditType;
   started_at: string;
   completed_at: string;
-  status: "success" | "partial" | "failure" | "error";
+  status: 'success' | 'partial' | 'failure' | 'error';
   results: AuditResults;
   alerts: Alert[];
 }
@@ -60,24 +60,25 @@ export interface AuditResults {
   journeys?: JourneyResult[];
   routes?: AuditReport;
   friction?: FrictionAnalysis;
+  [key: string]: unknown;
 }
 
 export interface HealthCheckResult {
-  status: "healthy" | "degraded" | "unhealthy";
+  status: 'healthy' | 'degraded' | 'unhealthy';
   checks: HealthCheck[];
   timestamp: string;
 }
 
 export interface HealthCheck {
   name: string;
-  status: "pass" | "fail";
+  status: 'pass' | 'fail';
   latency_ms: number;
   message?: string;
 }
 
 export interface Alert {
   id: string;
-  severity: "critical" | "high" | "medium" | "low";
+  severity: 'critical' | 'high' | 'medium' | 'low';
   type: AlertType;
   title: string;
   message: string;
@@ -86,12 +87,12 @@ export interface Alert {
 }
 
 export type AlertType =
-  | "health_degraded"
-  | "journey_failed"
-  | "route_failed"
-  | "friction_high"
-  | "performance_degraded"
-  | "error";
+  | 'health_degraded'
+  | 'journey_failed'
+  | 'route_failed'
+  | 'friction_high'
+  | 'performance_degraded'
+  | 'error';
 
 export interface RunnerOptions {
   baseUrl?: string;
@@ -118,8 +119,8 @@ export class ScheduledAuditRunner {
 
   constructor(options?: RunnerOptions) {
     this.runnerId = `scheduled_runner_${uuidv4().slice(0, 8)}`;
-    this.baseUrl = options?.baseUrl || "http://localhost:3000";
-    this.apiDir = options?.apiDir || "./app/api";
+    this.baseUrl = options?.baseUrl || 'http://localhost:3000';
+    this.apiDir = options?.apiDir || './app/api';
 
     this.journeyRunner = new UserJourneyRunner();
     this.frictionDetector = new UXFrictionDetector();
@@ -136,7 +137,7 @@ export class ScheduledAuditRunner {
   /**
    * Add a new audit schedule
    */
-  addSchedule(schedule: Omit<AuditSchedule, "id">): AuditSchedule {
+  addSchedule(schedule: Omit<AuditSchedule, 'id'>): AuditSchedule {
     const id = `schedule_${uuidv4().slice(0, 8)}`;
     const newSchedule: AuditSchedule = {
       ...schedule,
@@ -185,10 +186,7 @@ export class ScheduledAuditRunner {
   /**
    * Run an audit immediately
    */
-  async runAudit(
-    type: AuditType,
-    config?: AuditConfig
-  ): Promise<ScheduledAuditResult> {
+  async runAudit(type: AuditType, config?: AuditConfig): Promise<ScheduledAuditResult> {
     const runId = `run_${uuidv4().slice(0, 8)}`;
     const startedAt = new Date().toISOString();
     const results: AuditResults = {};
@@ -196,94 +194,87 @@ export class ScheduledAuditRunner {
 
     try {
       switch (type) {
-        case "health_check":
+        case 'health_check':
           results.health = await this.runHealthCheck();
-          if (results.health.status !== "healthy") {
+          if (results.health.status !== 'healthy') {
             alerts.push(
               this.createAlert(
-                "health_degraded",
+                'health_degraded',
                 `Health check: ${results.health.status}`,
                 `System health is ${results.health.status}`,
-                results.health.status === "unhealthy" ? "critical" : "high"
+                results.health.status === 'unhealthy' ? 'critical' : 'high'
               )
             );
           }
           break;
 
-        case "journey_run":
+        case 'journey_run':
           results.journeys = await this.runJourneys(config?.journeys);
           const failedJourneys = results.journeys.filter(
-            (j) => j.status === "failed" || j.status === "error"
+            (j) => j.status === 'failed' || j.status === 'error'
           );
           for (const journey of failedJourneys) {
             alerts.push(
               this.createAlert(
-                "journey_failed",
+                'journey_failed',
                 `Journey failed: ${journey.journey_name}`,
                 `Journey ${journey.journey_name} failed with status ${journey.status}`,
-                "high"
+                'high'
               )
             );
           }
           break;
 
-        case "route_audit":
+        case 'route_audit':
           await this.routeAuditor.discoverRoutes(this.apiDir);
           results.routes = await this.routeAuditor.auditAll();
-          if (
-            results.routes.average_score < (config?.threshold_score || 70)
-          ) {
+          if (results.routes.average_score < (config?.threshold_score || 70)) {
             alerts.push(
               this.createAlert(
-                "route_failed",
+                'route_failed',
                 `Route audit score: ${results.routes.average_score}`,
                 `Average route score ${results.routes.average_score} is below threshold`,
-                results.routes.average_score < 50 ? "critical" : "high"
+                results.routes.average_score < 50 ? 'critical' : 'high'
               )
             );
           }
           break;
 
-        case "friction_analysis":
+        case 'friction_analysis':
           const journeyResults = await this.runJourneys(config?.journeys);
           results.journeys = journeyResults;
           for (const journeyResult of journeyResults) {
             results.friction = this.frictionDetector.analyzeJourney(journeyResult);
           }
-          if (
-            results.friction &&
-            results.friction.metrics.friction_score > 50
-          ) {
+          if (results.friction && results.friction.metrics.friction_score > 50) {
             alerts.push(
               this.createAlert(
-                "friction_high",
+                'friction_high',
                 `High friction score: ${results.friction.metrics.friction_score}`,
                 `Friction score ${results.friction.metrics.friction_score} indicates UX issues`,
-                results.friction.metrics.friction_score > 70 ? "high" : "medium"
+                results.friction.metrics.friction_score > 70 ? 'high' : 'medium'
               )
             );
           }
           break;
 
-        case "full_audit":
+        case 'full_audit':
           // Run all audit types
           results.health = await this.runHealthCheck();
           results.journeys = await this.runJourneys(config?.journeys);
           await this.routeAuditor.discoverRoutes(this.apiDir);
           results.routes = await this.routeAuditor.auditAll();
           if (results.journeys.length > 0) {
-            results.friction = this.frictionDetector.analyzeJourney(
-              results.journeys[0]
-            );
+            results.friction = this.frictionDetector.analyzeJourney(results.journeys[0]);
           }
           // Generate alerts for any failures
-          if (results.health?.status !== "healthy") {
+          if (results.health?.status !== 'healthy') {
             alerts.push(
               this.createAlert(
-                "health_degraded",
+                'health_degraded',
                 `Health: ${results.health?.status}`,
-                "System health degraded",
-                "high"
+                'System health degraded',
+                'high'
               )
             );
           }
@@ -292,9 +283,9 @@ export class ScheduledAuditRunner {
 
       // Collect evidence
       await this.evidenceCollector.collect(
-        "report",
-        "scheduled",
-        alerts.length > 0 ? "warning" : "pass",
+        'report',
+        'scheduled',
+        alerts.length > 0 ? 'warning' : 'pass',
         results,
         { tags: [type] }
       );
@@ -303,7 +294,7 @@ export class ScheduledAuditRunner {
       const status = this.determineStatus(results, alerts);
 
       const result: ScheduledAuditResult = {
-        schedule_id: "",
+        schedule_id: '',
         run_id: runId,
         type,
         started_at: startedAt,
@@ -320,20 +311,20 @@ export class ScheduledAuditRunner {
 
       alerts.push(
         this.createAlert(
-          "error",
+          'error',
           `Audit error: ${type}`,
-          error instanceof Error ? error.message : "Unknown error",
-          "critical"
+          error instanceof Error ? error.message : 'Unknown error',
+          'critical'
         )
       );
 
       const result: ScheduledAuditResult = {
-        schedule_id: "",
+        schedule_id: '',
         run_id: runId,
         type,
         started_at: startedAt,
         completed_at: completedAt,
-        status: "error",
+        status: 'error',
         results,
         alerts,
       };
@@ -348,18 +339,18 @@ export class ScheduledAuditRunner {
    */
   private async runHealthCheck(): Promise<HealthCheckResult> {
     const checks: HealthCheck[] = [];
-    let overallStatus: HealthCheckResult["status"] = "healthy";
+    let overallStatus: HealthCheckResult['status'] = 'healthy';
 
     // Check basic health endpoint
-    const basicCheck = await this.checkEndpoint("/api/health", "Basic Health");
+    const basicCheck = await this.checkEndpoint('/api/health', 'Basic Health');
     checks.push(basicCheck);
-    if (basicCheck.status === "fail") overallStatus = "unhealthy";
+    if (basicCheck.status === 'fail') overallStatus = 'unhealthy';
 
     // Check deep health endpoint
-    const deepCheck = await this.checkEndpoint("/api/health/deep", "Deep Health");
+    const deepCheck = await this.checkEndpoint('/api/health/deep', 'Deep Health');
     checks.push(deepCheck);
-    if (deepCheck.status === "fail") {
-      overallStatus = overallStatus === "unhealthy" ? "unhealthy" : "degraded";
+    if (deepCheck.status === 'fail') {
+      overallStatus = overallStatus === 'unhealthy' ? 'unhealthy' : 'degraded';
     }
 
     return {
@@ -372,30 +363,27 @@ export class ScheduledAuditRunner {
   /**
    * Check a single endpoint
    */
-  private async checkEndpoint(
-    path: string,
-    name: string
-  ): Promise<HealthCheck> {
+  private async checkEndpoint(path: string, name: string): Promise<HealthCheck> {
     const start = Date.now();
 
     try {
       const response = await fetch(`${this.baseUrl}${path}`, {
-        method: "GET",
+        method: 'GET',
         signal: AbortSignal.timeout(5000),
       });
 
       return {
         name,
-        status: response.ok ? "pass" : "fail",
+        status: response.ok ? 'pass' : 'fail',
         latency_ms: Date.now() - start,
         message: response.ok ? undefined : `HTTP ${response.status}`,
       };
     } catch (error) {
       return {
         name,
-        status: "fail",
+        status: 'fail',
         latency_ms: Date.now() - start,
-        message: error instanceof Error ? error.message : "Request failed",
+        message: error instanceof Error ? error.message : 'Request failed',
       };
     }
   }
@@ -425,7 +413,7 @@ export class ScheduledAuditRunner {
     type: AlertType,
     title: string,
     message: string,
-    severity: Alert["severity"]
+    severity: Alert['severity']
   ): Alert {
     return {
       id: `alert_${uuidv4().slice(0, 8)}`,
@@ -440,20 +428,17 @@ export class ScheduledAuditRunner {
   /**
    * Determine overall status from results
    */
-  private determineStatus(
-    results: AuditResults,
-    alerts: Alert[]
-  ): ScheduledAuditResult["status"] {
-    if (alerts.some((a) => a.severity === "critical")) {
-      return "failure";
+  private determineStatus(results: AuditResults, alerts: Alert[]): ScheduledAuditResult['status'] {
+    if (alerts.some((a) => a.severity === 'critical')) {
+      return 'failure';
     }
-    if (alerts.some((a) => a.severity === "high")) {
-      return "partial";
+    if (alerts.some((a) => a.severity === 'high')) {
+      return 'partial';
     }
     if (alerts.length > 0) {
-      return "partial";
+      return 'partial';
     }
-    return "success";
+    return 'success';
   }
 
   /**
@@ -493,13 +478,13 @@ export class ScheduledAuditRunner {
   private cronToInterval(cron: string): number {
     // Simplified cron parsing - supports common intervals
     const intervals: Record<string, number> = {
-      "* * * * *": 60 * 1000, // Every minute
-      "*/5 * * * *": 5 * 60 * 1000, // Every 5 minutes
-      "*/15 * * * *": 15 * 60 * 1000, // Every 15 minutes
-      "*/30 * * * *": 30 * 60 * 1000, // Every 30 minutes
-      "0 * * * *": 60 * 60 * 1000, // Every hour
-      "0 */6 * * *": 6 * 60 * 60 * 1000, // Every 6 hours
-      "0 0 * * *": 24 * 60 * 60 * 1000, // Daily
+      '* * * * *': 60 * 1000, // Every minute
+      '*/5 * * * *': 5 * 60 * 1000, // Every 5 minutes
+      '*/15 * * * *': 15 * 60 * 1000, // Every 15 minutes
+      '*/30 * * * *': 30 * 60 * 1000, // Every 30 minutes
+      '0 * * * *': 60 * 60 * 1000, // Every hour
+      '0 */6 * * *': 6 * 60 * 60 * 1000, // Every 6 hours
+      '0 0 * * *': 24 * 60 * 60 * 1000, // Daily
     };
 
     return intervals[cron] || 60 * 60 * 1000; // Default to hourly
@@ -532,9 +517,7 @@ export class ScheduledAuditRunner {
    * Get results for a specific schedule
    */
   getScheduleResults(scheduleId: string): ScheduledAuditResult[] {
-    return Array.from(this.results.values()).filter(
-      (r) => r.schedule_id === scheduleId
-    );
+    return Array.from(this.results.values()).filter((r) => r.schedule_id === scheduleId);
   }
 
   /**

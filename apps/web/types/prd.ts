@@ -30,7 +30,7 @@ export interface Epic {
   name: string;
   description: string;
   user_stories: string[]; // Array of UserStory IDs
-  priority: "Critical" | "High" | "Medium" | "Low";
+  priority: 'Critical' | 'High' | 'Medium' | 'Low';
   business_value: string;
 }
 
@@ -39,10 +39,10 @@ export interface UserStory {
   title: string;
   description: string;
   acceptance_criteria: string[];
-  priority: "Critical" | "High" | "Medium" | "Low";
+  priority: 'Critical' | 'High' | 'Medium' | 'Low';
   epic: string; // Epic ID or name
   dependencies: string[]; // Array of UserStory IDs
-  effort_estimate?: "XS" | "S" | "M" | "L" | "XL";
+  effort_estimate?: 'XS' | 'S' | 'M' | 'L' | 'XL';
   technical_notes?: string[];
 }
 
@@ -61,6 +61,7 @@ export interface FeatureDecomposition {
 
 export interface DatabaseTable {
   name: string;
+  description?: string;
   purpose: string;
   columns: DatabaseColumn[];
   relationships: DatabaseRelationship[];
@@ -78,7 +79,7 @@ export interface DatabaseColumn {
 }
 
 export interface DatabaseRelationship {
-  type: "one-to-one" | "one-to-many" | "many-to-many";
+  type: 'one-to-one' | 'one-to-many' | 'many-to-many';
   from_table: string;
   to_table: string;
   from_column: string;
@@ -87,7 +88,7 @@ export interface DatabaseRelationship {
 }
 
 export interface APIEndpoint {
-  method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
   path: string;
   description: string;
   authentication_required: boolean;
@@ -122,12 +123,12 @@ export interface TechnicalSpecification {
 export interface TestCase {
   id: string;
   user_story_id: string;
-  type: "unit" | "integration" | "e2e" | "performance" | "security";
+  type: 'unit' | 'integration' | 'e2e' | 'performance' | 'security';
   description: string;
   preconditions: string[];
   test_steps: string[];
   expected_results: string[];
-  priority: "Critical" | "High" | "Medium" | "Low";
+  priority: 'Critical' | 'High' | 'Medium' | 'Low';
 }
 
 export interface TestPlan {
@@ -150,15 +151,19 @@ export interface TestPlan {
 export interface Sprint {
   sprint_number: number;
   duration_weeks: number;
+  sprint_goal?: string;
   user_stories: string[]; // Array of UserStory IDs
   goals: string[];
+  deliverables?: string[];
   dependencies: string[];
   risks: string[];
 }
 
 export interface Milestone {
   name: string;
+  description?: string;
   target_date: string;
+  target_sprint?: number;
   deliverables: string[];
   success_criteria: string[];
 }
@@ -182,7 +187,7 @@ export interface CompletePRD {
   id: string;
   user_id: string;
   project_name: string;
-  status: "pending" | "in_progress" | "completed" | "failed";
+  status: 'pending' | 'in_progress' | 'completed' | 'failed';
   analysis?: PRDAnalysis;
   feature_decomposition?: FeatureDecomposition;
   technical_specification?: TechnicalSpecification;
@@ -198,13 +203,13 @@ export interface CompletePRD {
 // ============================================================================
 
 export type AgentStatus =
-  | "pending"
-  | "in_progress"
-  | "completed"
-  | "failed"
-  | "escalated_to_human"
-  | "awaiting_verification"
-  | "verification_in_progress";
+  | 'pending'
+  | 'in_progress'
+  | 'completed'
+  | 'failed'
+  | 'escalated_to_human'
+  | 'awaiting_verification'
+  | 'verification_in_progress';
 
 export interface AgentRun {
   id: string;

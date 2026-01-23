@@ -127,16 +127,16 @@ export function useAgentRuns(taskId?: string, agentName?: string) {
     // Create channel for realtime subscription
     const realtimeChannel = supabase
       .channel('agent_runs_changes')
-      .on<AgentRun>(
-        'postgres_changes',
+      .on(
+        'postgres_changes' as const,
         {
           event: '*',
           schema: 'public',
           table: 'agent_runs',
           filter: taskId ? `task_id=eq.${taskId}` : undefined,
         },
-        (payload: RealtimePayload) => {
-          const { eventType, new: newRun, old: oldRun } = payload;
+        (payload) => {
+          const { eventType, new: newRun, old: oldRun } = payload as unknown as RealtimePayload;
 
           // Apply filters
           if (agentName && newRun.agent_name !== agentName) {

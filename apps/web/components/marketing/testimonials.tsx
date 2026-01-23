@@ -62,7 +62,9 @@ export interface Testimonial {
 }
 
 export interface TestimonialsProps
-  extends React.HTMLAttributes<HTMLElement>, VariantProps<typeof testimonialsVariants> {
+  extends
+    Omit<React.HTMLAttributes<HTMLElement>, 'title'>,
+    VariantProps<typeof testimonialsVariants> {
   title?: string | React.ReactNode;
   titleHighlight?: string;
   subtitle?: string | React.ReactNode;
@@ -169,7 +171,7 @@ TestimonialCard.displayName = 'TestimonialCard';
    ---------------------------------------- */
 const TestimonialsHeader = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement> & {
+  Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> & {
     badge?: string;
     title: string | React.ReactNode;
     titleHighlight?: string;

@@ -1,5 +1,5 @@
-import { createServerClient } from "@supabase/ssr";
-import { NextResponse, type NextRequest } from "next/server";
+import { createServerClient, type CookieOptions } from '@supabase/ssr';
+import { NextResponse, type NextRequest } from 'next/server';
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -14,15 +14,16 @@ export async function updateSession(request: NextRequest) {
         getAll() {
           return request.cookies.getAll();
         },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
+        setAll(cookiesToSet: { name: string; value: string; options?: CookieOptions }[]) {
+          cookiesToSet.forEach(({ name, value }: { name: string; value: string }) =>
             request.cookies.set(name, value)
           );
           supabaseResponse = NextResponse.next({
             request,
           });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
+          cookiesToSet.forEach(
+            ({ name, value, options }: { name: string; value: string; options?: CookieOptions }) =>
+              supabaseResponse.cookies.set(name, value, options)
           );
         },
       },
@@ -35,26 +36,22 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   // Protected routes
-  const protectedPaths = ["/dashboard"];
-  const isProtectedPath = protectedPaths.some((path) =>
-    request.nextUrl.pathname.startsWith(path)
-  );
+  const protectedPaths = ['/dashboard'];
+  const isProtectedPath = protectedPaths.some((path) => request.nextUrl.pathname.startsWith(path));
 
   if (isProtectedPath && !user) {
     const url = request.nextUrl.clone();
-    url.pathname = "/login";
+    url.pathname = '/login';
     return NextResponse.redirect(url);
   }
 
   // Redirect logged in users away from auth pages
-  const authPaths = ["/login", "/register"];
-  const isAuthPath = authPaths.some((path) =>
-    request.nextUrl.pathname.startsWith(path)
-  );
+  const authPaths = ['/login', '/register'];
+  const isAuthPath = authPaths.some((path) => request.nextUrl.pathname.startsWith(path));
 
   if (isAuthPath && user) {
     const url = request.nextUrl.clone();
-    url.pathname = "/dashboard";
+    url.pathname = '/dashboard';
     return NextResponse.redirect(url);
   }
 

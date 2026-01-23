@@ -5,7 +5,7 @@
  * Handles JWT authentication via cookies.
  */
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
 
 export interface ApiError {
   detail: string;
@@ -19,7 +19,7 @@ export class ApiClientError extends Error {
     public errorCode?: string
   ) {
     super(message);
-    this.name = "ApiClientError";
+    this.name = 'ApiClientError';
   }
 }
 
@@ -27,42 +27,37 @@ export class ApiClientError extends Error {
  * Get JWT token from cookies (browser-side)
  */
 function getAuthToken(): string | null {
-  if (typeof document === "undefined") return null;
+  if (typeof document === 'undefined') return null;
 
-  const cookies = document.cookie.split("; ");
-  const tokenCookie = cookies.find((c) => c.startsWith("auth_token="));
+  const cookies = document.cookie.split('; ');
+  const tokenCookie = cookies.find((c) => c.startsWith('auth_token='));
 
   if (!tokenCookie) return null;
 
-  return tokenCookie.split("=")[1];
+  return tokenCookie.split('=')[1];
 }
 
 /**
  * Make an authenticated API request
  */
-async function fetchApi<T>(
-  endpoint: string,
-  options: RequestInit = {}
-): Promise<T> {
+async function fetchApi<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const token = getAuthToken();
 
-  const headers: HeadersInit = {
-    "Content-Type": "application/json",
-    ...options.headers,
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(options.headers as Record<string, string>),
   };
 
   if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
+    headers['Authorization'] = `Bearer ${token}`;
   }
 
-  const url = endpoint.startsWith("http")
-    ? endpoint
-    : `${BACKEND_URL}${endpoint}`;
+  const url = endpoint.startsWith('http') ? endpoint : `${BACKEND_URL}${endpoint}`;
 
   const response = await fetch(url, {
     ...options,
     headers,
-    credentials: "include", // Include cookies
+    credentials: 'include', // Include cookies
   });
 
   if (!response.ok) {
@@ -70,11 +65,7 @@ async function fetchApi<T>(
       detail: `HTTP ${response.status}: ${response.statusText}`,
     }));
 
-    throw new ApiClientError(
-      error.detail,
-      response.status,
-      error.error_code
-    );
+    throw new ApiClientError(error.detail, response.status, error.error_code);
   }
 
   // Handle 204 No Content
@@ -93,7 +84,7 @@ export const apiClient = {
    * GET request
    */
   get: <T>(endpoint: string, options?: RequestInit) =>
-    fetchApi<T>(endpoint, { ...options, method: "GET" }),
+    fetchApi<T>(endpoint, { ...options, method: 'GET' }),
 
   /**
    * POST request
@@ -101,7 +92,7 @@ export const apiClient = {
   post: <T>(endpoint: string, data?: unknown, options?: RequestInit) =>
     fetchApi<T>(endpoint, {
       ...options,
-      method: "POST",
+      method: 'POST',
       body: data ? JSON.stringify(data) : undefined,
     }),
 
@@ -111,7 +102,7 @@ export const apiClient = {
   put: <T>(endpoint: string, data?: unknown, options?: RequestInit) =>
     fetchApi<T>(endpoint, {
       ...options,
-      method: "PUT",
+      method: 'PUT',
       body: data ? JSON.stringify(data) : undefined,
     }),
 
@@ -121,7 +112,7 @@ export const apiClient = {
   patch: <T>(endpoint: string, data?: unknown, options?: RequestInit) =>
     fetchApi<T>(endpoint, {
       ...options,
-      method: "PATCH",
+      method: 'PATCH',
       body: data ? JSON.stringify(data) : undefined,
     }),
 
@@ -129,7 +120,7 @@ export const apiClient = {
    * DELETE request
    */
   delete: <T>(endpoint: string, options?: RequestInit) =>
-    fetchApi<T>(endpoint, { ...options, method: "DELETE" }),
+    fetchApi<T>(endpoint, { ...options, method: 'DELETE' }),
 };
 
 /**

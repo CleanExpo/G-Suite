@@ -130,7 +130,7 @@ const FRICTION_RULES: FrictionRule[] = [
     name: 'Slow Page Load',
     description: 'Page takes too long to load',
     category: 'performance',
-    check: (_data) => {
+    check: (data) => {
       const threshold = 3000;
       const loadTime = data.step?.duration_ms || 0;
       return {
@@ -146,7 +146,7 @@ const FRICTION_RULES: FrictionRule[] = [
     name: 'Slow Interaction Response',
     description: 'User interaction takes too long to respond',
     category: 'performance',
-    check: (_data) => {
+    check: (data) => {
       const threshold = 100;
       const responseTime = data.pageMetrics?.first_input_delay_ms || 0;
       return {
@@ -162,7 +162,7 @@ const FRICTION_RULES: FrictionRule[] = [
     name: 'Unexpected Layout Shift',
     description: 'Page content shifts unexpectedly',
     category: 'visual',
-    check: (_data) => {
+    check: (data) => {
       const threshold = 0.1;
       const cls = data.pageMetrics?.cumulative_layout_shift || 0;
       return {
@@ -179,11 +179,12 @@ const FRICTION_RULES: FrictionRule[] = [
     name: 'Unhandled Error',
     description: 'Error occurs without user-friendly handling',
     category: 'error_handling',
-    check: (_data) => {
+    check: (data) => {
       const hasError = data.step?.status === 'error' || data.step?.status === 'failed';
       const errorLogs =
         data.step?.evidence.console_logs.filter(
-          (log) => log.includes('Error') || log.includes('error') || log.includes('Exception')
+          (log: string) =>
+            log.includes('Error') || log.includes('error') || log.includes('Exception')
         ) || [];
       return {
         triggered: hasError || errorLogs.length > 0,
@@ -198,7 +199,7 @@ const FRICTION_RULES: FrictionRule[] = [
     name: 'No Error Recovery Path',
     description: 'Error state without clear recovery action',
     category: 'error_handling',
-    check: (_data) => {
+    check: (data) => {
       // Check if error message includes recovery guidance
       const errorMessage = data.step?.error || '';
       const hasRecoveryGuidance =
@@ -236,7 +237,7 @@ const FRICTION_RULES: FrictionRule[] = [
     name: 'Missing Alt Text',
     description: 'Images without alternative text',
     category: 'accessibility',
-    check: (_data) => {
+    check: (data) => {
       // Would analyze DOM for images without alt attributes
       const hasIssue =
         data.domSnapshot?.includes('<img src="') && !data.domSnapshot?.includes('alt="');

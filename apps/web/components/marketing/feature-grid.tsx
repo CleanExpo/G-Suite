@@ -72,7 +72,9 @@ export interface Feature {
 }
 
 export interface FeatureGridProps
-  extends React.HTMLAttributes<HTMLElement>, VariantProps<typeof featureGridVariants> {
+  extends
+    Omit<React.HTMLAttributes<HTMLElement>, 'title'>,
+    VariantProps<typeof featureGridVariants> {
   title?: string | React.ReactNode;
   titleHighlight?: string;
   subtitle?: string | React.ReactNode;
@@ -199,7 +201,7 @@ FeatureCard.displayName = 'FeatureCard';
    ---------------------------------------- */
 const FeatureGridHeader = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement> & {
+  Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> & {
     badge?: string;
     title: string | React.ReactNode;
     titleHighlight?: string;
@@ -337,18 +339,31 @@ interface BentoGridProps extends Omit<FeatureGridProps, 'variant' | 'columns'> {
 }
 
 const BentoGrid = React.forwardRef<HTMLElement, BentoGridProps>(
-  ({ features, gap = 'default', ...props }, ref) => {
+  (
+    {
+      features,
+      gap = 'default',
+      title,
+      badge,
+      titleHighlight,
+      subtitle,
+      alignment,
+      animated,
+      ...props
+    },
+    ref
+  ) => {
     return (
       <section ref={ref} className={cn('py-16 md:py-24 lg:py-32')} {...props}>
         <div className="container px-4 md:px-6">
-          {props.title && (
+          {title && (
             <FeatureGridHeader
-              badge={props.badge}
-              title={props.title}
-              titleHighlight={props.titleHighlight}
-              subtitle={props.subtitle}
-              alignment={props.alignment}
-              animated={props.animated}
+              badge={badge}
+              title={title}
+              titleHighlight={titleHighlight}
+              subtitle={subtitle}
+              alignment={alignment}
+              animated={animated}
             />
           )}
 
@@ -364,7 +379,7 @@ const BentoGrid = React.forwardRef<HTMLElement, BentoGridProps>(
                 feature={feature}
                 variant="bento"
                 index={index}
-                animated={props.animated}
+                animated={animated}
                 className={cn(
                   feature.span === 2 && 'md:col-span-2',
                   feature.row === 2 && 'md:row-span-2'

@@ -270,12 +270,14 @@ const AgentNode = React.forwardRef<HTMLDivElement, AgentNodeProps>(
                   )}
 
                   {/* Verification evidence */}
-                  {run.verification_evidence && (
+                  {run.verification_evidence && run.verification_evidence.length > 0 && (
                     <div>
                       <h4 className="mb-2 text-[10px] tracking-widest text-white/30 uppercase">
-                        Verification Evidence
+                        Verification Evidence ({run.verification_evidence.length})
                       </h4>
-                      <p className="font-mono text-xs text-white/50">{run.verification_evidence}</p>
+                      <pre className="overflow-x-auto rounded-sm border-[0.5px] border-white/10 bg-white/[0.02] p-2 font-mono text-xs text-white/50">
+                        {JSON.stringify(run.verification_evidence, null, 2)}
+                      </pre>
                     </div>
                   )}
                 </div>

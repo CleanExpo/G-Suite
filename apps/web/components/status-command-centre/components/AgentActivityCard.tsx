@@ -163,26 +163,30 @@ const AgentActivityCard = React.forwardRef<HTMLDivElement, AgentActivityCardProp
             </div>
 
             {/* Result preview */}
-            {run.result && (
+            {run.result !== undefined && run.result !== null && (
               <div>
                 <h4 className="text-muted-foreground mb-2 text-xs font-medium tracking-wide uppercase">
                   Result
                 </h4>
                 <pre className="bg-muted/50 max-h-32 overflow-x-auto rounded-lg p-2 text-xs">
-                  {typeof run.result === 'string'
-                    ? run.result
-                    : JSON.stringify(run.result, null, 2)}
+                  {String(
+                    typeof run.result === 'string'
+                      ? run.result
+                      : JSON.stringify(run.result as Record<string, unknown>, null, 2)
+                  )}
                 </pre>
               </div>
             )}
 
             {/* Verification evidence */}
-            {run.verification_evidence && (
+            {run.verification_evidence && run.verification_evidence.length > 0 && (
               <div className="mt-4">
                 <h4 className="text-muted-foreground mb-2 text-xs font-medium tracking-wide uppercase">
-                  Verification Evidence
+                  Verification Evidence ({run.verification_evidence.length} items)
                 </h4>
-                <p className="text-muted-foreground text-xs">{run.verification_evidence}</p>
+                <pre className="bg-muted/50 max-h-24 overflow-auto rounded-lg p-2 text-xs">
+                  {JSON.stringify(run.verification_evidence, null, 2)}
+                </pre>
               </div>
             )}
           </div>
