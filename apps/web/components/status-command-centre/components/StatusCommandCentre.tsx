@@ -2,27 +2,36 @@
 
 /**
  * StatusCommandCentre - Main dashboard container
- * Elite Production Status Visualization System
- * Industrial luxury aesthetic with real-time agent monitoring
+ * REFACTORED: Timeline/orbital layout with spectral colours
+ *
+ * DESTROYED:
+ * - Generic 2x2/3x3 card grid
+ * - Standard rounded corners
+ * - Metric tiles grid
+ *
+ * IMPLEMENTED:
+ * - OLED Black (#050505) background
+ * - Timeline layout with breathing nodes
+ * - Horizontal data strip for metrics
+ * - Framer Motion animations
+ * - Spectral colours for statuses
+ * - Editorial typography with JetBrains Mono
  */
 
 import * as React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { Wifi, WifiOff, RefreshCw } from 'lucide-react';
 import { DEFAULTS, isActiveStatus, isErrorStatus, isSuccessStatus } from '../constants';
-import { AgentActivityCard } from './AgentActivityCard';
-import { MetricTile } from './MetricTile';
+import { AgentNode } from './AgentNode';
+import { DataStrip } from './DataStrip';
 import { NotificationStream } from './NotificationStream';
 import type { StatusCommandCentreProps, AgentRun, Notification, ConnectionStatus } from '../types';
 
 const StatusCommandCentre = React.forwardRef<HTMLDivElement, StatusCommandCentreProps>(
   (
     {
-      // TODO: taskId and agentName will be used for filtering when integrated with useAgentRuns hook
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      taskId,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      agentName,
+      taskId: _taskId,
+      agentName: _agentName,
       variant = 'full',
       maxAgents = DEFAULTS.maxAgents,
       showNotifications = true,
@@ -30,24 +39,18 @@ const StatusCommandCentre = React.forwardRef<HTMLDivElement, StatusCommandCentre
     },
     ref
   ) => {
-    // State - setRuns/setConnectionStatus will be used with real Supabase integration
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [runs, setRuns] = React.useState<AgentRun[]>([]);
+    const [runs, _setRuns] = React.useState<AgentRun[]>([]);
     const [loading, setLoading] = React.useState(true);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [connectionStatus, setConnectionStatus] = React.useState<ConnectionStatus>('connected');
+    const [connectionStatus, _setConnectionStatus] = React.useState<ConnectionStatus>('connected');
     const [expandedRunId, setExpandedRunId] = React.useState<string | null>(null);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [selectedRunId, setSelectedRunId] = React.useState<string | null>(null);
+    const [_selectedRunId, setSelectedRunId] = React.useState<string | null>(null);
 
     // Derived state
     const activeRuns = React.useMemo(() => runs.filter((r) => isActiveStatus(r.status)), [runs]);
-
     const completedRuns = React.useMemo(
       () => runs.filter((r) => isSuccessStatus(r.status)),
       [runs]
     );
-
     const failedRuns = React.useMemo(() => runs.filter((r) => isErrorStatus(r.status)), [runs]);
 
     // Convert runs to notifications
@@ -86,26 +89,23 @@ const StatusCommandCentre = React.forwardRef<HTMLDivElement, StatusCommandCentre
 
     // Mock data loading (replace with actual hook integration)
     React.useEffect(() => {
-      // Simulate loading
       const timer = setTimeout(() => {
         setLoading(false);
-        // In production, this would use useAgentRuns hook
       }, 500);
       return () => clearTimeout(timer);
     }, []);
 
-    // Render loading skeleton
+    // Loading state
     if (loading) {
       return (
         <div
           ref={ref}
           className={cn(
-            'bg-card overflow-hidden rounded-2xl border',
-            variant === 'full' && 'min-h-[600px]',
+            'relative min-h-[600px] overflow-hidden rounded-sm border-[0.5px] border-white/[0.06] bg-[#050505] p-8',
             className
           )}
         >
-          <LoadingSkeleton variant={variant} />
+          <LoadingSkeleton />
         </div>
       );
     }
@@ -113,9 +113,9 @@ const StatusCommandCentre = React.forwardRef<HTMLDivElement, StatusCommandCentre
     // Minimal variant
     if (variant === 'minimal') {
       return (
-        <div ref={ref} className={cn('flex items-center gap-3', className)}>
+        <div ref={ref} className={cn('flex items-center gap-4', className)}>
           <ConnectionIndicator status={connectionStatus} />
-          <span className="text-muted-foreground text-sm">
+          <span className="font-mono text-xs text-white/40">
             {activeRuns.length} active · {completedRuns.length} completed
           </span>
         </div>
@@ -125,21 +125,27 @@ const StatusCommandCentre = React.forwardRef<HTMLDivElement, StatusCommandCentre
     // Compact variant
     if (variant === 'compact') {
       return (
-        <div ref={ref} className={cn('bg-card rounded-xl border p-4', className)}>
-          <div className="mb-3 flex items-center justify-between">
-            <h3 className="text-sm font-semibold">Agent Activity</h3>
+        <div
+          ref={ref}
+          className={cn(
+            'rounded-sm border-[0.5px] border-white/[0.06] bg-[#050505] p-6',
+            className
+          )}
+        >
+          <div className="mb-4 flex items-center justify-between">
+            <h3 className="text-lg font-light tracking-tight text-white">Agent Activity</h3>
             <ConnectionIndicator status={connectionStatus} />
           </div>
 
           {runs.length === 0 ? (
             <EmptyState />
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-4">
               {runs.slice(0, 3).map((run, index) => (
-                <AgentActivityCard key={run.id} run={run} animationDelay={index * 50} />
+                <AgentNode key={run.id} run={run} index={index} compact />
               ))}
               {runs.length > 3 && (
-                <p className="text-muted-foreground pt-2 text-center text-xs">
+                <p className="pt-2 text-center font-mono text-[10px] text-white/30">
                   +{runs.length - 3} more agents
                 </p>
               )}
@@ -149,80 +155,112 @@ const StatusCommandCentre = React.forwardRef<HTMLDivElement, StatusCommandCentre
       );
     }
 
-    // Full variant
+    // Full variant - TIMELINE LAYOUT
     return (
       <div
         ref={ref}
         className={cn(
-          'bg-card overflow-hidden rounded-2xl border',
-          'command-centre-surface noise-overlay',
+          'relative min-h-[600px] overflow-hidden rounded-sm border-[0.5px] border-white/[0.06] bg-[#050505]',
           className
         )}
       >
+        {/* Ambient glow for active agents */}
+        <AnimatePresence>
+          {activeRuns.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.1 }}
+              exit={{ opacity: 0 }}
+              className="pointer-events-none absolute inset-0"
+              style={{
+                background:
+                  'radial-gradient(ellipse at 20% 10%, hsl(217 91% 60% / 0.15) 0%, transparent 50%)',
+              }}
+            />
+          )}
+        </AnimatePresence>
+
         {/* Header */}
-        <div className="flex items-center justify-between border-b px-6 py-4">
-          <div className="flex items-center gap-3">
-            <h2 className="text-lg font-semibold">Command Centre</h2>
+        <header className="border-b border-white/[0.06] px-8 py-6">
+          <div className="mb-4 flex items-end justify-between">
+            <div>
+              <motion.p
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-1 text-[10px] tracking-[0.3em] text-white/30 uppercase"
+              >
+                Real-Time Monitoring
+              </motion.p>
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="text-4xl font-extralight tracking-tight text-white lg:text-5xl"
+              >
+                Command Centre
+              </motion.h1>
+            </div>
             <ConnectionIndicator status={connectionStatus} />
           </div>
 
-          {/* Refresh button */}
-          <button
-            onClick={() => setLoading(true)}
-            className={cn(
-              'hover:bg-muted rounded-lg p-2 transition-colors',
-              'text-muted-foreground hover:text-foreground'
-            )}
-            aria-label="Refresh"
-          >
-            <RefreshCw size={16} />
-          </button>
-        </div>
-
-        {/* Metrics row */}
-        <div className="grid grid-cols-4 gap-4 border-b p-6">
-          <MetricTile label="Total" value={runs.length} icon="Activity" variant="default" />
-          <MetricTile label="Active" value={activeRuns.length} icon="Activity" variant="info" />
-          <MetricTile
-            label="Completed"
-            value={completedRuns.length}
-            icon="CheckCircle2"
-            variant="success"
+          {/* Horizontal Data Strip - REPLACED GRID */}
+          <DataStrip
+            metrics={[
+              { label: 'Total', value: runs.length },
+              { label: 'Active', value: activeRuns.length, variant: 'info' },
+              { label: 'Completed', value: completedRuns.length, variant: 'success' },
+              { label: 'Failed', value: failedRuns.length, variant: 'error' },
+            ]}
           />
-          <MetricTile label="Failed" value={failedRuns.length} icon="XCircle" variant="error" />
-        </div>
+        </header>
 
-        {/* Main content area */}
+        {/* Main content - TIMELINE LAYOUT */}
         <div className="flex min-h-[400px]">
-          {/* Agent cards grid */}
-          <div className={cn('flex-1 overflow-y-auto p-6', showNotifications ? 'border-r' : '')}>
+          {/* Agent timeline */}
+          <div
+            className={cn(
+              'flex-1 overflow-y-auto p-8',
+              showNotifications && 'border-r border-white/[0.06]'
+            )}
+          >
             {runs.length === 0 ? (
               <EmptyState />
             ) : (
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {runs.slice(0, maxAgents).map((run, index) => (
-                  <AgentActivityCard
-                    key={run.id}
-                    run={run}
-                    expanded={expandedRunId === run.id}
-                    onSelect={handleRunSelect}
-                    onToggleExpand={handleRunExpandToggle}
-                    animationDelay={index * 50}
-                  />
-                ))}
-              </div>
-            )}
+              <div className="relative pl-4">
+                {/* Vertical Timeline Spine */}
+                <motion.div
+                  initial={{ scaleY: 0 }}
+                  animate={{ scaleY: 1 }}
+                  transition={{ delay: 0.3, duration: 0.8, ease: [0.19, 1, 0.22, 1] }}
+                  className="absolute top-0 bottom-0 left-8 w-px origin-top bg-gradient-to-b from-white/10 via-white/5 to-transparent"
+                />
 
-            {runs.length > maxAgents && (
-              <p className="text-muted-foreground mt-4 text-center text-sm">
-                Showing {maxAgents} of {runs.length} agents
-              </p>
+                {/* Agent Nodes - TIMELINE, NOT GRID */}
+                <div className="space-y-8">
+                  {runs.slice(0, maxAgents).map((run, index) => (
+                    <AgentNode
+                      key={run.id}
+                      run={run}
+                      index={index}
+                      expanded={expandedRunId === run.id}
+                      onSelect={handleRunSelect}
+                      onToggleExpand={handleRunExpandToggle}
+                    />
+                  ))}
+                </div>
+
+                {runs.length > maxAgents && (
+                  <p className="mt-6 text-center font-mono text-[10px] text-white/30">
+                    Showing {maxAgents} of {runs.length} agents
+                  </p>
+                )}
+              </div>
             )}
           </div>
 
           {/* Notification stream sidebar */}
           {showNotifications && (
-            <div className="bg-muted/20 w-80 flex-shrink-0">
+            <div className="w-80 flex-shrink-0 bg-white/[0.01]">
               <NotificationStream
                 notifications={notifications}
                 onNotificationClick={handleNotificationClick}
@@ -231,6 +269,23 @@ const StatusCommandCentre = React.forwardRef<HTMLDivElement, StatusCommandCentre
             </div>
           )}
         </div>
+
+        {/* Footer */}
+        <motion.footer
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8 }}
+          className="absolute right-8 bottom-4 left-8 flex items-center justify-between"
+        >
+          <p className="font-mono text-[10px] text-white/20">GENESIS PROTOCOL v2.0.1</p>
+          <p className="font-mono text-[10px] text-white/20">
+            {new Date().toLocaleDateString('en-AU', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric',
+            })}
+          </p>
+        </motion.footer>
       </div>
     );
   }
@@ -240,81 +295,121 @@ StatusCommandCentre.displayName = 'StatusCommandCentre';
 
 // Connection status indicator
 function ConnectionIndicator({ status }: { status: ConnectionStatus }) {
+  const statusConfig = {
+    connected: { colour: '#00FF88', label: 'Live' },
+    reconnecting: { colour: '#FFB800', label: 'Reconnecting' },
+    disconnected: { colour: '#FF4444', label: 'Offline' },
+  };
+
+  const config = statusConfig[status];
+
   return (
-    <div className="flex items-center gap-1.5">
-      {status === 'connected' ? (
-        <>
-          <span className="relative flex h-2 w-2">
-            <span className="bg-success absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" />
-            <span className="bg-success relative inline-flex h-2 w-2 rounded-full" />
-          </span>
-          <span className="text-success text-xs">Live</span>
-        </>
-      ) : status === 'reconnecting' ? (
-        <>
-          <RefreshCw size={12} className="text-warning animate-spin" />
-          <span className="text-warning text-xs">Reconnecting</span>
-        </>
-      ) : (
-        <>
-          <WifiOff size={12} className="text-error" />
-          <span className="text-error text-xs">Offline</span>
-        </>
-      )}
-    </div>
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="flex items-center gap-2 rounded-sm border-[0.5px] border-white/10 px-3 py-1.5"
+    >
+      <motion.span
+        className="h-1.5 w-1.5 rounded-full"
+        style={{ backgroundColor: config.colour }}
+        animate={
+          status === 'connected'
+            ? { opacity: [1, 0.4, 1], scale: [1, 1.2, 1] }
+            : status === 'reconnecting'
+              ? { opacity: [1, 0.5, 1] }
+              : {}
+        }
+        transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+      />
+      <span
+        className="font-mono text-[10px] tracking-wider uppercase"
+        style={{ color: config.colour }}
+      >
+        {config.label}
+      </span>
+    </motion.div>
   );
 }
 
 // Empty state
 function EmptyState() {
   return (
-    <div className="text-muted-foreground flex flex-col items-center justify-center py-16">
-      <div className="bg-muted/50 mb-4 flex h-16 w-16 items-center justify-center rounded-full">
-        <Wifi size={24} className="opacity-50" />
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="flex flex-col items-center justify-center py-20"
+    >
+      <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full border-[0.5px] border-white/10 bg-white/[0.02]">
+        <motion.div
+          className="h-3 w-3 rounded-full bg-white/20"
+          animate={{ scale: [1, 1.5, 1], opacity: [0.5, 1, 0.5] }}
+          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+        />
       </div>
-      <h3 className="mb-1 font-medium">No Active Agents</h3>
-      <p className="max-w-xs text-center text-sm">
+      <h3 className="mb-2 text-xl font-light text-white">No Active Agents</h3>
+      <p className="max-w-xs text-center font-mono text-xs text-white/40">
         When agents start working, their activity will appear here in real-time.
       </p>
-    </div>
+    </motion.div>
   );
 }
 
 // Loading skeleton
-function LoadingSkeleton({ variant }: { variant: StatusCommandCentreProps['variant'] }) {
-  if (variant === 'compact') {
-    return (
-      <div className="space-y-3 p-4">
-        <div className="bg-muted h-4 w-24 animate-pulse rounded" />
-        <div className="space-y-2">
+function LoadingSkeleton() {
+  return (
+    <div className="space-y-8">
+      {/* Header skeleton */}
+      <div className="space-y-4">
+        <motion.div
+          className="h-3 w-32 rounded-sm bg-white/5"
+          animate={{ opacity: [0.5, 1, 0.5] }}
+          transition={{ duration: 1.5, repeat: Infinity }}
+        />
+        <motion.div
+          className="h-10 w-64 rounded-sm bg-white/5"
+          animate={{ opacity: [0.5, 1, 0.5] }}
+          transition={{ duration: 1.5, repeat: Infinity, delay: 0.1 }}
+        />
+      </div>
+
+      {/* Data strip skeleton */}
+      <div className="flex gap-8">
+        {[1, 2, 3, 4].map((i) => (
+          <motion.div
+            key={i}
+            className="h-6 w-20 rounded-sm bg-white/5"
+            animate={{ opacity: [0.5, 1, 0.5] }}
+            transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.1 }}
+          />
+        ))}
+      </div>
+
+      {/* Timeline skeleton */}
+      <div className="relative pl-4">
+        <div className="absolute top-0 bottom-0 left-8 w-px bg-white/5" />
+        <div className="space-y-8">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-muted h-24 animate-pulse rounded-xl" />
+            <div key={i} className="flex items-start gap-6">
+              <motion.div
+                className="h-12 w-12 rounded-full bg-white/5"
+                animate={{ opacity: [0.5, 1, 0.5] }}
+                transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.15 }}
+              />
+              <div className="flex-1 space-y-2">
+                <motion.div
+                  className="h-6 w-48 rounded-sm bg-white/5"
+                  animate={{ opacity: [0.5, 1, 0.5] }}
+                  transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.15 }}
+                />
+                <motion.div
+                  className="h-4 w-32 rounded-sm bg-white/5"
+                  animate={{ opacity: [0.5, 1, 0.5] }}
+                  transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.15 + 0.05 }}
+                />
+              </div>
+            </div>
           ))}
         </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-6 p-6">
-      {/* Header skeleton */}
-      <div className="flex items-center justify-between">
-        <div className="bg-muted h-6 w-40 animate-pulse rounded" />
-        <div className="bg-muted h-4 w-16 animate-pulse rounded" />
-      </div>
-
-      {/* Metrics skeleton */}
-      <div className="grid grid-cols-4 gap-4">
-        {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="bg-muted h-20 animate-pulse rounded-xl" />
-        ))}
-      </div>
-
-      {/* Cards skeleton */}
-      <div className="grid grid-cols-3 gap-4">
-        {[1, 2, 3, 4, 5, 6].map((i) => (
-          <div key={i} className="bg-muted h-44 animate-pulse rounded-xl" />
-        ))}
       </div>
     </div>
   );

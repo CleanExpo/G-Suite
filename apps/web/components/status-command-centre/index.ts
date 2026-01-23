@@ -19,6 +19,10 @@ export { AgentActivityCard } from './components/AgentActivityCard';
 export { ActivityTimeline } from './components/ActivityTimeline';
 export { AgentThinkingIndicator } from './components/AgentThinkingIndicator';
 
+// NEW: Timeline layout components (replaces card grid)
+export { AgentNode } from './components/AgentNode';
+export { DataStrip } from './components/DataStrip';
+
 // Dashboard components
 export { MetricTile } from './components/MetricTile';
 export { NotificationStream } from './components/NotificationStream';
