@@ -24,6 +24,7 @@ import type {
 
 import {
   CLAUDE_MODELS,
+  BETA_HEADERS,
   buildBetaHeader,
   createCacheableSystemPrompt,
   createThinkingConfig,
