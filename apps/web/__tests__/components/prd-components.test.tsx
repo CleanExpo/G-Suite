@@ -142,22 +142,29 @@ describe('PRDGenerationProgress', () => {
     const currentStep = 'Generating technical specification';
     render(<PRDGenerationProgress progress={60} currentStep={currentStep} />);
 
-    expect(screen.getByText(currentStep)).toBeInTheDocument();
+    // Text appears in both current step box and phase list, so use getAllByText
+    const elements = screen.getAllByText(currentStep);
+    expect(elements.length).toBeGreaterThan(0);
   });
 
   it('should show completed phases with checkmarks', () => {
-    render(<PRDGenerationProgress progress={60} currentStep="Creating test plan" />);
+    const { container } = render(
+      <PRDGenerationProgress progress={60} currentStep="Creating test plan" />
+    );
 
-    // First 3 phases should be completed (0-60%)
-    const checkmarks = screen.getAllByTestId(/check-circle/i);
+    // First 3 phases should be completed (0-60%) - CheckCircle2 icons have text-green-500 class
+    const checkmarks = container.querySelectorAll('.text-green-500');
     expect(checkmarks.length).toBeGreaterThan(0);
   });
 
   it('should show current phase with spinner', () => {
-    render(<PRDGenerationProgress progress={60} currentStep="Creating test plan" />);
+    const { container } = render(
+      <PRDGenerationProgress progress={60} currentStep="Creating test plan" />
+    );
 
-    // Should have loading spinner for current phase
-    expect(screen.getByRole('status')).toBeInTheDocument();
+    // Should have loading spinner (Loader2 with animate-spin class)
+    const spinners = container.querySelectorAll('.animate-spin');
+    expect(spinners.length).toBeGreaterThan(0);
   });
 
   it('should show pending phases without decoration', () => {
