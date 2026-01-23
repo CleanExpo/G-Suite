@@ -1,24 +1,24 @@
-"use client";
+'use client';
 
-import { useEffect, useState, useCallback } from "react";
-import { createClient } from "@/lib/supabase/client";
-import type { RealtimeChannel } from "@supabase/supabase-js";
+import { useEffect, useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
+import type { RealtimeChannel } from '@supabase/supabase-js';
 
 /**
  * Agent Run Status Types
  * Matches the backend TaskStatus enum
  */
 export type AgentRunStatus =
-  | "pending"
-  | "in_progress"
-  | "awaiting_verification"
-  | "verification_in_progress"
-  | "verification_passed"
-  | "verification_failed"
-  | "completed"
-  | "failed"
-  | "blocked"
-  | "escalated_to_human";
+  | 'pending'
+  | 'in_progress'
+  | 'awaiting_verification'
+  | 'verification_in_progress'
+  | 'verification_passed'
+  | 'verification_failed'
+  | 'completed'
+  | 'failed'
+  | 'blocked'
+  | 'escalated_to_human';
 
 /**
  * Agent Run Record
@@ -46,7 +46,7 @@ export interface AgentRun {
 /**
  * Realtime Event Types
  */
-type RealtimeEvent = "INSERT" | "UPDATE" | "DELETE";
+type RealtimeEvent = 'INSERT' | 'UPDATE' | 'DELETE';
 
 interface RealtimePayload {
   eventType: RealtimeEvent;
@@ -92,16 +92,16 @@ export function useAgentRuns(taskId?: string, agentName?: string) {
         const supabase = createClient();
 
         let query = supabase
-          .from("agent_runs")
-          .select("*")
-          .order("started_at", { ascending: false });
+          .from('agent_runs')
+          .select('*')
+          .order('started_at', { ascending: false });
 
         if (taskId) {
-          query = query.eq("task_id", taskId);
+          query = query.eq('task_id', taskId);
         }
 
         if (agentName) {
-          query = query.eq("agent_name", agentName);
+          query = query.eq('agent_name', agentName);
         }
 
         const { data, error: fetchError } = await query;
@@ -111,7 +111,7 @@ export function useAgentRuns(taskId?: string, agentName?: string) {
         setRuns(data || []);
         setError(null);
       } catch (err) {
-        setError(err instanceof Error ? err : new Error("Failed to fetch agent runs"));
+        setError(err instanceof Error ? err : new Error('Failed to fetch agent runs'));
       } finally {
         setLoading(false);
       }
@@ -126,13 +126,13 @@ export function useAgentRuns(taskId?: string, agentName?: string) {
 
     // Create channel for realtime subscription
     const realtimeChannel = supabase
-      .channel("agent_runs_changes")
+      .channel('agent_runs_changes')
       .on<AgentRun>(
-        "postgres_changes",
+        'postgres_changes',
         {
-          event: "*",
-          schema: "public",
-          table: "agent_runs",
+          event: '*',
+          schema: 'public',
+          table: 'agent_runs',
           filter: taskId ? `task_id=eq.${taskId}` : undefined,
         },
         (payload: RealtimePayload) => {
@@ -145,17 +145,15 @@ export function useAgentRuns(taskId?: string, agentName?: string) {
 
           setRuns((prevRuns) => {
             switch (eventType) {
-              case "INSERT":
+              case 'INSERT':
                 // Add new run to the beginning
                 return [newRun, ...prevRuns];
 
-              case "UPDATE":
+              case 'UPDATE':
                 // Update existing run
-                return prevRuns.map((run) =>
-                  run.id === newRun.id ? newRun : run
-                );
+                return prevRuns.map((run) => (run.id === newRun.id ? newRun : run));
 
-              case "DELETE":
+              case 'DELETE':
                 // Remove deleted run
                 return prevRuns.filter((run) => run.id !== oldRun.id);
 
@@ -219,9 +217,9 @@ export function useAgentRun(runId: string | null) {
         const supabase = createClient();
 
         const { data, error: fetchError } = await supabase
-          .from("agent_runs")
-          .select("*")
-          .eq("id", runId)
+          .from('agent_runs')
+          .select('*')
+          .eq('id', runId)
           .single();
 
         if (fetchError) throw fetchError;
@@ -229,7 +227,7 @@ export function useAgentRun(runId: string | null) {
         setRun(data);
         setError(null);
       } catch (err) {
-        setError(err instanceof Error ? err : new Error("Failed to fetch agent run"));
+        setError(err instanceof Error ? err : new Error('Failed to fetch agent run'));
       } finally {
         setLoading(false);
       }
@@ -242,11 +240,11 @@ export function useAgentRun(runId: string | null) {
     const channel = supabase
       .channel(`agent_run_${runId}`)
       .on<AgentRun>(
-        "postgres_changes",
+        'postgres_changes',
         {
-          event: "UPDATE",
-          schema: "public",
-          table: "agent_runs",
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'agent_runs',
           filter: `id=eq.${runId}`,
         },
         (payload) => {
@@ -286,7 +284,7 @@ export function useActiveAgentRuns() {
   const { runs, loading, error } = useAgentRuns();
 
   const activeRuns = runs.filter((run) =>
-    ["pending", "in_progress", "awaiting_verification", "verification_in_progress"].includes(
+    ['pending', 'in_progress', 'awaiting_verification', 'verification_in_progress'].includes(
       run.status
     )
   );
@@ -314,12 +312,12 @@ export function useActiveAgentRuns() {
  */
 export async function triggerAgentRun(
   taskDescription: string,
-  backendUrl: string = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000"
+  backendUrl: string = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'
 ): Promise<string> {
   const response = await fetch(`${backendUrl}/api/agents/run`, {
-    method: "POST",
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
     body: JSON.stringify({
       task_description: taskDescription,

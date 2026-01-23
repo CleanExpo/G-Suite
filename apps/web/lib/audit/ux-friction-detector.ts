@@ -10,12 +10,8 @@
  * - Mobile/responsive problems
  */
 
-import { v4 as uuidv4 } from "uuid";
-import type {
-  JourneyResult,
-  StepResult,
-  FrictionPoint,
-} from "./user-journey-runner";
+import { v4 as uuidv4 } from 'uuid';
+import type { JourneyResult, StepResult, FrictionPoint } from './user-journey-runner';
 
 // ============================================================================
 // Types
@@ -24,7 +20,7 @@ import type {
 export interface FrictionAnalysis {
   analysis_id: string;
   timestamp: string;
-  source: "journey" | "manual" | "automated";
+  source: 'journey' | 'manual' | 'automated';
   friction_points: DetailedFrictionPoint[];
   metrics: FrictionMetrics;
   recommendations: Recommendation[];
@@ -36,28 +32,28 @@ export interface DetailedFrictionPoint extends FrictionPoint {
   impact: FrictionImpact;
   evidence: FrictionEvidence;
   reproducible: boolean;
-  affected_users_estimate: "all" | "most" | "some" | "few";
+  affected_users_estimate: 'all' | 'most' | 'some' | 'few';
 }
 
 export type FrictionCategory =
-  | "performance"
-  | "usability"
-  | "accessibility"
-  | "error_handling"
-  | "navigation"
-  | "content"
-  | "visual"
-  | "mobile"
-  | "security";
+  | 'performance'
+  | 'usability'
+  | 'accessibility'
+  | 'error_handling'
+  | 'navigation'
+  | 'content'
+  | 'visual'
+  | 'mobile'
+  | 'security';
 
 export interface FrictionImpact {
-  user_impact: "blocking" | "frustrating" | "annoying" | "minor";
-  business_impact: "critical" | "high" | "medium" | "low";
+  user_impact: 'blocking' | 'frustrating' | 'annoying' | 'minor';
+  business_impact: 'critical' | 'high' | 'medium' | 'low';
   conversion_impact: number; // -100 to 0 (percentage impact on conversion)
 }
 
 export interface FrictionEvidence {
-  type: "screenshot" | "video" | "log" | "metric" | "user_report";
+  type: 'screenshot' | 'video' | 'log' | 'metric' | 'user_report';
   data: string;
   captured_at: string;
 }
@@ -75,10 +71,10 @@ export interface FrictionMetrics {
 export interface Recommendation {
   id: string;
   friction_point_id: string;
-  priority: "immediate" | "short_term" | "long_term";
+  priority: 'immediate' | 'short_term' | 'long_term';
   action: string;
   expected_improvement: string;
-  effort_estimate: "trivial" | "small" | "medium" | "large" | "major";
+  effort_estimate: 'trivial' | 'small' | 'medium' | 'large' | 'major';
   tags: string[];
 }
 
@@ -106,7 +102,7 @@ export interface RuleCheckData {
 
 export interface FrictionRuleResult {
   triggered: boolean;
-  severity: "high" | "medium" | "low";
+  severity: 'high' | 'medium' | 'low';
   description: string;
   suggestion?: string;
 }
@@ -130,160 +126,156 @@ export interface PageMetrics {
 const FRICTION_RULES: FrictionRule[] = [
   // Performance Rules
   {
-    id: "slow_page_load",
-    name: "Slow Page Load",
-    description: "Page takes too long to load",
-    category: "performance",
-    check: (data) => {
+    id: 'slow_page_load',
+    name: 'Slow Page Load',
+    description: 'Page takes too long to load',
+    category: 'performance',
+    check: (_data) => {
       const threshold = 3000;
       const loadTime = data.step?.duration_ms || 0;
       return {
         triggered: loadTime > threshold,
-        severity: loadTime > threshold * 2 ? "high" : "medium",
+        severity: loadTime > threshold * 2 ? 'high' : 'medium',
         description: `Page load time (${loadTime}ms) exceeds threshold (${threshold}ms)`,
-        suggestion: "Optimize bundle size, use code splitting, enable caching",
+        suggestion: 'Optimize bundle size, use code splitting, enable caching',
       };
     },
   },
   {
-    id: "slow_interaction",
-    name: "Slow Interaction Response",
-    description: "User interaction takes too long to respond",
-    category: "performance",
-    check: (data) => {
+    id: 'slow_interaction',
+    name: 'Slow Interaction Response',
+    description: 'User interaction takes too long to respond',
+    category: 'performance',
+    check: (_data) => {
       const threshold = 100;
       const responseTime = data.pageMetrics?.first_input_delay_ms || 0;
       return {
         triggered: responseTime > threshold,
-        severity: responseTime > 300 ? "high" : "medium",
+        severity: responseTime > 300 ? 'high' : 'medium',
         description: `Interaction response (${responseTime}ms) is slow`,
-        suggestion: "Reduce JavaScript execution time, defer non-critical scripts",
+        suggestion: 'Reduce JavaScript execution time, defer non-critical scripts',
       };
     },
   },
   {
-    id: "layout_shift",
-    name: "Unexpected Layout Shift",
-    description: "Page content shifts unexpectedly",
-    category: "visual",
-    check: (data) => {
+    id: 'layout_shift',
+    name: 'Unexpected Layout Shift',
+    description: 'Page content shifts unexpectedly',
+    category: 'visual',
+    check: (_data) => {
       const threshold = 0.1;
       const cls = data.pageMetrics?.cumulative_layout_shift || 0;
       return {
         triggered: cls > threshold,
-        severity: cls > 0.25 ? "high" : "medium",
+        severity: cls > 0.25 ? 'high' : 'medium',
         description: `Cumulative Layout Shift (${cls.toFixed(3)}) exceeds threshold`,
-        suggestion: "Reserve space for dynamic content, specify image dimensions",
+        suggestion: 'Reserve space for dynamic content, specify image dimensions',
       };
     },
   },
   // Error Handling Rules
   {
-    id: "unhandled_error",
-    name: "Unhandled Error",
-    description: "Error occurs without user-friendly handling",
-    category: "error_handling",
-    check: (data) => {
-      const hasError =
-        data.step?.status === "error" || data.step?.status === "failed";
+    id: 'unhandled_error',
+    name: 'Unhandled Error',
+    description: 'Error occurs without user-friendly handling',
+    category: 'error_handling',
+    check: (_data) => {
+      const hasError = data.step?.status === 'error' || data.step?.status === 'failed';
       const errorLogs =
         data.step?.evidence.console_logs.filter(
-          (log) =>
-            log.includes("Error") ||
-            log.includes("error") ||
-            log.includes("Exception")
+          (log) => log.includes('Error') || log.includes('error') || log.includes('Exception')
         ) || [];
       return {
         triggered: hasError || errorLogs.length > 0,
-        severity: "high",
-        description: `Error detected: ${data.step?.error || errorLogs[0] || "Unknown"}`,
-        suggestion: "Implement error boundary with user-friendly message and recovery option",
+        severity: 'high',
+        description: `Error detected: ${data.step?.error || errorLogs[0] || 'Unknown'}`,
+        suggestion: 'Implement error boundary with user-friendly message and recovery option',
       };
     },
   },
   {
-    id: "no_error_recovery",
-    name: "No Error Recovery Path",
-    description: "Error state without clear recovery action",
-    category: "error_handling",
-    check: (data) => {
+    id: 'no_error_recovery',
+    name: 'No Error Recovery Path',
+    description: 'Error state without clear recovery action',
+    category: 'error_handling',
+    check: (_data) => {
       // Check if error message includes recovery guidance
-      const errorMessage = data.step?.error || "";
+      const errorMessage = data.step?.error || '';
       const hasRecoveryGuidance =
-        errorMessage.includes("try again") ||
-        errorMessage.includes("contact support") ||
-        errorMessage.includes("go back");
+        errorMessage.includes('try again') ||
+        errorMessage.includes('contact support') ||
+        errorMessage.includes('go back');
       return {
-        triggered: data.step?.status === "error" && !hasRecoveryGuidance,
-        severity: "medium",
-        description: "Error state does not provide recovery guidance",
+        triggered: data.step?.status === 'error' && !hasRecoveryGuidance,
+        severity: 'medium',
+        description: 'Error state does not provide recovery guidance',
         suggestion: 'Add "Try again" button or clear next steps for users',
       };
     },
   },
   // Navigation Rules
   {
-    id: "dead_end",
-    name: "Navigation Dead End",
-    description: "User reaches a state with no clear next action",
-    category: "navigation",
-    check: (data) => {
+    id: 'dead_end',
+    name: 'Navigation Dead End',
+    description: 'User reaches a state with no clear next action',
+    category: 'navigation',
+    check: (_data) => {
       // This would be detected by analyzing DOM for clickable elements
       // Simplified check for now
       return {
         triggered: false, // Would need DOM analysis
-        severity: "medium",
-        description: "Page has no clear call-to-action or navigation",
-        suggestion: "Add clear navigation options or call-to-action buttons",
+        severity: 'medium',
+        description: 'Page has no clear call-to-action or navigation',
+        suggestion: 'Add clear navigation options or call-to-action buttons',
       };
     },
   },
   // Accessibility Rules
   {
-    id: "missing_alt_text",
-    name: "Missing Alt Text",
-    description: "Images without alternative text",
-    category: "accessibility",
-    check: (data) => {
+    id: 'missing_alt_text',
+    name: 'Missing Alt Text',
+    description: 'Images without alternative text',
+    category: 'accessibility',
+    check: (_data) => {
       // Would analyze DOM for images without alt attributes
-      const hasIssue = data.domSnapshot?.includes('<img src="') &&
-        !data.domSnapshot?.includes('alt="');
+      const hasIssue =
+        data.domSnapshot?.includes('<img src="') && !data.domSnapshot?.includes('alt="');
       return {
         triggered: hasIssue || false,
-        severity: "medium",
-        description: "Images found without alt text",
-        suggestion: "Add descriptive alt text to all meaningful images",
+        severity: 'medium',
+        description: 'Images found without alt text',
+        suggestion: 'Add descriptive alt text to all meaningful images',
       };
     },
   },
   {
-    id: "low_contrast",
-    name: "Low Color Contrast",
-    description: "Text does not have sufficient contrast with background",
-    category: "accessibility",
+    id: 'low_contrast',
+    name: 'Low Color Contrast',
+    description: 'Text does not have sufficient contrast with background',
+    category: 'accessibility',
     check: () => {
       // Would need color analysis
       return {
         triggered: false,
-        severity: "medium",
-        description: "Text contrast ratio is below WCAG requirements",
-        suggestion: "Increase contrast ratio to at least 4.5:1 for normal text",
+        severity: 'medium',
+        description: 'Text contrast ratio is below WCAG requirements',
+        suggestion: 'Increase contrast ratio to at least 4.5:1 for normal text',
       };
     },
   },
   // Mobile Rules
   {
-    id: "small_touch_target",
-    name: "Small Touch Target",
-    description: "Interactive elements too small for touch",
-    category: "mobile",
+    id: 'small_touch_target',
+    name: 'Small Touch Target',
+    description: 'Interactive elements too small for touch',
+    category: 'mobile',
     check: () => {
       // Would analyze DOM for element sizes
       return {
         triggered: false,
-        severity: "medium",
-        description: "Touch targets smaller than 44x44px",
-        suggestion: "Increase interactive element size to at least 44x44px",
+        severity: 'medium',
+        description: 'Touch targets smaller than 44x44px',
+        suggestion: 'Increase interactive element size to at least 44x44px',
       };
     },
   },
@@ -339,7 +331,7 @@ export class UXFrictionDetector {
     const analysis: FrictionAnalysis = {
       analysis_id: `analysis_${uuidv4().slice(0, 8)}`,
       timestamp: new Date().toISOString(),
-      source: "journey",
+      source: 'journey',
       friction_points: frictionPoints,
       metrics,
       recommendations,
@@ -353,10 +345,7 @@ export class UXFrictionDetector {
   /**
    * Analyze a single step for friction
    */
-  private analyzeStep(
-    step: StepResult,
-    journey: JourneyResult
-  ): DetailedFrictionPoint[] {
+  private analyzeStep(step: StepResult, journey: JourneyResult): DetailedFrictionPoint[] {
     const points: DetailedFrictionPoint[] = [];
     const allRules = [...FRICTION_RULES, ...this.customRules];
 
@@ -376,7 +365,7 @@ export class UXFrictionDetector {
           category: rule.category,
           impact: this.estimateImpact(result.severity, rule.category),
           evidence: {
-            type: "log",
+            type: 'log',
             data: JSON.stringify({
               step_name: step.step_name,
               duration_ms: step.duration_ms,
@@ -403,52 +392,50 @@ export class UXFrictionDetector {
       category: this.inferCategory(fp.type),
       impact: this.estimateImpact(fp.severity, this.inferCategory(fp.type)),
       evidence: {
-        type: "metric",
+        type: 'metric',
         data: fp.description,
         captured_at: new Date().toISOString(),
       },
       reproducible: true,
-      affected_users_estimate: "most",
+      affected_users_estimate: 'most',
     };
   }
 
   /**
    * Map friction category to simplified type
    */
-  private mapCategoryToType(
-    category: FrictionCategory
-  ): FrictionPoint["type"] {
+  private mapCategoryToType(category: FrictionCategory): FrictionPoint['type'] {
     switch (category) {
-      case "performance":
-        return "slow_response";
-      case "error_handling":
-        return "error";
-      case "navigation":
-        return "dead_end";
-      case "usability":
-        return "confusing_ui";
+      case 'performance':
+        return 'slow_response';
+      case 'error_handling':
+        return 'error';
+      case 'navigation':
+        return 'dead_end';
+      case 'usability':
+        return 'confusing_ui';
       default:
-        return "confusing_ui";
+        return 'confusing_ui';
     }
   }
 
   /**
    * Infer category from friction type
    */
-  private inferCategory(type: FrictionPoint["type"]): FrictionCategory {
+  private inferCategory(type: FrictionPoint['type']): FrictionCategory {
     switch (type) {
-      case "slow_response":
-        return "performance";
-      case "error":
-        return "error_handling";
-      case "dead_end":
-        return "navigation";
-      case "confusing_ui":
-        return "usability";
-      case "loop":
-        return "navigation";
+      case 'slow_response':
+        return 'performance';
+      case 'error':
+        return 'error_handling';
+      case 'dead_end':
+        return 'navigation';
+      case 'confusing_ui':
+        return 'usability';
+      case 'loop':
+        return 'navigation';
       default:
-        return "usability";
+        return 'usability';
     }
   }
 
@@ -456,28 +443,25 @@ export class UXFrictionDetector {
    * Estimate impact based on severity and category
    */
   private estimateImpact(
-    severity: "high" | "medium" | "low",
+    severity: 'high' | 'medium' | 'low',
     category: FrictionCategory
   ): FrictionImpact {
-    const userImpactMap: Record<
-      FrictionCategory,
-      Record<string, FrictionImpact["user_impact"]>
-    > = {
-      performance: { high: "frustrating", medium: "annoying", low: "minor" },
-      error_handling: { high: "blocking", medium: "frustrating", low: "annoying" },
-      accessibility: { high: "blocking", medium: "frustrating", low: "annoying" },
-      navigation: { high: "blocking", medium: "frustrating", low: "annoying" },
-      usability: { high: "frustrating", medium: "annoying", low: "minor" },
-      content: { high: "annoying", medium: "minor", low: "minor" },
-      visual: { high: "annoying", medium: "minor", low: "minor" },
-      mobile: { high: "frustrating", medium: "annoying", low: "minor" },
-      security: { high: "blocking", medium: "blocking", low: "frustrating" },
+    const userImpactMap: Record<FrictionCategory, Record<string, FrictionImpact['user_impact']>> = {
+      performance: { high: 'frustrating', medium: 'annoying', low: 'minor' },
+      error_handling: { high: 'blocking', medium: 'frustrating', low: 'annoying' },
+      accessibility: { high: 'blocking', medium: 'frustrating', low: 'annoying' },
+      navigation: { high: 'blocking', medium: 'frustrating', low: 'annoying' },
+      usability: { high: 'frustrating', medium: 'annoying', low: 'minor' },
+      content: { high: 'annoying', medium: 'minor', low: 'minor' },
+      visual: { high: 'annoying', medium: 'minor', low: 'minor' },
+      mobile: { high: 'frustrating', medium: 'annoying', low: 'minor' },
+      security: { high: 'blocking', medium: 'blocking', low: 'frustrating' },
     };
 
-    const businessImpactMap: Record<string, FrictionImpact["business_impact"]> = {
-      high: "high",
-      medium: "medium",
-      low: "low",
+    const businessImpactMap: Record<string, FrictionImpact['business_impact']> = {
+      high: 'high',
+      medium: 'medium',
+      low: 'low',
     };
 
     const conversionImpactMap: Record<string, number> = {
@@ -487,11 +471,11 @@ export class UXFrictionDetector {
       minor: -1,
     };
 
-    const userImpact = userImpactMap[category]?.[severity] || "minor";
+    const userImpact = userImpactMap[category]?.[severity] || 'minor';
 
     return {
       user_impact: userImpact,
-      business_impact: businessImpactMap[severity] || "low",
+      business_impact: businessImpactMap[severity] || 'low',
       conversion_impact: conversionImpactMap[userImpact] || 0,
     };
   }
@@ -501,25 +485,23 @@ export class UXFrictionDetector {
    */
   private estimateAffectedUsers(
     category: FrictionCategory
-  ): DetailedFrictionPoint["affected_users_estimate"] {
+  ): DetailedFrictionPoint['affected_users_estimate'] {
     switch (category) {
-      case "performance":
-        return "all";
-      case "mobile":
-        return "some"; // ~50% on mobile
-      case "accessibility":
-        return "some"; // ~15-20% have some accessibility needs
+      case 'performance':
+        return 'all';
+      case 'mobile':
+        return 'some'; // ~50% on mobile
+      case 'accessibility':
+        return 'some'; // ~15-20% have some accessibility needs
       default:
-        return "all";
+        return 'all';
     }
   }
 
   /**
    * Generate recommendations for friction points
    */
-  private generateRecommendations(
-    points: DetailedFrictionPoint[]
-  ): Recommendation[] {
+  private generateRecommendations(points: DetailedFrictionPoint[]): Recommendation[] {
     const recommendations: Recommendation[] = [];
 
     for (const point of points) {
@@ -546,14 +528,14 @@ export class UXFrictionDetector {
   /**
    * Get priority based on impact
    */
-  private getPriority(impact: FrictionImpact): Recommendation["priority"] {
-    if (impact.user_impact === "blocking" || impact.business_impact === "critical") {
-      return "immediate";
+  private getPriority(impact: FrictionImpact): Recommendation['priority'] {
+    if (impact.user_impact === 'blocking' || impact.business_impact === 'critical') {
+      return 'immediate';
     }
-    if (impact.user_impact === "frustrating" || impact.business_impact === "high") {
-      return "short_term";
+    if (impact.user_impact === 'frustrating' || impact.business_impact === 'high') {
+      return 'short_term';
     }
-    return "long_term";
+    return 'long_term';
   }
 
   /**
@@ -567,39 +549,32 @@ export class UXFrictionDetector {
   /**
    * Estimate effort to fix
    */
-  private estimateEffort(
-    category: FrictionCategory
-  ): Recommendation["effort_estimate"] {
-    const effortMap: Record<FrictionCategory, Recommendation["effort_estimate"]> = {
-      content: "trivial",
-      visual: "small",
-      accessibility: "small",
-      usability: "medium",
-      navigation: "medium",
-      performance: "medium",
-      error_handling: "medium",
-      mobile: "medium",
-      security: "large",
+  private estimateEffort(category: FrictionCategory): Recommendation['effort_estimate'] {
+    const effortMap: Record<FrictionCategory, Recommendation['effort_estimate']> = {
+      content: 'trivial',
+      visual: 'small',
+      accessibility: 'small',
+      usability: 'medium',
+      navigation: 'medium',
+      performance: 'medium',
+      error_handling: 'medium',
+      mobile: 'medium',
+      security: 'large',
     };
-    return effortMap[category] || "medium";
+    return effortMap[category] || 'medium';
   }
 
   /**
    * Calculate friction metrics
    */
   private calculateMetrics(points: DetailedFrictionPoint[]): FrictionMetrics {
-    const critical = points.filter(
-      (p) => p.impact.user_impact === "blocking"
-    ).length;
-    const high = points.filter((p) => p.severity === "high").length;
-    const medium = points.filter((p) => p.severity === "medium").length;
-    const low = points.filter((p) => p.severity === "low").length;
+    const critical = points.filter((p) => p.impact.user_impact === 'blocking').length;
+    const high = points.filter((p) => p.severity === 'high').length;
+    const medium = points.filter((p) => p.severity === 'medium').length;
+    const low = points.filter((p) => p.severity === 'low').length;
 
     // Friction score: weighted sum (lower is better)
-    const frictionScore = Math.min(
-      100,
-      critical * 30 + high * 15 + medium * 5 + low * 1
-    );
+    const frictionScore = Math.min(100, critical * 30 + high * 15 + medium * 5 + low * 1);
 
     return {
       total_friction_points: points.length,
@@ -643,14 +618,12 @@ export class UXFrictionDetector {
   /**
    * Calculate severity distribution
    */
-  private calculateSeverityDistribution(
-    points: DetailedFrictionPoint[]
-  ): SeverityDistribution {
+  private calculateSeverityDistribution(points: DetailedFrictionPoint[]): SeverityDistribution {
     return {
-      blocking: points.filter((p) => p.impact.user_impact === "blocking").length,
-      frustrating: points.filter((p) => p.impact.user_impact === "frustrating").length,
-      annoying: points.filter((p) => p.impact.user_impact === "annoying").length,
-      minor: points.filter((p) => p.impact.user_impact === "minor").length,
+      blocking: points.filter((p) => p.impact.user_impact === 'blocking').length,
+      frustrating: points.filter((p) => p.impact.user_impact === 'frustrating').length,
+      annoying: points.filter((p) => p.impact.user_impact === 'annoying').length,
+      minor: points.filter((p) => p.impact.user_impact === 'minor').length,
     };
   }
 

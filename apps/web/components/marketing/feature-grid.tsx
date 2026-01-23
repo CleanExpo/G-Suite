@@ -1,73 +1,58 @@
-"use client";
+'use client';
 
-import * as React from "react";
-import { cva, type VariantProps } from "class-variance-authority";
-import { cn } from "@/lib/utils";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "@/components/ui/card";
-import { FadeIn, SlideUp, Stagger } from "@/components/ui/motion";
+import * as React from 'react';
+import { cva, type VariantProps } from 'class-variance-authority';
+import { cn } from '@/lib/utils';
+import { FadeIn, SlideUp } from '@/components/ui/motion';
 
 /* ----------------------------------------
    Feature Grid Variants
    ---------------------------------------- */
-const featureGridVariants = cva(
-  "w-full",
-  {
-    variants: {
-      variant: {
-        default: "",
-        cards: "",
-        bento: "",
-        minimal: "",
-        bordered: "",
-      },
-      columns: {
-        2: "grid-cols-1 md:grid-cols-2",
-        3: "grid-cols-1 md:grid-cols-2 lg:grid-cols-3",
-        4: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4",
-        auto: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",
-      },
-      gap: {
-        sm: "gap-4",
-        default: "gap-6 md:gap-8",
-        lg: "gap-8 md:gap-10 lg:gap-12",
-      },
+const featureGridVariants = cva('w-full', {
+  variants: {
+    variant: {
+      default: '',
+      cards: '',
+      bento: '',
+      minimal: '',
+      bordered: '',
     },
-    defaultVariants: {
-      variant: "default",
-      columns: 3,
-      gap: "default",
+    columns: {
+      2: 'grid-cols-1 md:grid-cols-2',
+      3: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
+      4: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4',
+      auto: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4',
     },
-  }
-);
+    gap: {
+      sm: 'gap-4',
+      default: 'gap-6 md:gap-8',
+      lg: 'gap-8 md:gap-10 lg:gap-12',
+    },
+  },
+  defaultVariants: {
+    variant: 'default',
+    columns: 3,
+    gap: 'default',
+  },
+});
 
-const featureCardVariants = cva(
-  "group relative overflow-hidden transition-all duration-normal",
-  {
-    variants: {
-      variant: {
-        default:
-          "bg-card hover:bg-muted/50 rounded-xl border p-6 hover:shadow-lg hover:-translate-y-1",
-        cards:
-          "bg-gradient-to-br from-card to-muted/30 rounded-2xl border shadow-sm p-8 hover:shadow-xl hover:-translate-y-2",
-        bento:
-          "bg-card rounded-3xl border p-6 md:p-8 hover:border-brand-primary/30 hover:shadow-lg",
-        minimal:
-          "p-6 hover:bg-muted/30 rounded-lg",
-        bordered:
-          "border-l-4 border-l-brand-primary/50 hover:border-l-brand-primary bg-muted/20 rounded-r-lg p-6 hover:bg-muted/40",
-      },
+const featureCardVariants = cva('group relative overflow-hidden transition-all duration-normal', {
+  variants: {
+    variant: {
+      default:
+        'bg-card hover:bg-muted/50 rounded-xl border p-6 hover:shadow-lg hover:-translate-y-1',
+      cards:
+        'bg-gradient-to-br from-card to-muted/30 rounded-2xl border shadow-sm p-8 hover:shadow-xl hover:-translate-y-2',
+      bento: 'bg-card rounded-3xl border p-6 md:p-8 hover:border-brand-primary/30 hover:shadow-lg',
+      minimal: 'p-6 hover:bg-muted/30 rounded-lg',
+      bordered:
+        'border-l-4 border-l-brand-primary/50 hover:border-l-brand-primary bg-muted/20 rounded-r-lg p-6 hover:bg-muted/40',
     },
-    defaultVariants: {
-      variant: "default",
-    },
-  }
-);
+  },
+  defaultVariants: {
+    variant: 'default',
+  },
+});
 
 /* ----------------------------------------
    Feature Grid Types
@@ -87,15 +72,14 @@ export interface Feature {
 }
 
 export interface FeatureGridProps
-  extends React.HTMLAttributes<HTMLElement>,
-    VariantProps<typeof featureGridVariants> {
+  extends React.HTMLAttributes<HTMLElement>, VariantProps<typeof featureGridVariants> {
   title?: string | React.ReactNode;
   titleHighlight?: string;
   subtitle?: string | React.ReactNode;
   badge?: string;
   features: Feature[];
   animated?: boolean;
-  alignment?: "left" | "center";
+  alignment?: 'left' | 'center';
 }
 
 /* ----------------------------------------
@@ -104,41 +88,35 @@ export interface FeatureGridProps
 const FeatureIcon = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & { variant?: string }
->(({ className, variant = "default", children, ...props }, ref) => {
+>(({ className, variant = 'default', children, ...props }, ref) => {
   const iconStyles: Record<string, string> = {
     default:
-      "w-12 h-12 rounded-xl bg-brand-primary/10 text-brand-primary flex items-center justify-center mb-4 group-hover:bg-brand-primary group-hover:text-white transition-colors",
+      'w-12 h-12 rounded-xl bg-brand-primary/10 text-brand-primary flex items-center justify-center mb-4 group-hover:bg-brand-primary group-hover:text-white transition-colors',
     cards:
-      "w-14 h-14 rounded-2xl bg-gradient-brand text-white flex items-center justify-center mb-6 shadow-lg shadow-brand-primary/25",
+      'w-14 h-14 rounded-2xl bg-gradient-brand text-white flex items-center justify-center mb-6 shadow-lg shadow-brand-primary/25',
     bento:
-      "w-10 h-10 rounded-lg bg-brand-primary/10 text-brand-primary flex items-center justify-center mb-4",
-    minimal:
-      "w-10 h-10 text-brand-primary mb-4",
-    bordered:
-      "w-10 h-10 text-brand-primary mb-4",
+      'w-10 h-10 rounded-lg bg-brand-primary/10 text-brand-primary flex items-center justify-center mb-4',
+    minimal: 'w-10 h-10 text-brand-primary mb-4',
+    bordered: 'w-10 h-10 text-brand-primary mb-4',
   };
 
   return (
-    <div
-      ref={ref}
-      className={cn(iconStyles[variant] || iconStyles.default, className)}
-      {...props}
-    >
+    <div ref={ref} className={cn(iconStyles[variant] || iconStyles.default, className)} {...props}>
       {children}
     </div>
   );
 });
-FeatureIcon.displayName = "FeatureIcon";
+FeatureIcon.displayName = 'FeatureIcon';
 
 const FeatureCard = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & {
     feature: Feature;
-    variant?: "default" | "cards" | "bento" | "minimal" | "bordered";
+    variant?: 'default' | 'cards' | 'bento' | 'minimal' | 'bordered';
     index?: number;
     animated?: boolean;
   }
->(({ className, feature, variant = "default", index = 0, animated = true, ...props }, ref) => {
+>(({ className, feature, variant = 'default', index = 0, animated = true, ...props }, ref) => {
   const Wrapper = animated ? FadeIn : React.Fragment;
   const wrapperProps = animated ? { delay: index * 100 } : {};
 
@@ -148,55 +126,50 @@ const FeatureCard = React.forwardRef<
         ref={ref}
         className={cn(
           featureCardVariants({ variant }),
-          feature.highlight && "ring-2 ring-brand-primary/20 bg-brand-primary-50/50 dark:bg-brand-primary-950/20",
-          feature.span === 2 && "md:col-span-2",
+          feature.highlight &&
+            'ring-brand-primary/20 bg-brand-primary-50/50 dark:bg-brand-primary-950/20 ring-2',
+          feature.span === 2 && 'md:col-span-2',
           className
         )}
         {...props}
       >
         {/* Badge */}
         {feature.badge && (
-          <span className="absolute top-4 right-4 px-2.5 py-0.5 text-xs font-medium rounded-full bg-brand-primary text-white">
+          <span className="bg-brand-primary absolute top-4 right-4 rounded-full px-2.5 py-0.5 text-xs font-medium text-white">
             {feature.badge}
           </span>
         )}
 
         {/* Image (for bento-style cards) */}
-        {feature.image && variant === "bento" && (
-          <div className="mb-6 -mx-6 -mt-6 md:-mx-8 md:-mt-8 overflow-hidden rounded-t-3xl">
+        {feature.image && variant === 'bento' && (
+          <div className="-mx-6 -mt-6 mb-6 overflow-hidden rounded-t-3xl md:-mx-8 md:-mt-8">
             {feature.image}
           </div>
         )}
 
         {/* Icon */}
-        {feature.icon && (
-          <FeatureIcon variant={variant}>
-            {feature.icon}
-          </FeatureIcon>
-        )}
+        {feature.icon && <FeatureIcon variant={variant}>{feature.icon}</FeatureIcon>}
 
         {/* Title */}
         <h3
           className={cn(
-            "font-semibold leading-none tracking-tight mb-2",
-            variant === "cards" ? "text-xl" : "text-lg"
+            'mb-2 leading-none font-semibold tracking-tight',
+            variant === 'cards' ? 'text-xl' : 'text-lg'
           )}
         >
           {feature.title}
         </h3>
 
         {/* Description */}
-        <p className="text-sm text-muted-foreground leading-relaxed">
-          {feature.description}
-        </p>
+        <p className="text-muted-foreground text-sm leading-relaxed">{feature.description}</p>
 
         {/* Link */}
         {feature.link && (
           <a
             href={feature.link.href}
             className={cn(
-              "inline-flex items-center gap-1 mt-4 text-sm font-medium",
-              "text-brand-primary hover:text-brand-primary/80 transition-colors"
+              'mt-4 inline-flex items-center gap-1 text-sm font-medium',
+              'text-brand-primary hover:text-brand-primary/80 transition-colors'
             )}
           >
             {feature.link.text}
@@ -206,25 +179,20 @@ const FeatureCard = React.forwardRef<
               viewBox="0 0 24 24"
               stroke="currentColor"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5l7 7-7 7"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </a>
         )}
 
         {/* Hover Effect Decoration */}
-        {(variant === "cards" || variant === "bento") && (
-          <div className="absolute inset-0 -z-10 bg-gradient-to-br from-brand-primary/5 via-transparent to-brand-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-slow" />
+        {(variant === 'cards' || variant === 'bento') && (
+          <div className="from-brand-primary/5 to-brand-accent/5 duration-slow absolute inset-0 -z-10 bg-gradient-to-br via-transparent opacity-0 transition-opacity group-hover:opacity-100" />
         )}
       </div>
     </Wrapper>
   );
 });
-FeatureCard.displayName = "FeatureCard";
+FeatureCard.displayName = 'FeatureCard';
 
 /* ----------------------------------------
    Section Header Sub-Component
@@ -236,7 +204,7 @@ const FeatureGridHeader = React.forwardRef<
     title: string | React.ReactNode;
     titleHighlight?: string;
     subtitle?: string | React.ReactNode;
-    alignment?: "left" | "center";
+    alignment?: 'left' | 'center';
     animated?: boolean;
   }
 >(
@@ -247,7 +215,7 @@ const FeatureGridHeader = React.forwardRef<
       title,
       titleHighlight,
       subtitle,
-      alignment = "center",
+      alignment = 'center',
       animated = true,
       ...props
     },
@@ -255,7 +223,7 @@ const FeatureGridHeader = React.forwardRef<
   ) => {
     // Handle title highlight
     let titleContent = title;
-    if (titleHighlight && typeof title === "string") {
+    if (titleHighlight && typeof title === 'string') {
       const parts = title.split(titleHighlight);
       if (parts.length > 1) {
         titleContent = (
@@ -275,8 +243,8 @@ const FeatureGridHeader = React.forwardRef<
         <div
           ref={ref}
           className={cn(
-            "mb-12 lg:mb-16",
-            alignment === "center" && "text-center max-w-3xl mx-auto",
+            'mb-12 lg:mb-16',
+            alignment === 'center' && 'mx-auto max-w-3xl text-center',
             className
           )}
           {...props}
@@ -284,27 +252,23 @@ const FeatureGridHeader = React.forwardRef<
           {badge && (
             <span
               className={cn(
-                "inline-block px-4 py-1.5 text-sm font-medium rounded-full mb-4",
-                "bg-brand-primary/10 text-brand-primary"
+                'mb-4 inline-block rounded-full px-4 py-1.5 text-sm font-medium',
+                'bg-brand-primary/10 text-brand-primary'
               )}
             >
               {badge}
             </span>
           )}
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-4">
+          <h2 className="mb-4 text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl">
             {titleContent}
           </h2>
-          {subtitle && (
-            <p className="text-lg text-muted-foreground leading-relaxed">
-              {subtitle}
-            </p>
-          )}
+          {subtitle && <p className="text-muted-foreground text-lg leading-relaxed">{subtitle}</p>}
         </div>
       </Wrapper>
     );
   }
 );
-FeatureGridHeader.displayName = "FeatureGridHeader";
+FeatureGridHeader.displayName = 'FeatureGridHeader';
 
 /* ----------------------------------------
    Main Feature Grid Component
@@ -322,18 +286,14 @@ const FeatureGrid = React.forwardRef<HTMLElement, FeatureGridProps>(
       badge,
       features,
       animated = true,
-      alignment = "center",
+      alignment = 'center',
       children,
       ...props
     },
     ref
   ) => {
     return (
-      <section
-        ref={ref}
-        className={cn("py-16 md:py-24 lg:py-32", className)}
-        {...props}
-      >
+      <section ref={ref} className={cn('py-16 md:py-24 lg:py-32', className)} {...props}>
         <div className="container px-4 md:px-6">
           {/* Header */}
           {title && (
@@ -348,17 +308,12 @@ const FeatureGrid = React.forwardRef<HTMLElement, FeatureGridProps>(
           )}
 
           {/* Grid */}
-          <div
-            className={cn(
-              "grid",
-              featureGridVariants({ columns, gap })
-            )}
-          >
+          <div className={cn('grid', featureGridVariants({ columns, gap }))}>
             {features.map((feature, index) => (
               <FeatureCard
                 key={index}
                 feature={feature}
-                variant={variant || "default"}
+                variant={variant || 'default'}
                 index={index}
                 animated={animated}
               />
@@ -372,23 +327,19 @@ const FeatureGrid = React.forwardRef<HTMLElement, FeatureGridProps>(
     );
   }
 );
-FeatureGrid.displayName = "FeatureGrid";
+FeatureGrid.displayName = 'FeatureGrid';
 
 /* ----------------------------------------
    Bento Grid Preset
    ---------------------------------------- */
-interface BentoGridProps extends Omit<FeatureGridProps, "variant" | "columns"> {
+interface BentoGridProps extends Omit<FeatureGridProps, 'variant' | 'columns'> {
   features: (Feature & { span?: 1 | 2; row?: 1 | 2 })[];
 }
 
 const BentoGrid = React.forwardRef<HTMLElement, BentoGridProps>(
-  ({ features, gap = "default", ...props }, ref) => {
+  ({ features, gap = 'default', ...props }, ref) => {
     return (
-      <section
-        ref={ref}
-        className={cn("py-16 md:py-24 lg:py-32")}
-        {...props}
-      >
+      <section ref={ref} className={cn('py-16 md:py-24 lg:py-32')} {...props}>
         <div className="container px-4 md:px-6">
           {props.title && (
             <FeatureGridHeader
@@ -403,8 +354,8 @@ const BentoGrid = React.forwardRef<HTMLElement, BentoGridProps>(
 
           <div
             className={cn(
-              "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3",
-              gap === "sm" ? "gap-4" : gap === "lg" ? "gap-8" : "gap-6"
+              'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
+              gap === 'sm' ? 'gap-4' : gap === 'lg' ? 'gap-8' : 'gap-6'
             )}
           >
             {features.map((feature, index) => (
@@ -415,8 +366,8 @@ const BentoGrid = React.forwardRef<HTMLElement, BentoGridProps>(
                 index={index}
                 animated={props.animated}
                 className={cn(
-                  feature.span === 2 && "md:col-span-2",
-                  feature.row === 2 && "md:row-span-2"
+                  feature.span === 2 && 'md:col-span-2',
+                  feature.row === 2 && 'md:row-span-2'
                 )}
               />
             ))}
@@ -426,7 +377,7 @@ const BentoGrid = React.forwardRef<HTMLElement, BentoGridProps>(
     );
   }
 );
-BentoGrid.displayName = "BentoGrid";
+BentoGrid.displayName = 'BentoGrid';
 
 export {
   FeatureGrid,

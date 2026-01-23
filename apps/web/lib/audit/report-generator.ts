@@ -7,11 +7,11 @@
  * - HTML (for web display)
  */
 
-import { v4 as uuidv4 } from "uuid";
-import type { JourneyResult } from "./user-journey-runner";
-import type { FrictionAnalysis } from "./ux-friction-detector";
-import type { AuditReport as RouteAuditReport } from "./api-route-auditor";
-import type { ScheduledAuditResult, HealthCheckResult } from "./scheduled-audit-runner";
+import { v4 as uuidv4 } from 'uuid';
+import type { JourneyResult } from './user-journey-runner';
+import type { FrictionAnalysis } from './ux-friction-detector';
+import type { AuditReport as RouteAuditReport } from './api-route-auditor';
+import type { ScheduledAuditResult, HealthCheckResult } from './scheduled-audit-runner';
 
 // ============================================================================
 // Types
@@ -25,7 +25,7 @@ export interface ReportConfig {
   summary_only: boolean;
 }
 
-export type ReportFormat = "json" | "markdown" | "html";
+export type ReportFormat = 'json' | 'markdown' | 'html';
 
 export interface AuditReport {
   id: string;
@@ -38,7 +38,7 @@ export interface AuditReport {
 }
 
 export interface ReportSummary {
-  overall_status: "pass" | "warning" | "fail" | "critical";
+  overall_status: 'pass' | 'warning' | 'fail' | 'critical';
   overall_score: number;
   key_findings: string[];
   immediate_actions: string[];
@@ -60,18 +60,18 @@ export interface ReportSection {
   id: string;
   title: string;
   type: SectionType;
-  status: "pass" | "warning" | "fail";
+  status: 'pass' | 'warning' | 'fail';
   content: string;
   data?: unknown;
 }
 
 export type SectionType =
-  | "health"
-  | "journeys"
-  | "routes"
-  | "friction"
-  | "verification"
-  | "recommendations";
+  | 'health'
+  | 'journeys'
+  | 'routes'
+  | 'friction'
+  | 'verification'
+  | 'recommendations';
 
 export interface ReportMetadata {
   generator_version: string;
@@ -86,7 +86,7 @@ export interface ReportMetadata {
 
 export class ReportGenerator {
   private readonly generatorId: string;
-  private readonly version = "1.0.0";
+  private readonly version = '1.0.0';
 
   constructor() {
     this.generatorId = `report_generator_${uuidv4().slice(0, 8)}`;
@@ -111,7 +111,7 @@ export class ReportGenerator {
   ): AuditReport {
     const startTime = Date.now();
     const fullConfig: ReportConfig = {
-      format: "markdown",
+      format: 'markdown',
       include_evidence: true,
       include_recommendations: true,
       include_metrics: true,
@@ -125,22 +125,22 @@ export class ReportGenerator {
     // Build sections based on available data
     if (data.health) {
       sections.push(this.buildHealthSection(data.health));
-      dataSources.push("health_check");
+      dataSources.push('health_check');
     }
 
     if (data.journeys && data.journeys.length > 0) {
       sections.push(this.buildJourneysSection(data.journeys));
-      dataSources.push("user_journeys");
+      dataSources.push('user_journeys');
     }
 
     if (data.routes) {
       sections.push(this.buildRoutesSection(data.routes));
-      dataSources.push("route_audit");
+      dataSources.push('route_audit');
     }
 
     if (data.friction) {
       sections.push(this.buildFrictionSection(data.friction));
-      dataSources.push("friction_analysis");
+      dataSources.push('friction_analysis');
     }
 
     // Add recommendations section
@@ -173,7 +173,7 @@ export class ReportGenerator {
    * Build health check section
    */
   private buildHealthSection(health: HealthCheckResult): ReportSection {
-    const passedChecks = health.checks.filter((c) => c.status === "pass").length;
+    const passedChecks = health.checks.filter((c) => c.status === 'pass').length;
     const totalChecks = health.checks.length;
 
     let content = `## Health Check Results\n\n`;
@@ -183,15 +183,16 @@ export class ReportGenerator {
     content += `|-------|--------|----------|\n`;
 
     for (const check of health.checks) {
-      const statusIcon = check.status === "pass" ? "✅" : "❌";
+      const statusIcon = check.status === 'pass' ? '✅' : '❌';
       content += `| ${check.name} | ${statusIcon} | ${check.latency_ms}ms |\n`;
     }
 
     return {
-      id: "health",
-      title: "System Health",
-      type: "health",
-      status: health.status === "healthy" ? "pass" : health.status === "degraded" ? "warning" : "fail",
+      id: 'health',
+      title: 'System Health',
+      type: 'health',
+      status:
+        health.status === 'healthy' ? 'pass' : health.status === 'degraded' ? 'warning' : 'fail',
       content,
       data: health,
     };
@@ -201,8 +202,8 @@ export class ReportGenerator {
    * Build journeys section
    */
   private buildJourneysSection(journeys: JourneyResult[]): ReportSection {
-    const passed = journeys.filter((j) => j.status === "passed").length;
-    const failed = journeys.filter((j) => j.status === "failed" || j.status === "error").length;
+    const passed = journeys.filter((j) => j.status === 'passed').length;
+    const failed = journeys.filter((j) => j.status === 'failed' || j.status === 'error').length;
 
     let content = `## User Journey Results\n\n`;
     content += `**Total Journeys:** ${journeys.length}\n`;
@@ -225,10 +226,10 @@ export class ReportGenerator {
     }
 
     return {
-      id: "journeys",
-      title: "User Journeys",
-      type: "journeys",
-      status: failed > 0 ? "fail" : "pass",
+      id: 'journeys',
+      title: 'User Journeys',
+      type: 'journeys',
+      status: failed > 0 ? 'fail' : 'pass',
       content,
       data: journeys,
     };
@@ -258,15 +259,15 @@ export class ReportGenerator {
     content += `| Route | Score |\n`;
     content += `|-------|-------|\n`;
     for (const route of routes.summary.routes_by_score.slice(0, 10)) {
-      const scoreColor = route.score >= 80 ? "🟢" : route.score >= 60 ? "🟡" : "🔴";
+      const scoreColor = route.score >= 80 ? '🟢' : route.score >= 60 ? '🟡' : '🔴';
       content += `| ${route.route} | ${scoreColor} ${route.score} |\n`;
     }
 
     return {
-      id: "routes",
-      title: "API Routes",
-      type: "routes",
-      status: routes.routes_failed > 0 ? "fail" : routes.routes_warning > 0 ? "warning" : "pass",
+      id: 'routes',
+      title: 'API Routes',
+      type: 'routes',
+      status: routes.routes_failed > 0 ? 'fail' : routes.routes_warning > 0 ? 'warning' : 'pass',
       content,
       data: routes,
     };
@@ -302,10 +303,15 @@ export class ReportGenerator {
     }
 
     return {
-      id: "friction",
-      title: "UX Friction",
-      type: "friction",
-      status: friction.metrics.friction_score > 50 ? "fail" : friction.metrics.friction_score > 25 ? "warning" : "pass",
+      id: 'friction',
+      title: 'UX Friction',
+      type: 'friction',
+      status:
+        friction.metrics.friction_score > 50
+          ? 'fail'
+          : friction.metrics.friction_score > 25
+            ? 'warning'
+            : 'pass',
       content,
       data: friction,
     };
@@ -323,16 +329,16 @@ export class ReportGenerator {
     const recommendations: string[] = [];
 
     // Health recommendations
-    if (data.health?.status !== "healthy") {
+    if (data.health?.status !== 'healthy') {
       recommendations.push(
-        "🔧 **Fix Health Issues**: Address failing health checks before deploying"
+        '🔧 **Fix Health Issues**: Address failing health checks before deploying'
       );
     }
 
     // Journey recommendations
     if (data.journeys) {
       const failedJourneys = data.journeys.filter(
-        (j) => j.status === "failed" || j.status === "error"
+        (j) => j.status === 'failed' || j.status === 'error'
       );
       if (failedJourneys.length > 0) {
         recommendations.push(
@@ -371,8 +377,8 @@ export class ReportGenerator {
 
     // Default recommendations if none found
     if (recommendations.length === 0) {
-      recommendations.push("✅ **All Clear**: No immediate actions required");
-      recommendations.push("📊 **Continue Monitoring**: Schedule regular audits");
+      recommendations.push('✅ **All Clear**: No immediate actions required');
+      recommendations.push('📊 **Continue Monitoring**: Schedule regular audits');
     }
 
     let content = `## Recommendations\n\n`;
@@ -382,14 +388,14 @@ export class ReportGenerator {
     }
 
     return {
-      id: "recommendations",
-      title: "Recommendations",
-      type: "recommendations",
-      status: recommendations.some((r) => r.includes("Critical") || r.includes("blocking"))
-        ? "fail"
-        : recommendations.some((r) => r.includes("Fix"))
-          ? "warning"
-          : "pass",
+      id: 'recommendations',
+      title: 'Recommendations',
+      type: 'recommendations',
+      status: recommendations.some((r) => r.includes('Critical') || r.includes('blocking'))
+        ? 'fail'
+        : recommendations.some((r) => r.includes('Fix'))
+          ? 'warning'
+          : 'pass',
       content,
     };
   }
@@ -406,39 +412,35 @@ export class ReportGenerator {
       friction?: FrictionAnalysis;
     }
   ): ReportSummary {
-    const failedSections = sections.filter((s) => s.status === "fail").length;
-    const warningSections = sections.filter((s) => s.status === "warning").length;
+    const failedSections = sections.filter((s) => s.status === 'fail').length;
+    const warningSections = sections.filter((s) => s.status === 'warning').length;
 
-    let overallStatus: ReportSummary["overall_status"] = "pass";
+    let overallStatus: ReportSummary['overall_status'] = 'pass';
     if (failedSections > 0) {
-      overallStatus = failedSections > 1 ? "critical" : "fail";
+      overallStatus = failedSections > 1 ? 'critical' : 'fail';
     } else if (warningSections > 0) {
-      overallStatus = "warning";
+      overallStatus = 'warning';
     }
 
     // Calculate overall score
-    let scores: number[] = [];
+    const scores: number[] = [];
     if (data.routes) scores.push(data.routes.average_score);
     if (data.friction) scores.push(100 - data.friction.metrics.friction_score);
     if (data.journeys) {
       const journeyScore =
-        (data.journeys.filter((j) => j.status === "passed").length /
-          data.journeys.length) *
-        100;
+        (data.journeys.filter((j) => j.status === 'passed').length / data.journeys.length) * 100;
       scores.push(journeyScore);
     }
     const overallScore =
-      scores.length > 0
-        ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
-        : 100;
+      scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 100;
 
     // Key findings
     const keyFindings: string[] = [];
-    if (data.health?.status !== "healthy") {
+    if (data.health?.status !== 'healthy') {
       keyFindings.push(`Health status: ${data.health?.status}`);
     }
     if (data.journeys) {
-      const failed = data.journeys.filter((j) => j.status === "failed").length;
+      const failed = data.journeys.filter((j) => j.status === 'failed').length;
       if (failed > 0) {
         keyFindings.push(`${failed} user journey(s) failing`);
       }
@@ -452,11 +454,11 @@ export class ReportGenerator {
 
     // Immediate actions
     const immediateActions: string[] = [];
-    if (overallStatus === "critical" || overallStatus === "fail") {
-      immediateActions.push("Review and fix failing checks before deployment");
+    if (overallStatus === 'critical' || overallStatus === 'fail') {
+      immediateActions.push('Review and fix failing checks before deployment');
     }
     if (data.routes?.summary.critical_issues) {
-      immediateActions.push("Address critical security issues in API routes");
+      immediateActions.push('Address critical security issues in API routes');
     }
 
     // Stats
@@ -473,8 +475,8 @@ export class ReportGenerator {
 
     if (data.health) {
       stats.total_checks += data.health.checks.length;
-      stats.passed += data.health.checks.filter((c) => c.status === "pass").length;
-      stats.failed += data.health.checks.filter((c) => c.status === "fail").length;
+      stats.passed += data.health.checks.filter((c) => c.status === 'pass').length;
+      stats.failed += data.health.checks.filter((c) => c.status === 'fail').length;
     }
 
     if (data.routes) {
@@ -498,11 +500,11 @@ export class ReportGenerator {
    */
   export(report: AuditReport): string {
     switch (report.format) {
-      case "json":
+      case 'json':
         return this.exportJson(report);
-      case "markdown":
+      case 'markdown':
         return this.exportMarkdown(report);
-      case "html":
+      case 'html':
         return this.exportHtml(report);
       default:
         return this.exportMarkdown(report);
@@ -606,15 +608,15 @@ export class ReportGenerator {
 
     // Convert markdown to HTML (simplified)
     html += md
-      .replace(/^# (.*$)/gm, "<h1>$1</h1>")
-      .replace(/^## (.*$)/gm, "<h2>$1</h2>")
-      .replace(/^### (.*$)/gm, "<h3>$1</h3>")
-      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-      .replace(/\*(.*?)\*/g, "<em>$1</em>")
-      .replace(/^- (.*$)/gm, "<li>$1</li>")
-      .replace(/(<li>.*<\/li>\n)+/g, "<ul>$&</ul>")
-      .replace(/\n\n/g, "</p><p>")
-      .replace(/^---$/gm, "<hr>")
+      .replace(/^# (.*$)/gm, '<h1>$1</h1>')
+      .replace(/^## (.*$)/gm, '<h2>$1</h2>')
+      .replace(/^### (.*$)/gm, '<h3>$1</h3>')
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/^- (.*$)/gm, '<li>$1</li>')
+      .replace(/(<li>.*<\/li>\n)+/g, '<ul>$&</ul>')
+      .replace(/\n\n/g, '</p><p>')
+      .replace(/^---$/gm, '<hr>')
       .replace(/✅/g, '<span class="pass">✅</span>')
       .replace(/❌/g, '<span class="fail">❌</span>')
       .replace(/⚠️/g, '<span class="warning">⚠️</span>');
@@ -631,16 +633,16 @@ export class ReportGenerator {
    */
   private formatStatus(status: string): string {
     const statusMap: Record<string, string> = {
-      pass: "✅ Pass",
-      passed: "✅ Passed",
-      healthy: "✅ Healthy",
-      warning: "⚠️ Warning",
-      degraded: "⚠️ Degraded",
-      fail: "❌ Fail",
-      failed: "❌ Failed",
-      unhealthy: "❌ Unhealthy",
-      critical: "🚨 Critical",
-      error: "🚨 Error",
+      pass: '✅ Pass',
+      passed: '✅ Passed',
+      healthy: '✅ Healthy',
+      warning: '⚠️ Warning',
+      degraded: '⚠️ Degraded',
+      fail: '❌ Fail',
+      failed: '❌ Failed',
+      unhealthy: '❌ Unhealthy',
+      critical: '🚨 Critical',
+      error: '🚨 Error',
     };
     return statusMap[status] || status;
   }
@@ -650,15 +652,15 @@ export class ReportGenerator {
    */
   private getStatusIcon(status: string): string {
     const iconMap: Record<string, string> = {
-      pass: "✅",
-      passed: "✅",
-      warning: "⚠️",
-      partial: "⚠️",
-      fail: "❌",
-      failed: "❌",
-      error: "🚨",
+      pass: '✅',
+      passed: '✅',
+      warning: '⚠️',
+      partial: '⚠️',
+      fail: '❌',
+      failed: '❌',
+      error: '🚨',
     };
-    return iconMap[status] || "❓";
+    return iconMap[status] || '❓';
   }
 
   /**
@@ -666,12 +668,12 @@ export class ReportGenerator {
    */
   private getSeverityIcon(severity: string): string {
     const iconMap: Record<string, string> = {
-      critical: "🚨",
-      high: "🔴",
-      medium: "🟡",
-      low: "🟢",
+      critical: '🚨',
+      high: '🔴',
+      medium: '🟡',
+      low: '🟢',
     };
-    return iconMap[severity] || "ℹ️";
+    return iconMap[severity] || 'ℹ️';
   }
 }
 

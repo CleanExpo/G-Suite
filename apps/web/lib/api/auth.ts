@@ -4,7 +4,7 @@
  * Handles login, logout, registration, and user management.
  */
 
-import { apiClient } from "./client";
+import { apiClient } from './client';
 
 export interface User {
   id: string;
@@ -46,10 +46,7 @@ export const authApi = {
    * Login with email and password
    */
   async login(credentials: LoginRequest): Promise<LoginResponse> {
-    const response = await apiClient.post<LoginResponse>(
-      "/api/auth/login",
-      credentials
-    );
+    const response = await apiClient.post<LoginResponse>('/api/auth/login', credentials);
 
     // Store token in cookie
     if (response.access_token) {
@@ -63,7 +60,7 @@ export const authApi = {
    * Register a new user
    */
   async register(data: RegisterRequest): Promise<RegisterResponse> {
-    return apiClient.post<RegisterResponse>("/api/auth/register", data);
+    return apiClient.post<RegisterResponse>('/api/auth/register', data);
   },
 
   /**
@@ -71,11 +68,11 @@ export const authApi = {
    */
   async logout(): Promise<void> {
     // Clear token cookie
-    document.cookie = "auth_token=; path=/; max-age=0";
+    document.cookie = 'auth_token=; path=/; max-age=0';
 
     // Optionally call backend logout endpoint if it exists
     try {
-      await apiClient.post("/api/auth/logout");
+      await apiClient.post('/api/auth/logout');
     } catch {
       // Ignore errors - token is already cleared
     }
@@ -86,8 +83,8 @@ export const authApi = {
    */
   async getCurrentUser(): Promise<User | null> {
     try {
-      return await apiClient.get<User>("/api/auth/me");
-    } catch (error) {
+      return await apiClient.get<User>('/api/auth/me');
+    } catch (_error) {
       // Not authenticated
       return null;
     }
@@ -97,17 +94,14 @@ export const authApi = {
    * Update current user profile
    */
   async updateProfile(data: Partial<User>): Promise<User> {
-    return apiClient.patch<User>("/api/auth/me", data);
+    return apiClient.patch<User>('/api/auth/me', data);
   },
 
   /**
    * Change password
    */
-  async changePassword(
-    currentPassword: string,
-    newPassword: string
-  ): Promise<{ message: string }> {
-    return apiClient.post("/api/auth/change-password", {
+  async changePassword(currentPassword: string, newPassword: string): Promise<{ message: string }> {
+    return apiClient.post('/api/auth/change-password', {
       current_password: currentPassword,
       new_password: newPassword,
     });
@@ -117,17 +111,14 @@ export const authApi = {
    * Request password reset
    */
   async requestPasswordReset(email: string): Promise<{ message: string }> {
-    return apiClient.post("/api/auth/forgot-password", { email });
+    return apiClient.post('/api/auth/forgot-password', { email });
   },
 
   /**
    * Reset password with token
    */
-  async resetPassword(
-    token: string,
-    newPassword: string
-  ): Promise<{ message: string }> {
-    return apiClient.post("/api/auth/reset-password", {
+  async resetPassword(token: string, newPassword: string): Promise<{ message: string }> {
+    return apiClient.post('/api/auth/reset-password', {
       token,
       new_password: newPassword,
     });

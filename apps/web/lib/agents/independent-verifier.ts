@@ -121,7 +121,7 @@ export class IndependentVerifier {
    * Verifies ALL criteria and collects evidence for each
    */
   async verify(request: VerificationRequest): Promise<VerificationResult> {
-    const startTime = Date.now();
+    const _startTime = Date.now();
     const evidence: VerificationEvidence[] = [];
     const failures: VerificationFailure[] = [];
 
@@ -129,7 +129,7 @@ export class IndependentVerifier {
     if (request.requesting_agent_id === this.verifierId) {
       throw new Error(
         'VERIFICATION INTEGRITY ERROR: Agent cannot verify its own work. ' +
-        `Requesting agent: ${request.requesting_agent_id}, Verifier: ${this.verifierId}`
+          `Requesting agent: ${request.requesting_agent_id}, Verifier: ${this.verifierId}`
       );
     }
 
@@ -167,8 +167,8 @@ export class IndependentVerifier {
       }
     }
 
-    const passedChecks = evidence.filter(e => e.result === 'pass').length;
-    const failedChecks = evidence.filter(e => e.result === 'fail').length;
+    const passedChecks = evidence.filter((e) => e.result === 'pass').length;
+    const failedChecks = evidence.filter((e) => e.result === 'fail').length;
 
     return {
       verified: failures.length === 0,
@@ -559,12 +559,10 @@ export class IndependentVerifier {
     try {
       const response = await fetch(endpoint, {
         method: 'GET',
-        headers: { 'Accept': 'application/json' },
+        headers: { Accept: 'application/json' },
       });
 
-      const statusOk = expectedStatus
-        ? response.status.toString() === expectedStatus
-        : response.ok;
+      const statusOk = expectedStatus ? response.status.toString() === expectedStatus : response.ok;
 
       const body = await response.text();
       const proof = `Status: ${response.status}, Body: ${body.substring(0, 200)}`;
@@ -680,9 +678,7 @@ export class IndependentVerifier {
         type: 'content_contains',
         method: `Check file contains: "${expected.substring(0, 50)}..."`,
         result: contains ? 'pass' : 'fail',
-        proof: contains
-          ? `File contains expected content`
-          : `Expected content not found in file`,
+        proof: contains ? `File contains expected content` : `Expected content not found in file`,
         timestamp: new Date().toISOString(),
         duration_ms: Date.now() - startTime,
       },

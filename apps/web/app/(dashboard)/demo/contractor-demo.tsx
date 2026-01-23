@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { ContractorAvailability } from "@/components/contractor-availability";
+import { ContractorAvailability } from '@/components/contractor-availability';
 
 /**
  * Demo page for Contractor Availability Calendar
@@ -19,56 +19,56 @@ export default function ContractorAvailabilityDemo() {
     // Today's availability
     {
       date: today,
-      startTime: "09:00",
-      endTime: "12:00",
-      location: "Indooroopilly, QLD",
-      status: "available" as const,
+      startTime: '09:00',
+      endTime: '12:00',
+      location: 'Indooroopilly, QLD',
+      status: 'available' as const,
     },
     {
       date: today,
-      startTime: "14:00",
-      endTime: "17:00",
-      location: "Toowong, QLD",
-      status: "booked" as const,
+      startTime: '14:00',
+      endTime: '17:00',
+      location: 'Toowong, QLD',
+      status: 'booked' as const,
     },
     // Tomorrow's availability
     {
       date: tomorrow,
-      startTime: "08:00",
-      endTime: "10:00",
-      location: "West End, QLD",
-      status: "available" as const,
+      startTime: '08:00',
+      endTime: '10:00',
+      location: 'West End, QLD',
+      status: 'available' as const,
     },
     {
       date: tomorrow,
-      startTime: "10:30",
-      endTime: "12:30",
-      location: "South Brisbane, QLD",
-      status: "available" as const,
+      startTime: '10:30',
+      endTime: '12:30',
+      location: 'South Brisbane, QLD',
+      status: 'available' as const,
     },
     {
       date: tomorrow,
-      startTime: "13:00",
-      endTime: "15:00",
-      location: "Woolloongabba, QLD",
-      status: "tentative" as const,
+      startTime: '13:00',
+      endTime: '15:00',
+      location: 'Woolloongabba, QLD',
+      status: 'tentative' as const,
     },
     // Day after tomorrow
     {
       date: dayAfter,
-      startTime: "09:00",
-      endTime: "17:00",
-      location: "Brisbane CBD, QLD",
-      status: "available" as const,
+      startTime: '09:00',
+      endTime: '17:00',
+      location: 'Brisbane CBD, QLD',
+      status: 'available' as const,
     },
   ];
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-6xl mx-auto space-y-8">
+      <div className="mx-auto max-w-6xl space-y-8">
         {/* Header */}
         <div>
-          <h1 className="font-heading text-4xl font-bold text-gray-900 mb-2">
+          <h1 className="font-heading mb-2 text-4xl font-bold text-gray-900">
             Contractor Availability Demo
           </h1>
           <p className="text-gray-600">
@@ -94,27 +94,25 @@ export default function ContractorAvailabilityDemo() {
             availabilitySlots={[
               {
                 date: today,
-                startTime: "08:00",
-                endTime: "16:00",
-                location: "Ashgrove, QLD",
-                status: "available",
+                startTime: '08:00',
+                endTime: '16:00',
+                location: 'Ashgrove, QLD',
+                status: 'available',
               },
               {
                 date: tomorrow,
-                startTime: "09:00",
-                endTime: "12:00",
-                location: "Paddington, QLD",
-                status: "available",
+                startTime: '09:00',
+                endTime: '12:00',
+                location: 'Paddington, QLD',
+                status: 'available',
               },
             ]}
           />
         </div>
 
         {/* Testing checklist */}
-        <div className="bg-white/70 backdrop-blur-md rounded-lg p-6 border border-white/20 shadow-[0_10px_15px_rgba(13,148,136,0.1)]">
-          <h2 className="font-heading text-2xl font-bold mb-4">
-            Architecture Testing Checklist
-          </h2>
+        <div className="rounded-lg border border-white/20 bg-white/70 p-6 shadow-[0_10px_15px_rgba(13,148,136,0.1)] backdrop-blur-md">
+          <h2 className="font-heading mb-4 text-2xl font-bold">Architecture Testing Checklist</h2>
 
           <div className="space-y-3">
             <div className="flex items-start gap-3">
@@ -122,7 +120,8 @@ export default function ContractorAvailabilityDemo() {
               <div>
                 <div className="font-medium">Australian Context (en-AU)</div>
                 <div className="text-sm text-gray-600">
-                  DD/MM/YYYY dates, AEST timezone, Brisbane locations, "colour" spelling, 04XX XXX XXX mobile format
+                  DD/MM/YYYY dates, AEST timezone, Brisbane locations, &quot;colour&quot; spelling,
+                  04XX XXX XXX mobile format
                 </div>
               </div>
             </div>
@@ -132,7 +131,8 @@ export default function ContractorAvailabilityDemo() {
               <div>
                 <div className="font-medium">2025-2026 Design System</div>
                 <div className="text-sm text-gray-600">
-                  Bento grid cards, glassmorphism (bg-white/70 backdrop-blur), soft coloured shadows (NEVER pure black), primary #0D9488
+                  Bento grid cards, glassmorphism (bg-white/70 backdrop-blur), soft coloured shadows
+                  (NEVER pure black), primary #0D9488
                 </div>
               </div>
             </div>
@@ -142,7 +142,8 @@ export default function ContractorAvailabilityDemo() {
               <div>
                 <div className="font-medium">Next.js 15 Patterns</div>
                 <div className="text-sm text-gray-600">
-                  "use client" directive, React 19, TypeScript, forwardRef, proper component structure
+                  &quot;use client&quot; directive, React 19, TypeScript, forwardRef, proper
+                  component structure
                 </div>
               </div>
             </div>
@@ -152,7 +153,8 @@ export default function ContractorAvailabilityDemo() {
               <div>
                 <div className="font-medium">NO Lucide Icons</div>
                 <div className="text-sm text-gray-600">
-                  Using emoji (📍) and custom UI elements only - Lucide is deprecated in 2025-2026 aesthetic
+                  Using emoji (📍) and custom UI elements only - Lucide is deprecated in 2025-2026
+                  aesthetic
                 </div>
               </div>
             </div>
@@ -180,10 +182,10 @@ export default function ContractorAvailabilityDemo() {
         </div>
 
         {/* Code example */}
-        <div className="bg-gray-900 rounded-lg p-6 text-sm">
-          <div className="text-gray-400 mb-2 font-mono">Usage Example:</div>
-          <pre className="text-gray-300 overflow-x-auto">
-{`<ContractorAvailability
+        <div className="rounded-lg bg-gray-900 p-6 text-sm">
+          <div className="mb-2 font-mono text-gray-400">Usage Example:</div>
+          <pre className="overflow-x-auto text-gray-300">
+            {`<ContractorAvailability
   contractorName="John Smith"
   contractorMobile="0412 345 678"  {/* Australian format */}
   contractorABN="12 345 678 901"   {/* Optional ABN */}
