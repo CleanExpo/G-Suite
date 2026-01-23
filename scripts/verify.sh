@@ -132,7 +132,7 @@ else
     check_fail "PostgreSQL container is not running"
 fi
 
-if docker compose ps redis | grep -q "running"; then
+if docker compose ps redis | grep -q "healthy\|running\|Up"; then
     check_pass "Redis container is running"
 
     # Check if Redis is responding

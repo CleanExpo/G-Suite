@@ -6,7 +6,7 @@
 
 -- Enable required extensions
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-CREATE EXTENSION IF NOT EXISTS "pgvector";
+CREATE EXTENSION IF NOT EXISTS "vector";
 
 -- =============================================================================
 -- SECTION 1: Authentication Schema (Simple JWT-based auth)
@@ -203,7 +203,7 @@ BEGIN
     RAISE NOTICE '=============================================================================';
     RAISE NOTICE 'Database initialization complete!';
     RAISE NOTICE '=============================================================================';
-    RAISE NOTICE 'Extensions: uuid-ossp, pgvector';
+    RAISE NOTICE 'Extensions: uuid-ossp, vector (pgvector)';
     RAISE NOTICE 'Tables: users, contractors, availability_slots, documents, schema_version';
     RAISE NOTICE 'Views: available_contractors';
     RAISE NOTICE 'Default admin: admin@local.dev / admin123 (CHANGE THIS!)';
