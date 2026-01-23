@@ -173,7 +173,7 @@ async def list_documents(
 
         # Filter by document type
         if type:
-            filters.append(Document.metadata["type"].astext == type)
+            filters.append(Document.doc_metadata["type"].astext == type)
 
         # Filter by author (if different from current user)
         if author_id:
@@ -227,7 +227,7 @@ async def list_documents(
                 id=str(doc.id),
                 title=doc.title,
                 content=doc.content[:200] + "..." if len(doc.content) > 200 else doc.content,
-                metadata=doc.metadata or {},
+                metadata=doc.doc_metadata or {},
                 created_at=doc.created_at,
                 updated_at=doc.updated_at,
             )
@@ -310,7 +310,7 @@ async def create_document(
             user_id=user_id,
             title=document.title,
             content=document.content,
-            metadata=document.metadata or {},
+            metadata=document.doc_metadata or {},
         )
 
         db.add(new_doc)
@@ -321,7 +321,7 @@ async def create_document(
             id=str(new_doc.id),
             title=new_doc.title,
             content=new_doc.content,
-            metadata=new_doc.metadata or {},
+            metadata=new_doc.doc_metadata or {},
             created_at=new_doc.created_at,
             updated_at=new_doc.updated_at,
         )
@@ -404,7 +404,7 @@ async def get_document(
             id=str(document.id),
             title=document.title,
             content=document.content,
-            metadata=document.metadata or {},
+            metadata=document.doc_metadata or {},
             created_at=document.created_at,
             updated_at=document.updated_at,
         )
@@ -490,7 +490,7 @@ async def update_document(
         if updates.content is not None:
             document.content = updates.content
         if updates.metadata is not None:
-            document.metadata = updates.metadata
+            document.doc_metadata = updates.metadata
 
         await db.commit()
         await db.refresh(document)
@@ -499,7 +499,7 @@ async def update_document(
             id=str(document.id),
             title=document.title,
             content=document.content,
-            metadata=document.metadata or {},
+            metadata=document.doc_metadata or {},
             created_at=document.created_at,
             updated_at=document.updated_at,
         )

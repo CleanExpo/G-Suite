@@ -8,9 +8,18 @@
 
   "permissions": {
     "allow": [
-      "Read", "Write", "Edit", "Bash(npm *)", "Bash(npx *)", "Bash(mkdir *)",
-      "Bash(cat *)", "Bash(echo *)", "Bash(chmod *)", "Bash(touch *)",
-      "Bash(git *)", "Bash(supabase *)"
+      "Read",
+      "Write",
+      "Edit",
+      "Bash(npm *)",
+      "Bash(npx *)",
+      "Bash(mkdir *)",
+      "Bash(cat *)",
+      "Bash(echo *)",
+      "Bash(chmod *)",
+      "Bash(touch *)",
+      "Bash(git *)",
+      "Bash(supabase *)"
     ],
     "deny": ["Bash(rm -rf /)", "Bash(sudo *)"]
   },
@@ -181,12 +190,6 @@
       "pattern": "hook for data + conditional rendering for states",
       "required": ["loading state", "error state", "empty state", "success state"]
     }
-  },
-
-  "hooks": {
-    "preCommit": ["typecheck", "lint-staged"],
-    "prePush": ["test", "build"],
-    "onMigration": ["db:types"]
   },
 
   "memory": {

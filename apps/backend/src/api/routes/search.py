@@ -143,7 +143,7 @@ async def search_documents(
             select(
                 Document.id,
                 Document.title,
-                Document.metadata["type"].astext.label("doc_type"),
+                Document.doc_metadata["type"].astext.label("doc_type"),
                 Document.content,
                 # Calculate relevance score using ts_rank
                 func.ts_rank(
@@ -170,7 +170,7 @@ async def search_documents(
         # Filter by document type if provided
         if search_request.type:
             fts_query = fts_query.where(
-                Document.metadata["type"].astext == search_request.type
+                Document.doc_metadata["type"].astext == search_request.type
             )
 
         # Order by relevance score (descending)

@@ -191,7 +191,7 @@ class Document(Base):
     title: str = Column(String(255), nullable=False)
     content: str = Column(Text, nullable=False)
     embedding: Optional[list[float]] = Column(Vector(1536), nullable=True)  # OpenAI/Anthropic dimension
-    metadata: dict = Column(JSONB, default=dict, nullable=False)
+    doc_metadata: dict = Column("metadata", JSONB, default=dict, nullable=False)  # renamed from 'metadata' to avoid SQLAlchemy reserved name
     created_at: datetime = Column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False
     )
