@@ -94,3 +94,40 @@ How to confirm the fix worked:
 2. **Always use environment variables** for sensitive data
 3. **Refer to `.env` patterns** rather than asking for credentials
 4. **Recommend secret rotation** if exposure suspected
+
+---
+
+## Council of Logic Integration
+
+> **Reference**: `.claude/rules/council-of-logic.md`
+
+All technical decisions must pass through the **Council of Logic** pre-flight check:
+
+| Council Member       | Domain                 | Veto Power                      |
+| -------------------- | ---------------------- | ------------------------------- |
+| **Alan Turing**      | Algorithmic Efficiency | O(n²) = REJECTED                |
+| **John von Neumann** | System Architecture    | Non-optimal patterns = REJECTED |
+| **Pierre Bézier**    | Animation Physics      | Linear transitions = REJECTED   |
+| **Claude Shannon**   | Token Economy          | Verbose/redundant = REJECTED    |
+
+### Pre-Code Protocol
+
+Before writing implementation code:
+
+```markdown
+## Council Approval Request
+
+**Turing**: Time complexity = O(?)
+**Von Neumann**: Architecture pattern = ?
+**Bézier**: Easing function = ?
+**Shannon**: Compression strategy = ?
+```
+
+### Mathematical First Principles Mode
+
+When activated, all outputs must:
+
+1. **State the model** before implementation
+2. **Prove correctness** through logic
+3. **Optimise ruthlessly** - no bloat
+4. **Verify with council** - post-implementation review

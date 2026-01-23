@@ -335,6 +335,165 @@
 }
 
 /* ============================================
+   ELITE STATUS COMMAND CENTRE ANIMATIONS
+   ============================================ */
+
+/* Status Glow Pulse - Breathing glow effect */
+@keyframes status-glow-pulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 8px hsl(var(--status-glow) / 0.4));
+  }
+  50% {
+    filter: drop-shadow(0 0 20px hsl(var(--status-glow) / 0.6));
+  }
+}
+
+/* Ring Progress - SVG stroke animation */
+@keyframes ring-progress {
+  from {
+    stroke-dashoffset: var(--ring-circumference, 283);
+  }
+  to {
+    stroke-dashoffset: var(--ring-offset, 0);
+  }
+}
+
+/* Orb Rotate - Outer ring rotation */
+@keyframes orb-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Orb Inner Pulse - Core orb breathing */
+@keyframes orb-inner-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+}
+
+/* Thinking Wave - AI thinking dots */
+@keyframes thinking-wave {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+/* Notification Enter - Slide in from left */
+@keyframes notification-enter {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Success Ripple - Completion celebration */
+@keyframes success-ripple {
+  0% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+/* Pulse Ring - Heartbeat concentric rings */
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.8);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+/* Pulse Ring Urgent - Faster heartbeat */
+@keyframes pulse-ring-urgent {
+  0% {
+    transform: scale(0.8);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+/* Card Highlight - Gradient sweep */
+@keyframes card-highlight {
+  0% {
+    background-position: 200% 50%;
+  }
+  100% {
+    background-position: -200% 50%;
+  }
+}
+
+/* Status Badge Pulse - Badge glow */
+@keyframes badge-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 hsl(var(--status-glow) / 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 4px hsl(var(--status-glow) / 0);
+  }
+}
+
+/* Timeline Entry - Step animation */
+@keyframes timeline-entry {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Metric Count Up - Number animation helper */
+@keyframes metric-pop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Connection Pulse - Live indicator */
+@keyframes connection-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* ============================================
    BASE STYLES
    ============================================ */
 
@@ -444,5 +603,195 @@
     );
     background-size: 200% 100%;
     animation: shimmer 2s linear infinite;
+  }
+
+  /* ============================================
+     ELITE STATUS COMMAND CENTRE UTILITIES
+     ============================================ */
+
+  /* Status Glow Animation */
+  .animate-status-glow {
+    animation: status-glow-pulse 2s ease-in-out infinite;
+  }
+
+  .animate-status-glow-fast {
+    animation: status-glow-pulse 1s ease-in-out infinite;
+  }
+
+  /* Ring Progress Animation */
+  .animate-ring-progress {
+    animation: ring-progress 1s ease-out forwards;
+  }
+
+  /* Orb Animations */
+  .animate-orb-rotate {
+    animation: orb-rotate 3s linear infinite;
+  }
+
+  .animate-orb-pulse {
+    animation: orb-inner-pulse 2s ease-in-out infinite;
+  }
+
+  /* Thinking Wave Animation */
+  .animate-thinking-wave {
+    animation: thinking-wave 1.2s ease-in-out infinite;
+  }
+
+  .animate-thinking-wave-delay-1 {
+    animation: thinking-wave 1.2s ease-in-out infinite;
+    animation-delay: 0.1s;
+  }
+
+  .animate-thinking-wave-delay-2 {
+    animation: thinking-wave 1.2s ease-in-out infinite;
+    animation-delay: 0.2s;
+  }
+
+  /* Notification Entry Animation */
+  .animate-notification-enter {
+    animation: notification-enter 0.3s ease-out forwards;
+  }
+
+  /* Success Ripple Animation */
+  .animate-success-ripple {
+    animation: success-ripple 0.6s ease-out forwards;
+  }
+
+  /* Pulse Ring Animations */
+  .animate-pulse-ring {
+    animation: pulse-ring 1.5s ease-out infinite;
+  }
+
+  .animate-pulse-ring-active {
+    animation: pulse-ring 1.2s ease-out infinite;
+  }
+
+  .animate-pulse-ring-urgent {
+    animation: pulse-ring-urgent 0.8s ease-out infinite;
+  }
+
+  /* Card Highlight Animation */
+  .animate-card-highlight {
+    background-size: 400% 100%;
+    animation: card-highlight 3s ease infinite;
+  }
+
+  /* Badge Pulse Animation */
+  .animate-badge-pulse {
+    animation: badge-pulse 2s ease-in-out infinite;
+  }
+
+  /* Timeline Entry Animation */
+  .animate-timeline-entry {
+    animation: timeline-entry 0.3s ease-out forwards;
+  }
+
+  /* Metric Pop Animation */
+  .animate-metric-pop {
+    animation: metric-pop 0.3s ease-out;
+  }
+
+  /* Connection Pulse Animation */
+  .animate-connection-pulse {
+    animation: connection-pulse 2s ease-in-out infinite;
+  }
+
+  /* Status Colour Variables Container */
+  .status-vars {
+    --status-primary: 220 14% 46%;
+    --status-glow: 220 14% 46%;
+    --status-bg: 220 14% 20%;
+  }
+
+  .status-vars-pending {
+    --status-primary: 220 14% 46%;
+    --status-glow: 220 14% 46%;
+    --status-bg: 220 14% 20%;
+  }
+
+  .status-vars-in-progress {
+    --status-primary: 217 91% 60%;
+    --status-glow: 217 91% 60%;
+    --status-bg: 217 91% 60%;
+  }
+
+  .status-vars-awaiting-verification {
+    --status-primary: 38 92% 50%;
+    --status-glow: 38 92% 50%;
+    --status-bg: 38 92% 50%;
+  }
+
+  .status-vars-verification-in-progress {
+    --status-primary: 38 92% 50%;
+    --status-glow: 38 92% 50%;
+    --status-bg: 38 92% 50%;
+  }
+
+  .status-vars-verification-passed {
+    --status-primary: 142 76% 36%;
+    --status-glow: 142 76% 36%;
+    --status-bg: 142 76% 36%;
+  }
+
+  .status-vars-verification-failed {
+    --status-primary: 0 84% 60%;
+    --status-glow: 0 84% 60%;
+    --status-bg: 0 84% 60%;
+  }
+
+  .status-vars-completed {
+    --status-primary: 142 76% 36%;
+    --status-glow: 142 76% 36%;
+    --status-bg: 142 76% 36%;
+  }
+
+  .status-vars-failed {
+    --status-primary: 0 84% 60%;
+    --status-glow: 0 84% 60%;
+    --status-bg: 0 84% 60%;
+  }
+
+  .status-vars-blocked {
+    --status-primary: 25 95% 53%;
+    --status-glow: 25 95% 53%;
+    --status-bg: 25 95% 53%;
+  }
+
+  .status-vars-escalated {
+    --status-primary: 262 83% 58%;
+    --status-glow: 262 83% 58%;
+    --status-bg: 262 83% 58%;
+  }
+
+  /* Command Centre Surface */
+  .command-centre-surface {
+    background: linear-gradient(
+      180deg,
+      hsl(222 47% 8%) 0%,
+      hsl(222 47% 6%) 100%
+    );
+  }
+
+  .command-centre-surface-light {
+    background: linear-gradient(
+      180deg,
+      hsl(220 14% 96%) 0%,
+      hsl(220 14% 94%) 100%
+    );
+  }
+
+  /* Noise Texture Overlay */
+  .noise-overlay {
+    position: relative;
+  }
+
+  .noise-overlay::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    opacity: 0.03;
+    pointer-events: none;
+    mix-blend-mode: overlay;
   }
 }
