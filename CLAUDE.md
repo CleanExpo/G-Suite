@@ -411,15 +411,54 @@ Specs must be ≥80% complete before implementation:
 
 **See**: `docs/SPEC_GENERATION.md` for full documentation and workflows
 
+## 🎨 Design System - Scientific Luxury Tier
+
+This framework implements a **Scientific Luxury** design system. All UI components must follow these rules:
+
+### Mandatory Elements
+
+| Element           | Implementation                                      |
+| ----------------- | --------------------------------------------------- |
+| Background        | OLED Black (`#050505`)                              |
+| Borders           | Single pixel (`border-[0.5px] border-white/[0.06]`) |
+| Corners           | Sharp only (`rounded-sm`)                           |
+| Typography        | JetBrains Mono (data), Editorial (names)            |
+| Animations        | Framer Motion only (no CSS transitions)             |
+| Layout            | Timeline/orbital (no card grids)                    |
+| Status Indicators | Breathing orbs with spectral colours                |
+
+### Spectral Colour System
+
+| Colour  | Hex       | Usage                          |
+| ------- | --------- | ------------------------------ |
+| Cyan    | `#00F5FF` | Active, in-progress            |
+| Emerald | `#00FF88` | Success, completed             |
+| Amber   | `#FFB800` | Warning, verification          |
+| Red     | `#FF4444` | Error, failed                  |
+| Magenta | `#FF00FF` | Escalation, human intervention |
+
+### Banned Elements
+
+- Standard Bootstrap/Tailwind cards
+- Symmetrical grids (`grid-cols-2`, `grid-cols-4`)
+- Lucide/FontAwesome icons for status
+- Linear transitions
+- White/light backgrounds
+- `rounded-lg`, `rounded-xl`
+
+**Full Documentation**: [`docs/DESIGN_SYSTEM.md`](docs/DESIGN_SYSTEM.md)
+**Design Tokens**: `apps/web/lib/design-tokens.ts`
+
 ## 📚 Documentation
 
-| Document                                                         | Purpose                  |
-| ---------------------------------------------------------------- | ------------------------ |
-| [`README.md`](README.md)                                         | Overview and quick start |
-| [`docs/LOCAL_SETUP.md`](docs/LOCAL_SETUP.md)                     | Complete setup guide     |
-| [`docs/AI_PROVIDERS.md`](docs/AI_PROVIDERS.md)                   | Ollama vs Claude         |
-| [`docs/OPTIONAL_SERVICES.md`](docs/OPTIONAL_SERVICES.md)         | Deployment guides        |
-| [`docs/new-project-checklist.md`](docs/new-project-checklist.md) | 3-step setup             |
+| Document                                                         | Purpose                         |
+| ---------------------------------------------------------------- | ------------------------------- |
+| [`README.md`](README.md)                                         | Overview and quick start        |
+| [`docs/LOCAL_SETUP.md`](docs/LOCAL_SETUP.md)                     | Complete setup guide            |
+| [`docs/AI_PROVIDERS.md`](docs/AI_PROVIDERS.md)                   | Ollama vs Claude                |
+| [`docs/OPTIONAL_SERVICES.md`](docs/OPTIONAL_SERVICES.md)         | Deployment guides               |
+| [`docs/DESIGN_SYSTEM.md`](docs/DESIGN_SYSTEM.md)                 | Scientific Luxury design system |
+| [`docs/new-project-checklist.md`](docs/new-project-checklist.md) | 3-step setup                    |
 
 ## 🔧 Troubleshooting
 
