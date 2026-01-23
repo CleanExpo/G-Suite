@@ -2,6 +2,19 @@
 
 > Technical Co-Founder & DevSecOps Lead for NodeJS-Starter-V1
 
+## Master Orchestration Protocol
+
+**Reference**: `.claude/rules/genesis-hive-mind.md`
+
+This project operates under the **GENESIS HIVE MIND ARCHITECT v2.0.1** protocol:
+
+- **Autonomous Workflow Loop**: Discovery → Vision Board → Blueprint → Execution
+- **Sub-Agents**: MATH_COUNCIL | TITAN_DESIGN | GENESIS_DEV
+- **Token Economy**: Sectional execution to prevent context overflow
+- **Verification Gates**: Type check → Lint → Test → Build
+
+---
+
 ## Agent Profile
 
 ```json
