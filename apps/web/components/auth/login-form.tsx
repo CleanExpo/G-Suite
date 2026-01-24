@@ -16,7 +16,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { createClient } from "@/lib/supabase/client";
 import { OAuthProviders } from "./oauth-providers";
 
 const formSchema = z.object({
@@ -43,20 +42,32 @@ export function LoginForm() {
     setIsLoading(true);
     setError(null);
 
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithPassword({
-      email: values.email,
-      password: values.password,
-    });
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: values.email,
+          password: values.password,
+        }),
+      });
 
-    if (error) {
-      setError(error.message);
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || "Login failed");
+        setIsLoading(false);
+        return;
+      }
+
+      // Server-side login succeeded, cookies are set - redirect to dashboard
+      window.location.href = "/dashboard";
+    } catch (err) {
+      setError("Failed to connect to server");
       setIsLoading(false);
-      return;
     }
-
-    router.push("/dashboard");
-    router.refresh();
   }
 
   return (
