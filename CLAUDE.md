@@ -449,6 +449,38 @@ This framework implements a **Scientific Luxury** design system. All UI componen
 **Full Documentation**: [`docs/DESIGN_SYSTEM.md`](docs/DESIGN_SYSTEM.md)
 **Design Tokens**: `apps/web/lib/design-tokens.ts`
 
+## 🧠 Agent Skills System
+
+This project includes a skills system compatible with Vercel's Agent Skills format.
+
+**Location**: `.skills/`
+
+### Installed Skills
+
+| Skill                   | Trigger                         | Purpose                                                        |
+| ----------------------- | ------------------------------- | -------------------------------------------------------------- |
+| `genesis-orchestrator`  | "build", "implement", "plan"    | Phase-locked workflow execution                                |
+| `council-of-logic`      | "optimise", "algorithm", "O(n)" | Mathematical validation (Turing, Von Neumann, Bezier, Shannon) |
+| `scientific-luxury`     | "design", "UI", "component"     | Design system enforcement                                      |
+| `react-best-practices`  | "React performance", "bundle"   | 57 Vercel React optimisation rules                             |
+| `web-design-guidelines` | "accessibility", "UX audit"     | 100+ accessibility & UX rules                                  |
+
+### Installation
+
+```bash
+# Windows
+.\.skills\install.ps1
+
+# Unix/macOS
+bash .skills/install.sh
+```
+
+### Creating Custom Skills
+
+See `.skills/AGENTS.md` for the full skills registry and creation guide.
+
+---
+
 ## 📚 Documentation
 
 | Document                                                         | Purpose                         |
