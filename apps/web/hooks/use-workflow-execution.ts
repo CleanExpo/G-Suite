@@ -108,7 +108,7 @@ export function useWorkflowExecution({
 
     try {
       const detail = await apiClient.get<ExecutionDetailResponse>(
-        `/api/workflow-builder/workflows/${workflowId}/executions/${executionIdRef.current}`
+        `/api/workflows/${workflowId}/executions/${executionIdRef.current}`
       );
 
       setExecution(detail);
@@ -148,7 +148,7 @@ export function useWorkflowExecution({
 
       try {
         const response = await apiClient.post<ExecutionResponse>(
-          `/api/workflow-builder/workflows/${workflowId}/execute`,
+          `/api/workflows/${workflowId}/execute`,
           {
             body: JSON.stringify({
               input_data: inputData,
@@ -187,7 +187,7 @@ export function useWorkflowExecution({
   const loadHistory = useCallback(async () => {
     try {
       const executions = await apiClient.get<ExecutionResponse[]>(
-        `/api/workflow-builder/workflows/${workflowId}/executions?limit=20`
+        `/api/workflows/${workflowId}/executions?limit=20`
       );
       setHistory(executions);
     } catch {

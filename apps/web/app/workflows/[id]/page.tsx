@@ -41,7 +41,7 @@ export default function WorkflowEditorPage() {
     const loadWorkflow = async () => {
       if (workflowId && workflowId !== 'new') {
         try {
-          const response = await fetch(`/api/workflow-builder/workflows/${workflowId}`);
+          const response = await fetch(`/api/workflows/${workflowId}`);
           if (response.ok) {
             const data = await response.json();
             setWorkflow(data);
@@ -107,10 +107,7 @@ export default function WorkflowEditorPage() {
     };
 
     try {
-      const url =
-        workflowId === 'new'
-          ? '/api/workflow-builder/workflows'
-          : `/api/workflow-builder/workflows/${workflowId}`;
+      const url = workflowId === 'new' ? '/api/workflows' : `/api/workflows/${workflowId}`;
 
       const method = workflowId === 'new' ? 'POST' : 'PATCH';
 
