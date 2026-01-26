@@ -82,6 +82,7 @@ function WorkflowNodeInner({ data, selected }: WorkflowNodeProps) {
 
   // Determine if node should show breathing animation
   const isActive = status === 'running';
+  const hasStatus = status !== 'idle';
 
   // Handle visibility based on node type
   const hasInputHandle = !['start', 'trigger'].includes(nodeType);
@@ -89,9 +90,25 @@ function WorkflowNodeInner({ data, selected }: WorkflowNodeProps) {
 
   // Memoize animation config
   const breathingBoxShadow = useMemo(
-    () => [`0 0 0 ${colour}00`, `0 0 20px ${colour}40`, `0 0 0 ${colour}00`],
-    [colour]
+    () => [`0 0 0 ${statusColour}00`, `0 0 20px ${statusColour}40`, `0 0 0 ${statusColour}00`],
+    [statusColour]
   );
+
+  // Border colour: status takes priority over selection
+  const borderColour = useMemo(() => {
+    if (hasStatus) return `${statusColour}80`;
+    if (selected) return `${colour}80`;
+    return 'rgba(255, 255, 255, 0.06)';
+  }, [hasStatus, statusColour, selected, colour]);
+
+  // Box shadow: status glow for completed/failed, selection glow otherwise
+  const staticBoxShadow = useMemo(() => {
+    if (status === 'completed') return `0 0 16px ${statusColour}25`;
+    if (status === 'failed') return `0 0 16px ${statusColour}25`;
+    if (status === 'awaiting') return `0 0 12px ${statusColour}20`;
+    if (selected) return `0 0 20px ${colour}30`;
+    return 'none';
+  }, [status, statusColour, selected, colour]);
 
   return (
     <motion.div
@@ -118,8 +135,8 @@ function WorkflowNodeInner({ data, selected }: WorkflowNodeProps) {
         className="min-w-[180px] overflow-hidden rounded-sm border-[0.5px] transition-all duration-300"
         style={{
           backgroundColor: '#050505',
-          borderColor: selected ? `${colour}80` : 'rgba(255, 255, 255, 0.06)',
-          boxShadow: selected ? `0 0 20px ${colour}30` : 'none',
+          borderColor: borderColour,
+          boxShadow: isActive ? undefined : staticBoxShadow,
         }}
         animate={isActive ? { boxShadow: breathingBoxShadow } : {}}
         transition={

@@ -36,6 +36,7 @@ import { Save, Play, ZoomIn, ZoomOut, Maximize2, Undo2, Redo2 } from 'lucide-rea
 import { SPECTRAL, BACKGROUNDS, EASINGS, DURATIONS } from '@/lib/design-tokens';
 import { NODE_SPECTRAL_COLOURS, NodeType } from '@/types/workflow';
 import type { ExecutionStatus } from '@/hooks/use-workflow-execution';
+import type { NodeVisualStatus } from '@/types/workflow';
 
 // Import custom node components
 import { WorkflowNodeComponent } from '../nodes/workflow-node';
@@ -270,20 +271,41 @@ function WorkflowCanvasInner({
     [setEdges, saveToHistory]
   );
 
+  // Map backend execution status to frontend visual status
+  const toVisualStatus = useCallback((status: ExecutionStatus): NodeVisualStatus => {
+    switch (status) {
+      case 'pending':
+        return 'awaiting';
+      case 'running':
+        return 'running';
+      case 'completed':
+        return 'completed';
+      case 'failed':
+        return 'failed';
+      case 'cancelled':
+        return 'idle';
+      default:
+        return 'idle';
+    }
+  }, []);
+
   // Update node visual status during execution
   const handleNodeStatusChange = useCallback(
     (nodeStatuses: Map<string, ExecutionStatus>) => {
       setNodes((nds) =>
         nds.map((node) => {
-          const status = nodeStatuses.get(node.id);
-          if (status && node.data.status !== status) {
-            return { ...node, data: { ...node.data, status } };
+          const execStatus = nodeStatuses.get(node.id);
+          if (execStatus) {
+            const visualStatus = toVisualStatus(execStatus);
+            if (node.data.status !== visualStatus) {
+              return { ...node, data: { ...node.data, status: visualStatus } };
+            }
           }
           return node;
         })
       );
     },
-    [setNodes]
+    [setNodes, toVisualStatus]
   );
 
   // Keyboard shortcuts
