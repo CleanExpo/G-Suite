@@ -24,6 +24,14 @@ Location: `.skills/custom/`
 | **council-of-logic**     | Mathematical first principles validation (Turing, Von Neumann, Bezier, Shannon) | "optimise", "algorithm", "performance", "complexity"        |
 | **scientific-luxury**    | Design system enforcement for Scientific Luxury tier UI                         | "design", "UI", "component", "styling", "animation"         |
 
+### Identified Gaps
+
+| Skill             | Description                                                                  | Status        |
+| ----------------- | ---------------------------------------------------------------------------- | ------------- |
+| **xaem-theme-ui** | Two-pass theme generation → code UI translation (high-entropy design themes) | Not installed |
+
+**XAEM Gap Analysis**: The existing `scientific-luxury` skill enforces design constraints but does not generate themes. An XAEM-style skill would add a two-pass pipeline: (1) generate high-entropy visual themes (colour palettes, typography, spacing, animation curves), then (2) translate those themes into implementable code (CSS variables, Tailwind config, component styles). This complements `scientific-luxury` by handling the creative generation pass before constraint enforcement.
+
 ## Skill Priority
 
 When multiple skills could apply, use this priority order:
