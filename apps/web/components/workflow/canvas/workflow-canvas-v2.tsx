@@ -29,18 +29,20 @@ import {
   SelectionMode,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 import { Button } from '@/components/ui/button';
 import { Save, Play, ZoomIn, ZoomOut, Maximize2, Undo2, Redo2 } from 'lucide-react';
 import { SPECTRAL, BACKGROUNDS, EASINGS, DURATIONS } from '@/lib/design-tokens';
 import { NODE_SPECTRAL_COLOURS, NodeType } from '@/types/workflow';
+import type { ExecutionStatus } from '@/hooks/use-workflow-execution';
 
 // Import custom node components
 import { WorkflowNodeComponent } from '../nodes/workflow-node';
 import { NodePalette } from '../sidebar/node-palette';
 import { NodeConfigPanel, type NodeData } from '../config/node-config-panel';
 import { NodeContextMenu, type ContextMenuPosition } from '../context-menu/node-context-menu';
+import { ExecutionPanel } from '../execution/execution-panel';
 
 // Define node types mapping
 const nodeTypes: NodeTypes = {
@@ -71,6 +73,7 @@ interface WorkflowCanvasV2Props {
 }
 
 function WorkflowCanvasInner({
+  workflowId,
   initialNodes = [
     {
       id: 'start-1',
@@ -92,6 +95,9 @@ function WorkflowCanvasInner({
   // Node configuration panel state
   const [selectedNode, setSelectedNode] = useState<NodeData | null>(null);
   const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(false);
+
+  // Execution panel state
+  const [isExecutionPanelOpen, setIsExecutionPanelOpen] = useState(false);
 
   // Context menu state
   const [contextMenuPosition, setContextMenuPosition] = useState<ContextMenuPosition | null>(null);
@@ -262,6 +268,22 @@ function WorkflowCanvasInner({
       setEdges((eds) => eds.filter((edge) => edge.source !== nodeId && edge.target !== nodeId));
     },
     [setEdges, saveToHistory]
+  );
+
+  // Update node visual status during execution
+  const handleNodeStatusChange = useCallback(
+    (nodeStatuses: Map<string, ExecutionStatus>) => {
+      setNodes((nds) =>
+        nds.map((node) => {
+          const status = nodeStatuses.get(node.id);
+          if (status && node.data.status !== status) {
+            return { ...node, data: { ...node.data, status } };
+          }
+          return node;
+        })
+      );
+    },
+    [setNodes]
   );
 
   // Keyboard shortcuts
@@ -506,13 +528,23 @@ function WorkflowCanvasInner({
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: DURATIONS.normal, ease: EASINGS.outExpo }}
               >
-                {onExecute && (
+                {(workflowId || onExecute) && (
                   <Button
-                    onClick={handleExecute}
-                    className="border-[0.5px] border-[#00F5FF]/30 bg-[#00F5FF]/10 text-[#00F5FF] hover:bg-[#00F5FF]/20"
+                    onClick={() => {
+                      if (workflowId) {
+                        setIsExecutionPanelOpen((prev) => !prev);
+                      } else if (onExecute) {
+                        handleExecute();
+                      }
+                    }}
+                    className={`border-[0.5px] ${
+                      isExecutionPanelOpen
+                        ? 'border-[#00F5FF]/50 bg-[#00F5FF]/20 text-[#00F5FF]'
+                        : 'border-[#00F5FF]/30 bg-[#00F5FF]/10 text-[#00F5FF] hover:bg-[#00F5FF]/20'
+                    }`}
                   >
                     <Play className="mr-2 h-4 w-4" />
-                    Execute
+                    {isExecutionPanelOpen ? 'Close' : 'Execute'}
                   </Button>
                 )}
                 {onSave && (
@@ -567,6 +599,21 @@ function WorkflowCanvasInner({
           />
         )}
       </div>
+
+      {/* Execution Panel — right sidebar */}
+      <AnimatePresence>
+        {isExecutionPanelOpen && workflowId && (
+          <motion.div
+            className="h-full w-80 flex-shrink-0"
+            initial={{ width: 0, opacity: 0 }}
+            animate={{ width: 320, opacity: 1 }}
+            exit={{ width: 0, opacity: 0 }}
+            transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+          >
+            <ExecutionPanel workflowId={workflowId} onNodeStatusChange={handleNodeStatusChange} />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -132,29 +132,6 @@ export default function WorkflowEditorPage() {
     }
   };
 
-  const handleExecute = async () => {
-    if (!workflow || !workflow.id) return;
-
-    try {
-      const response = await fetch(`/api/workflow-builder/workflows/${workflow.id}/execute`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          input_data: {},
-          variables: {},
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Execution started:', data);
-        // TODO: Navigate to execution view or show status
-      }
-    } catch (error) {
-      console.error('Failed to execute workflow:', error);
-    }
-  };
-
   if (loading) {
     return (
       <div
@@ -402,7 +379,6 @@ export default function WorkflowEditorPage() {
           initialNodes={initialNodes.length > 0 ? initialNodes : undefined}
           initialEdges={initialEdges}
           onSave={handleSave}
-          onExecute={workflow.id ? handleExecute : undefined}
         />
       </div>
     </div>
