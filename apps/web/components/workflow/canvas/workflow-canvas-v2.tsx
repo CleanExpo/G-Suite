@@ -9,7 +9,7 @@
  * @see docs/DESIGN_SYSTEM.md for styling reference
  */
 
-import { useCallback, useRef, DragEvent } from 'react';
+import { useCallback, useRef, useState, DragEvent, useEffect } from 'react';
 import {
   ReactFlow,
   Background,
@@ -25,18 +25,22 @@ import {
   Panel,
   useReactFlow,
   ReactFlowProvider,
+  NodeMouseHandler,
+  SelectionMode,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { motion } from 'framer-motion';
 
 import { Button } from '@/components/ui/button';
-import { Save, Play, ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
+import { Save, Play, ZoomIn, ZoomOut, Maximize2, Undo2, Redo2 } from 'lucide-react';
 import { SPECTRAL, BACKGROUNDS, EASINGS, DURATIONS } from '@/lib/design-tokens';
 import { NODE_SPECTRAL_COLOURS, NodeType } from '@/types/workflow';
 
 // Import custom node components
 import { WorkflowNodeComponent } from '../nodes/workflow-node';
 import { NodePalette } from '../sidebar/node-palette';
+import { NodeConfigPanel, type NodeData } from '../config/node-config-panel';
+import { NodeContextMenu, type ContextMenuPosition } from '../context-menu/node-context-menu';
 
 // Define node types mapping
 const nodeTypes: NodeTypes = {
@@ -85,8 +89,49 @@ function WorkflowCanvasInner({
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const { screenToFlowPosition, fitView, zoomIn, zoomOut } = useReactFlow();
 
+  // Node configuration panel state
+  const [selectedNode, setSelectedNode] = useState<NodeData | null>(null);
+  const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(false);
+
+  // Context menu state
+  const [contextMenuPosition, setContextMenuPosition] = useState<ContextMenuPosition | null>(null);
+  const [contextMenuNodeId, setContextMenuNodeId] = useState<string | null>(null);
+
+  // History for undo/redo (simplified)
+  const [history, setHistory] = useState<{ nodes: Node[]; edges: Edge[] }[]>([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+
+  // Save to history before changes
+  const saveToHistory = useCallback(() => {
+    const newHistory = history.slice(0, historyIndex + 1);
+    newHistory.push({ nodes: [...nodes], edges: [...edges] });
+    setHistory(newHistory.slice(-50)); // Keep last 50 states
+    setHistoryIndex(newHistory.length - 1);
+  }, [history, historyIndex, nodes, edges]);
+
+  // Undo action
+  const handleUndo = useCallback(() => {
+    if (historyIndex > 0) {
+      const prevState = history[historyIndex - 1];
+      setNodes(prevState.nodes);
+      setEdges(prevState.edges);
+      setHistoryIndex(historyIndex - 1);
+    }
+  }, [history, historyIndex, setNodes, setEdges]);
+
+  // Redo action
+  const handleRedo = useCallback(() => {
+    if (historyIndex < history.length - 1) {
+      const nextState = history[historyIndex + 1];
+      setNodes(nextState.nodes);
+      setEdges(nextState.edges);
+      setHistoryIndex(historyIndex + 1);
+    }
+  }, [history, historyIndex, setNodes, setEdges]);
+
   const onConnect = useCallback(
     (params: Connection) => {
+      saveToHistory();
       // Add edge with Scientific Luxury styling
       setEdges((eds) =>
         addEdge(
@@ -106,8 +151,174 @@ function WorkflowCanvasInner({
         )
       );
     },
-    [setEdges]
+    [setEdges, saveToHistory]
   );
+
+  // Handle node click to open config panel
+  const onNodeClick: NodeMouseHandler = useCallback((_event, node) => {
+    const nodeData: NodeData = {
+      id: node.id,
+      label: node.data.label as string,
+      nodeType: node.data.nodeType as NodeType,
+      description: node.data.description as string | undefined,
+      config: node.data.config as Record<string, unknown> | undefined,
+    };
+    setSelectedNode(nodeData);
+    setIsConfigPanelOpen(true);
+  }, []);
+
+  // Handle node double click (also opens config)
+  const onNodeDoubleClick: NodeMouseHandler = useCallback((_event, node) => {
+    const nodeData: NodeData = {
+      id: node.id,
+      label: node.data.label as string,
+      nodeType: node.data.nodeType as NodeType,
+      description: node.data.description as string | undefined,
+      config: node.data.config as Record<string, unknown> | undefined,
+    };
+    setSelectedNode(nodeData);
+    setIsConfigPanelOpen(true);
+  }, []);
+
+  // Handle node right-click context menu
+  const onNodeContextMenu: NodeMouseHandler = useCallback((event, node) => {
+    event.preventDefault();
+    setContextMenuPosition({ x: event.clientX, y: event.clientY });
+    setContextMenuNodeId(node.id);
+  }, []);
+
+  // Close context menu
+  const closeContextMenu = useCallback(() => {
+    setContextMenuPosition(null);
+    setContextMenuNodeId(null);
+  }, []);
+
+  // Update node data from config panel
+  const handleNodeUpdate = useCallback(
+    (nodeId: string, data: Partial<NodeData>) => {
+      saveToHistory();
+      setNodes((nds) =>
+        nds.map((node) => {
+          if (node.id === nodeId) {
+            return {
+              ...node,
+              data: {
+                ...node.data,
+                ...data,
+              },
+            };
+          }
+          return node;
+        })
+      );
+      // Update selected node state
+      if (selectedNode?.id === nodeId) {
+        setSelectedNode((prev) => (prev ? { ...prev, ...data } : null));
+      }
+    },
+    [setNodes, selectedNode, saveToHistory]
+  );
+
+  // Delete node
+  const handleNodeDelete = useCallback(
+    (nodeId: string) => {
+      saveToHistory();
+      setNodes((nds) => nds.filter((node) => node.id !== nodeId));
+      setEdges((eds) => eds.filter((edge) => edge.source !== nodeId && edge.target !== nodeId));
+      if (selectedNode?.id === nodeId) {
+        setSelectedNode(null);
+        setIsConfigPanelOpen(false);
+      }
+    },
+    [setNodes, setEdges, selectedNode, saveToHistory]
+  );
+
+  // Duplicate node
+  const handleNodeDuplicate = useCallback(
+    (nodeId: string) => {
+      saveToHistory();
+      const nodeToDuplicate = nodes.find((n) => n.id === nodeId);
+      if (nodeToDuplicate) {
+        const newNode: Node = {
+          ...nodeToDuplicate,
+          id: `${nodeToDuplicate.type}-${Date.now()}`,
+          position: {
+            x: nodeToDuplicate.position.x + 50,
+            y: nodeToDuplicate.position.y + 50,
+          },
+          data: { ...nodeToDuplicate.data },
+          selected: false,
+        };
+        setNodes((nds) => nds.concat(newNode));
+      }
+    },
+    [nodes, setNodes, saveToHistory]
+  );
+
+  // Disconnect all edges from a node
+  const handleNodeDisconnect = useCallback(
+    (nodeId: string) => {
+      saveToHistory();
+      setEdges((eds) => eds.filter((edge) => edge.source !== nodeId && edge.target !== nodeId));
+    },
+    [setEdges, saveToHistory]
+  );
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Delete selected nodes
+      if ((event.key === 'Delete' || event.key === 'Backspace') && !readonly) {
+        const selectedNodes = nodes.filter((n) => n.selected);
+        if (selectedNodes.length > 0) {
+          saveToHistory();
+          const selectedIds = new Set(selectedNodes.map((n) => n.id));
+          setNodes((nds) => nds.filter((n) => !selectedIds.has(n.id)));
+          setEdges((eds) =>
+            eds.filter((e) => !selectedIds.has(e.source) && !selectedIds.has(e.target))
+          );
+        }
+      }
+
+      // Undo: Ctrl/Cmd + Z
+      if ((event.metaKey || event.ctrlKey) && event.key === 'z' && !event.shiftKey) {
+        event.preventDefault();
+        handleUndo();
+      }
+
+      // Redo: Ctrl/Cmd + Shift + Z
+      if ((event.metaKey || event.ctrlKey) && event.key === 'z' && event.shiftKey) {
+        event.preventDefault();
+        handleRedo();
+      }
+
+      // Duplicate: Ctrl/Cmd + D
+      if ((event.metaKey || event.ctrlKey) && event.key === 'd') {
+        event.preventDefault();
+        const selectedNodes = nodes.filter((n) => n.selected);
+        selectedNodes.forEach((node) => handleNodeDuplicate(node.id));
+      }
+
+      // Close config panel: Escape
+      if (event.key === 'Escape') {
+        setIsConfigPanelOpen(false);
+        closeContextMenu();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [
+    nodes,
+    readonly,
+    handleUndo,
+    handleRedo,
+    handleNodeDuplicate,
+    saveToHistory,
+    setNodes,
+    setEdges,
+    closeContextMenu,
+  ]);
 
   // Handle drag and drop from palette
   const onDragOver = useCallback((event: DragEvent) => {
@@ -172,6 +383,10 @@ function WorkflowCanvasInner({
           onNodesChange={readonly ? undefined : onNodesChange}
           onEdgesChange={readonly ? undefined : onEdgesChange}
           onConnect={readonly ? undefined : onConnect}
+          onNodeClick={onNodeClick}
+          onNodeDoubleClick={onNodeDoubleClick}
+          onNodeContextMenu={onNodeContextMenu}
+          onPaneClick={closeContextMenu}
           onDragOver={onDragOver}
           onDrop={onDrop}
           nodeTypes={nodeTypes}
@@ -179,6 +394,9 @@ function WorkflowCanvasInner({
           nodesDraggable={!readonly}
           nodesConnectable={!readonly}
           elementsSelectable={!readonly}
+          selectionMode={SelectionMode.Partial}
+          multiSelectionKeyCode="Shift"
+          deleteKeyCode={null} // We handle delete ourselves
           defaultEdgeOptions={{
             animated: true,
             style: { stroke: 'rgba(255, 255, 255, 0.3)', strokeWidth: 1 },
@@ -196,6 +414,38 @@ function WorkflowCanvasInner({
 
           {/* Custom Controls Panel */}
           <Panel position="top-right" className="flex gap-2">
+            {/* Undo/Redo Controls */}
+            {!readonly && (
+              <motion.div
+                className="flex gap-1 rounded-sm border-[0.5px] border-white/[0.06] bg-[#050505]/90 p-1 backdrop-blur-sm"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: DURATIONS.normal, ease: EASINGS.outExpo, delay: 0.05 }}
+              >
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleUndo}
+                  disabled={historyIndex <= 0}
+                  className="h-8 w-8 text-white/50 hover:bg-white/5 hover:text-white disabled:opacity-30"
+                  title="Undo (⌘Z)"
+                >
+                  <Undo2 className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleRedo}
+                  disabled={historyIndex >= history.length - 1}
+                  className="h-8 w-8 text-white/50 hover:bg-white/5 hover:text-white disabled:opacity-30"
+                  title="Redo (⌘⇧Z)"
+                >
+                  <Redo2 className="h-4 w-4" />
+                </Button>
+              </motion.div>
+            )}
+
+            {/* Zoom Controls */}
             <motion.div
               className="flex gap-1 rounded-sm border-[0.5px] border-white/[0.06] bg-[#050505]/90 p-1 backdrop-blur-sm"
               initial={{ opacity: 0, y: -10 }}
@@ -207,6 +457,7 @@ function WorkflowCanvasInner({
                 size="icon"
                 onClick={() => zoomIn()}
                 className="h-8 w-8 text-white/50 hover:bg-white/5 hover:text-white"
+                title="Zoom In"
               >
                 <ZoomIn className="h-4 w-4" />
               </Button>
@@ -215,6 +466,7 @@ function WorkflowCanvasInner({
                 size="icon"
                 onClick={() => zoomOut()}
                 className="h-8 w-8 text-white/50 hover:bg-white/5 hover:text-white"
+                title="Zoom Out"
               >
                 <ZoomOut className="h-4 w-4" />
               </Button>
@@ -223,6 +475,7 @@ function WorkflowCanvasInner({
                 size="icon"
                 onClick={() => fitView()}
                 className="h-8 w-8 text-white/50 hover:bg-white/5 hover:text-white"
+                title="Fit View"
               >
                 <Maximize2 className="h-4 w-4" />
               </Button>
@@ -275,6 +528,44 @@ function WorkflowCanvasInner({
             </Panel>
           )}
         </ReactFlow>
+
+        {/* Node Configuration Panel */}
+        {!readonly && (
+          <NodeConfigPanel
+            node={selectedNode}
+            isOpen={isConfigPanelOpen}
+            onClose={() => setIsConfigPanelOpen(false)}
+            onUpdate={handleNodeUpdate}
+            onDelete={handleNodeDelete}
+            onDuplicate={handleNodeDuplicate}
+          />
+        )}
+
+        {/* Node Context Menu */}
+        {!readonly && (
+          <NodeContextMenu
+            position={contextMenuPosition}
+            nodeId={contextMenuNodeId}
+            onClose={closeContextMenu}
+            onConfigure={(nodeId) => {
+              const node = nodes.find((n) => n.id === nodeId);
+              if (node) {
+                const nodeData: NodeData = {
+                  id: node.id,
+                  label: node.data.label as string,
+                  nodeType: node.data.nodeType as NodeType,
+                  description: node.data.description as string | undefined,
+                  config: node.data.config as Record<string, unknown> | undefined,
+                };
+                setSelectedNode(nodeData);
+                setIsConfigPanelOpen(true);
+              }
+            }}
+            onDuplicate={handleNodeDuplicate}
+            onDelete={handleNodeDelete}
+            onDisconnect={handleNodeDisconnect}
+          />
+        )}
       </div>
     </div>
   );
