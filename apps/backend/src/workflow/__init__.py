@@ -1,5 +1,14 @@
 """Visual workflow system."""
 
+from .compiler import (
+    CompilationError,
+    CompiledWorkflow,
+    WorkflowCompiler,
+)
+from .db_executor import (
+    DbWorkflowExecutor,
+    run_workflow_execution,
+)
 from .models import (
     EdgeType,
     ExecutionContext,
@@ -7,15 +16,30 @@ from .models import (
     NodePosition,
     NodeType,
     WorkflowDefinition,
-    WorkflowEdge,
+)
+from .state import (
+    ExecutionState,
+    NodeResult,
+    NodeStatus,
 )
 
 __all__ = [
+    # Models (Pydantic)
     "NodeType",
     "EdgeType",
     "NodePosition",
     "NodeConfig",
-    "WorkflowEdge",
     "WorkflowDefinition",
     "ExecutionContext",
+    # Compiler
+    "CompilationError",
+    "CompiledWorkflow",
+    "WorkflowCompiler",
+    # Execution state
+    "ExecutionState",
+    "NodeResult",
+    "NodeStatus",
+    # Executor
+    "DbWorkflowExecutor",
+    "run_workflow_execution",
 ]

@@ -17,7 +17,7 @@ from math import ceil
 from typing import Annotated, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, status
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -538,6 +538,7 @@ async def delete_edge(
 async def execute_workflow(
     workflow_id: UUID,
     request: WorkflowExecuteRequest,
+    background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_async_db),
     current_user: User = Depends(get_current_user),
 ) -> WorkflowExecutionResponse:
@@ -561,8 +562,11 @@ async def execute_workflow(
     await db.commit()
     await db.refresh(execution)
 
-    # TODO: Trigger actual execution via LangGraph worker
-    # For now, just create the record
+    # Trigger actual execution in background
+    background_tasks.add_task(
+        _run_execution_background,
+        execution_id=execution.id,
+    )
 
     logger.info(
         "Workflow execution started",
@@ -572,6 +576,22 @@ async def execute_workflow(
     )
 
     return _execution_to_response(execution)
+
+
+async def _run_execution_background(execution_id: UUID) -> None:
+    """Run workflow execution in the background with its own DB session."""
+    from src.config.database import AsyncSessionLocal
+    from src.workflow.db_executor import run_workflow_execution
+
+    try:
+        async with AsyncSessionLocal() as db:
+            await run_workflow_execution(db, execution_id)
+    except Exception as e:
+        logger.error(
+            "Background execution failed",
+            execution_id=str(execution_id),
+            error=str(e),
+        )
 
 
 @router.get(
