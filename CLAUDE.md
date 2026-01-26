@@ -27,10 +27,15 @@ pnpm turbo run test         # All tests
 pnpm turbo run lint         # Linting
 pnpm turbo run type-check   # Type checking
 
-# Dependency Verification (NEW)
+# Dependency Verification
 pnpm verify                 # Full verification + dependency check
 pnpm verify:fix             # Auto-fix dependency issues
 pnpm deps:clean             # Clean install dependencies
+
+# Beads - AI Agent Memory (NEW)
+.bin/bd.exe ready           # Show unblocked tasks
+.bin/bd.exe create "Title"  # Create new task
+.bin/bd.exe sync            # Sync to git
 ```
 
 ## 🏗️ Architecture Overview
@@ -479,6 +484,65 @@ bash .skills/install.sh
 
 See `.skills/AGENTS.md` for the full skills registry and creation guide.
 
+## 🧵 Beads - AI Agent Memory System
+
+This project uses **Beads** (`bd`) for persistent, git-backed task tracking across AI coding sessions.
+
+**Location**: `.bin/bd.exe` (Windows) | `.beads/` (data)
+
+### Why Beads?
+
+| Problem | Beads Solution |
+|---------|----------------|
+| Tasks forgotten between sessions | Git-backed persistence |
+| No dependency tracking | `bd ready` shows unblocked tasks |
+| Merge conflicts in shared projects | Collision-free hash IDs |
+| No audit trail | Full git history |
+
+### Essential Commands
+
+```bash
+# View actionable tasks
+.bin/bd.exe ready
+
+# Create task with priority
+.bin/bd.exe create "Implement feature" -p 0
+
+# Create subtask
+.bin/bd.exe create "Write tests" --parent bd-abc1
+
+# Update status
+.bin/bd.exe update bd-abc1 --status in_progress
+
+# Close task
+.bin/bd.exe close bd-abc1 --reason "Completed"
+
+# Sync to git (always before session end)
+.bin/bd.exe sync
+```
+
+### Session End Protocol ("Land the Plane")
+
+**CRITICAL**: Before ending any session:
+
+```bash
+# 1. File remaining work
+.bin/bd.exe create "TODO: Remaining work" -p 2
+
+# 2. Update statuses
+.bin/bd.exe close bd-xxx --reason "Done"
+
+# 3. Sync and push
+git pull --rebase
+.bin/bd.exe sync
+git push
+
+# 4. Verify
+git status  # Must show "up to date with origin/main"
+```
+
+**Full Documentation**: [`docs/BEADS.md`](docs/BEADS.md)
+
 ---
 
 ## 📚 Documentation
@@ -490,6 +554,7 @@ See `.skills/AGENTS.md` for the full skills registry and creation guide.
 | [`docs/AI_PROVIDERS.md`](docs/AI_PROVIDERS.md)                   | Ollama vs Claude                |
 | [`docs/OPTIONAL_SERVICES.md`](docs/OPTIONAL_SERVICES.md)         | Deployment guides               |
 | [`docs/DESIGN_SYSTEM.md`](docs/DESIGN_SYSTEM.md)                 | Scientific Luxury design system |
+| [`docs/BEADS.md`](docs/BEADS.md)                                 | AI agent memory system          |
 | [`docs/new-project-checklist.md`](docs/new-project-checklist.md) | 3-step setup                    |
 
 ## 🔧 Troubleshooting
