@@ -29,18 +29,22 @@ model UserProfile {
   clerkId             String   @unique
   websiteUrl          String?
   brandConfig         Json?    // Stores extracted logo, fonts, colors (The Mirror)
-  
+
   // Encrypted Keys (The Vault)
   googleApiKey        String?  // Google AI Studio / Gemini Key
   shopifyAccessToken  String?  // For Shopify sync
   redditApiKey        String?  // For Reddit scraping/posting
   socialApiKeys       Json?    // Encrypted map of other social keys (X, LinkedIn, etc.)
-  
+
+  // Vault Security (Phase 9.1)
+  keyVersion          Int      @default(1)  // Current encryption key version
+  keyRotationHistory  Json?    // Audit trail of key rotations: [{ version, rotatedAt, rotatedBy }]
+
   integrations        Json?    // Connection status & metadata
   onboardingCompleted Boolean  @default(false)
-  
+
   tasks               KanbanTask[]
-  
+
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 }
@@ -65,13 +69,14 @@ model KanbanTask {
 
 // v8.2 Mission Persistence
 model Mission {
-  id        String   @id @default(uuid())
-  status    String   // PENDING, RUNNING, COMPLETED, FAILED
-  plan      Json?
-  result    Json?
-  audit     Json?    // Independent Verification Report
-  cost      Int
-  userId    String   // Corresponds to clerkId/User ID
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String   @id @default(uuid())
+  status     String   // PENDING, RUNNING, COMPLETED, FAILED
+  plan       Json?
+  result     Json?
+  audit      Json?    // Independent Verification Report
+  cost       Int      // Total cost in credits
+  agentCosts Json?    // Phase 9.2: Per-agent cost breakdown { agentName: { tokens, cost, duration } }
+  userId     String   // Corresponds to clerkId/User ID
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
