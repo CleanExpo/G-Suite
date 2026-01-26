@@ -1,9 +1,22 @@
 'use client';
 
-import { Rocket, Shield, Globe, Zap, Cpu, ShoppingCart, Share2 } from 'lucide-react';
+import { Rocket, Shield, Globe, Zap, Cpu, ShoppingCart, Share2, Activity } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import { getFleetStats } from '@/actions/mission-history';
 
 export function FleetStatus() {
+  const [stats, setStats] = useState({
+    totalMissions: 0,
+    successRate: 100,
+    totalFuelConsumed: 0,
+    activeAgents: 5
+  });
+
+  useEffect(() => {
+    getFleetStats().then(setStats);
+  }, []);
+
   const systems = [
     { name: 'Architect', status: 'READY', icon: Cpu, color: 'text-blue-600' },
     { name: 'Executor', status: 'STANDBY', icon: Rocket, color: 'text-amber-500' },
@@ -15,13 +28,31 @@ export function FleetStatus() {
 
   return (
     <div className="bg-white dark:bg-[#161b22] p-12 rounded-[4rem] border border-gray-100 dark:border-white/5 shadow-sm space-y-10">
-      <div>
-        <h3 className="text-gray-400 dark:text-gray-500 text-[10px] font-black uppercase tracking-[0.3em] mb-4">
-          Fleet Operational Status
-        </h3>
-        <h2 className="text-4xl font-black italic uppercase tracking-tighter text-gray-900 dark:text-white leading-none">
-          System Readiness
-        </h2>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+        <div>
+          <h3 className="text-gray-400 dark:text-gray-500 text-[10px] font-black uppercase tracking-[0.3em] mb-4">
+            Fleet Operational Status
+          </h3>
+          <h2 className="text-4xl font-black italic uppercase tracking-tighter text-gray-900 dark:text-white leading-none">
+            System Readiness
+          </h2>
+        </div>
+
+        {/* Real Metrics */}
+        <div className="flex gap-8">
+          <div className="space-y-1">
+            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Total Missions</p>
+            <p className="text-2xl font-black text-gray-900 dark:text-white leading-none">{stats.totalMissions}</p>
+          </div>
+          <div className="space-y-1">
+            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Success Rate</p>
+            <p className="text-2xl font-black text-emerald-500 leading-none">{stats.successRate.toFixed(1)}%</p>
+          </div>
+          <div className="space-y-1">
+            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Fuel Consumed</p>
+            <p className="text-2xl font-black text-blue-600 leading-none">{stats.totalFuelConsumed} PTS</p>
+          </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

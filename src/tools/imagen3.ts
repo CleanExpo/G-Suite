@@ -74,8 +74,8 @@ export async function imagen3Generate(
     const style = options.style ?? 'photographic';
 
     // Apply aspect ratio if specified
-    let finalWidth = width;
-    let finalHeight = height;
+    let finalWidth: number = width;
+    let finalHeight: number = height;
     if (options.aspectRatio) {
         const [w, h] = options.aspectRatio.split(':').map(Number);
         if (w > h) {

@@ -36,12 +36,17 @@ function AuthenticatedDashboard({
   onOpenCreditDialog: () => void;
 }) {
   const [wallet, setWallet] = useState<any>(null);
+  const [missions, setMissions] = useState<any[]>([]); // New state for missions
   const [isLoading, setIsLoading] = useState(true);
 
-  async function fetchWallet() {
+  async function fetchData() {
     try {
-      const data = await getWalletData();
-      setWallet(data);
+      const [walletData, missionData] = await Promise.all([
+        getWalletData(),
+        import('@/actions/mission-history').then(mod => mod.getMissionHistory())
+      ]);
+      setWallet(walletData);
+      setMissions(missionData);
     } catch (err) {
       console.error('Dashboard error:', err);
     } finally {
@@ -50,7 +55,7 @@ function AuthenticatedDashboard({
   }
 
   useEffect(() => {
-    fetchWallet();
+    fetchData();
   }, []);
 
   if (isLoading) {
@@ -246,9 +251,9 @@ function AuthenticatedDashboard({
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 dark:divide-white/5">
-              {wallet.transactions.map((tx: any, idx: number) => (
+              {missions.map((mission: any, idx: number) => (
                 <motion.tr
-                  key={tx.id}
+                  key={mission.id}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.3 + idx * 0.05 }}
@@ -257,25 +262,25 @@ function AuthenticatedDashboard({
                   <td className="px-6 md:px-12 py-6 md:py-10">
                     <div className="flex items-center gap-4 md:gap-8">
                       <div
-                        className={`w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl border flex items-center justify-center shrink-0 transition-all ${tx.amount > 0 ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-100 dark:border-emerald-800 text-emerald-600' : 'bg-blue-50 dark:bg-blue-900/20 border-blue-100 dark:border-blue-800 text-blue-600'}`}
+                        className={`w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl border flex items-center justify-center shrink-0 transition-all ${mission.status === 'COMPLETED' ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-100 dark:border-emerald-800 text-emerald-600' : 'bg-blue-50 dark:bg-blue-900/20 border-blue-100 dark:border-blue-800 text-blue-600'}`}
                       >
-                        {tx.amount > 0 ? (
-                          <Plus className="w-5 h-5 md:w-6 md:h-6" />
+                        {mission.status === 'COMPLETED' ? (
+                          <CheckCircle2 className="w-5 h-5 md:w-6 md:h-6" />
                         ) : (
-                          <Activity className="w-5 h-5 md:w-6 md:h-6" />
+                          <Activity className="w-5 h-5 md:w-6 md:h-6 animate-pulse" />
                         )}
                       </div>
                       <div className="min-w-0">
                         <p className="font-black text-gray-900 dark:text-white text-lg md:text-2xl italic tracking-tighter uppercase leading-none mb-1 md:mb-2 truncate">
-                          {tx.description}
+                          {mission.result?.data?.missionId ? `Mission: ${mission.result.data.missionId.slice(0, 8)}` : 'Mission Execution'}
                         </p>
                         <div className="flex items-center gap-2 md:gap-3">
                           <span className="text-[8px] md:text-[10px] uppercase font-black tracking-widest text-gray-400">
-                            UUID: {tx.id.slice(0, 8)}
+                            ID: {mission.id.slice(0, 8)}
                           </span>
                           <span className="w-1 md:w-1.5 h-1 md:h-1.5 rounded-full bg-gray-200 dark:bg-white/10" />
                           <span className="text-[8px] md:text-[10px] uppercase font-black tracking-widest text-blue-600">
-                            Verified Dispatch
+                            {mission.status}
                           </span>
                         </div>
                       </div>
@@ -283,17 +288,17 @@ function AuthenticatedDashboard({
                   </td>
                   <td className={'px-6 md:px-12 py-6 md:py-10 text-center'}>
                     <div
-                      className={`inline-flex items-center justify-center h-12 md:h-16 px-4 md:px-8 rounded-xl md:rounded-[1.5rem] font-black text-xl md:text-3xl font-mono tracking-tighter ${tx.amount > 0 ? 'text-emerald-500 bg-emerald-50 dark:bg-emerald-900/10' : 'text-gray-900 dark:text-white bg-gray-50 dark:bg-white/10'}`}
+                      className={`inline-flex items-center justify-center h-12 md:h-16 px-4 md:px-8 rounded-xl md:rounded-[1.5rem] font-black text-xl md:text-3xl font-mono tracking-tighter text-gray-900 dark:text-white bg-gray-50 dark:bg-white/10`}
                     >
-                      {tx.amount > 0 ? `+${tx.amount}` : tx.amount}
+                      {mission.cost} PTS
                     </div>
                   </td>
                   <td className="px-6 md:px-12 py-6 md:py-10 text-right">
                     <div className="text-gray-900 dark:text-white font-black text-sm md:text-lg tracking-tight uppercase italic">
-                      {format(new Date(tx.createdAt), 'dd MMM · HH:mm')}
+                      {format(new Date(mission.createdAt), 'dd MMM · HH:mm')}
                     </div>
                     <div className="text-[8px] md:text-[10px] text-gray-400 uppercase font-black tracking-widest mt-1 md:mt-2 flex items-center justify-end gap-1 md:gap-2">
-                      <Shield className="w-2 md:w-3 h-2 md:h-3 text-emerald-500" /> SECURE UPLINK FINALIZED
+                      <Shield className="w-2 md:w-3 h-2 md:h-3 text-emerald-500" /> VERIFIED
                     </div>
                   </td>
                 </motion.tr>

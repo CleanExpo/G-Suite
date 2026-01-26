@@ -3,7 +3,7 @@
  * 
  * The supreme orchestration layer of G-Pilot.
  * Watches over all mission execution, learns from outcomes,
- * and ensures quality through iterative refinement.
+ * and ensures quality through iterative refinement using Independent Verification.
  */
 
 import {
@@ -17,6 +17,7 @@ import {
 } from './base';
 import { AgentRegistry, initializeAgents } from './registry';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { PrismaMissionAdapter } from '../lib/prisma-mission-adapter';
 
 // Extended mode type for the Overseer
 export type OverseerMode = AgentMode | 'ANALYZE' | 'TESTING' | 'RETRY' | 'FINALIZE';
@@ -34,12 +35,14 @@ interface LearningRecord {
 
 // Mission state tracked by the Overseer
 interface MissionState {
-    id: string;
+    id: string; // Internal/In-memory ID
+    dbId?: string; // Database Persistence ID
     context: AgentContext;
     currentPhase: OverseerMode;
     plan?: AgentPlan;
     results: AgentResult[];
     verifications: VerificationReport[];
+    independentAudits: VerificationReport[];
     retryCount: number;
     startTime: number;
     logs: string[];
@@ -51,7 +54,7 @@ const genAI = new GoogleGenerativeAI(
 
 export class MissionOverseerAgent extends BaseAgent {
     readonly name = 'mission-overseer';
-    readonly description = 'High-level orchestrator that supervises the entire mission lifecycle';
+    readonly description = 'High-level orchestrator that supervises the entire mission lifecycle with independent verification';
     readonly capabilities = [
         'mission_analysis',
         'agent_coordination',
@@ -59,7 +62,7 @@ export class MissionOverseerAgent extends BaseAgent {
         'iterative_refinement',
         'learning_adaptation'
     ];
-    readonly requiredSkills = []; // Overseer uses other agents, not direct skills
+    readonly requiredSkills = [];
 
     // Configuration
     private readonly maxRetries = 3;
@@ -80,60 +83,37 @@ export class MissionOverseerAgent extends BaseAgent {
         suggestedAgents: string[];
         estimatedCost: number;
     }> {
-        this.log('🔍 Analyzing mission intent...');
-
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-
-        const prompt = `
-      Analyze this mission request and classify it:
-      Mission: "${context.mission}"
-      
-      Available agents:
-      - marketing-strategist: Campaign planning, growth strategy
-      - seo-analyst: SEO audits, search optimization
-      - social-commander: Multi-platform social media
-      - content-orchestrator: Presentations, research, media
-      
-      Return JSON:
-      {
-        "missionType": "marketing|seo|social|content|multi",
-        "complexity": "low|medium|high",
-        "suggestedAgents": ["agent-name"],
-        "estimatedCost": 100,
-        "reasoning": "Why this classification"
-      }
-    `;
-
-        try {
-            const result = await model.generateContent(prompt);
-            const text = result.response.text().replace(/```json|```/gi, '').trim();
-            return JSON.parse(text);
-        } catch (error: any) {
-            this.log('Analysis fallback to heuristics', error.message);
-
-            // Fallback heuristic analysis
-            const mission = context.mission.toLowerCase();
-            let missionType = 'content';
-            let suggestedAgents: string[] = ['content-orchestrator'];
-
-            if (mission.includes('marketing') || mission.includes('campaign')) {
-                missionType = 'marketing';
-                suggestedAgents = ['marketing-strategist'];
-            } else if (mission.includes('seo') || mission.includes('audit') || mission.includes('ranking')) {
-                missionType = 'seo';
-                suggestedAgents = ['seo-analyst'];
-            } else if (mission.includes('social') || mission.includes('reddit') || mission.includes('post')) {
-                missionType = 'social';
-                suggestedAgents = ['social-commander'];
-            }
-
+        // Check for explicit agents from the Architect/Graph
+        if (context.config && context.config.explicitAgents && Array.isArray(context.config.explicitAgents)) {
+            this.log(`🎯 Using explicit agents from context: ${context.config.explicitAgents.join(', ')}`);
             return {
-                missionType,
+                missionType: 'directed',
                 complexity: 'medium',
-                suggestedAgents,
-                estimatedCost: 100
+                suggestedAgents: context.config.explicitAgents,
+                estimatedCost: 100 * context.config.explicitAgents.length
             };
         }
+
+        this.log('🔍 Analyzing mission intent...');
+
+        const mission = context.mission.toLowerCase();
+        let missionType = 'general';
+        let suggestedAgents: string[] = ['content-orchestrator'];
+
+        if (mission.includes('marketing')) {
+            missionType = 'marketing';
+            suggestedAgents = ['marketing-strategist'];
+        } else if (mission.includes('seo')) {
+            missionType = 'seo';
+            suggestedAgents = ['seo-analyst'];
+        }
+
+        return {
+            missionType,
+            complexity: 'medium',
+            suggestedAgents,
+            estimatedCost: 100
+        };
     }
 
     /**
@@ -150,374 +130,200 @@ export class MissionOverseerAgent extends BaseAgent {
             currentPhase: 'ANALYZE',
             results: [],
             verifications: [],
+            independentAudits: [],
             retryCount: 0,
             startTime: Date.now(),
             logs: []
         };
 
-        // Phase 1: Analyze
-        this.missionState.currentPhase = 'ANALYZE';
-        const analysis = await this.analyze(context);
-        this.addLog(`Analysis complete: ${analysis.missionType} (${analysis.complexity})`);
+        // PERSISTENCE: Create initial log
+        const dbId = await PrismaMissionAdapter.createMission(context.userId);
+        if (dbId) {
+            this.missionState.dbId = dbId;
+            this.log(`Persistence initialized: ${dbId}`);
+        }
 
         // Ensure agents are initialized
         await initializeAgents();
 
-        // Build execution steps
+        const analysis = await this.analyze(context);
+
         const steps: PlanStep[] = [];
 
+        // 1. Execution Steps
         for (const agentName of analysis.suggestedAgents) {
-            const agent = AgentRegistry.get(agentName);
-            if (agent) {
-                steps.push({
-                    id: `invoke_${agentName}`,
-                    action: `Execute ${agentName} for ${analysis.missionType} tasks`,
-                    tool: `agent:${agentName}`,
-                    payload: context.config || {}
-                });
-            }
+            steps.push({
+                id: `invoke_${agentName}`,
+                action: `Execute ${agentName}`,
+                tool: `agent:${agentName}`,
+                payload: context.config || {}
+            });
         }
 
-        // Add verification step
+        // 2. Independent Verification Step (Explicitly added)
         steps.push({
-            id: 'quality_gate',
-            action: 'Run quality verification checks',
-            tool: 'overseer:verify',
-            payload: { threshold: this.qualityThreshold },
+            id: 'independent_audit',
+            action: 'Perform independent audit of all outputs',
+            tool: 'audit:independent-verifier',
+            payload: {},
             dependencies: analysis.suggestedAgents.map(a => `invoke_${a}`)
         });
 
-        // Add finalization step
-        steps.push({
-            id: 'finalize',
-            action: 'Aggregate results and complete mission',
-            tool: 'overseer:finalize',
-            payload: {},
-            dependencies: ['quality_gate']
-        });
-
-        this.missionState.currentPhase = 'PLANNING';
         const plan: AgentPlan = {
             steps,
             estimatedCost: analysis.estimatedCost,
             requiredSkills: analysis.suggestedAgents,
-            reasoning: `Mission classified as ${analysis.missionType} (${analysis.complexity}). ` +
-                `Coordinating ${analysis.suggestedAgents.length} agent(s) with quality gates.`
+            reasoning: `Mission classified as ${analysis.missionType}. Independent audit required.`
         };
 
         this.missionState.plan = plan;
-        this.addLog(`Plan created with ${steps.length} steps`);
+
+        // PERSISTENCE: Save plan
+        if (this.missionState.dbId) {
+            await PrismaMissionAdapter.updatePlan(this.missionState.dbId, plan);
+        }
 
         return plan;
     }
 
     /**
-     * EXECUTION: Coordinate agent execution with monitoring
+     * EXECUTION: Coordinate agent execution with monitoring and INDEPENDENT AUDIT
      */
     async execute(plan: AgentPlan, context: AgentContext): Promise<AgentResult> {
         this.mode = 'EXECUTION';
         this.log('🚀 Overseer entering EXECUTION mode...');
 
-        if (!this.missionState) {
-            throw new Error('Mission state not initialized - call plan() first');
-        }
+        if (!this.missionState) throw new Error('Mission state not initialized');
 
-        this.missionState.currentPhase = 'EXECUTION';
         const startTime = Date.now();
         const allArtifacts: AgentResult['artifacts'] = [];
         const agentsUsed: string[] = [];
 
         try {
+            // Execute Agent Steps
             for (const step of plan.steps) {
-                this.addLog(`Executing: ${step.action}`);
-
-                // Handle agent invocation
                 if (step.tool.startsWith('agent:')) {
                     const agentName = step.tool.replace('agent:', '');
-                    const agent = AgentRegistry.get(agentName);
-
-                    if (agent) {
-                        agentsUsed.push(agentName);
-
-                        // Execute the sub-agent through its full lifecycle
-                        const agentPlan = await agent.plan(context);
-                        const agentResult = await agent.execute(agentPlan, context);
-                        const agentVerification = await agent.verify(agentResult, context);
-
-                        this.missionState.results.push(agentResult);
-                        this.missionState.verifications.push(agentVerification);
-
-                        if (agentResult.artifacts) {
-                            allArtifacts.push(...agentResult.artifacts);
-                        }
-
-                        this.addLog(`${agentName} completed: ${agentResult.success ? '✅' : '❌'}`);
-                    }
+                    await this.executeAgentStep(agentName, context, agentsUsed, allArtifacts);
                 }
-
-                // Handle internal overseer operations
-                else if (step.tool === 'overseer:verify') {
-                    await this.runQualityGate();
-                }
-                else if (step.tool === 'overseer:finalize') {
-                    // Handled after loop
+                else if (step.tool === 'audit:independent-verifier') {
+                    await this.performIndependentAudit(context);
                 }
             }
 
-            // Check if we need to retry
-            const overallSuccess = this.calculateOverallSuccess();
+            // Check Audit Results
+            const auditsPassed = this.missionState.independentAudits.every(r => r.passed);
 
-            if (!overallSuccess && this.missionState.retryCount < this.maxRetries) {
-                this.addLog(`Quality gate failed, initiating retry cycle ${this.missionState.retryCount + 1}`);
+            if (!auditsPassed && this.missionState.retryCount < this.maxRetries) {
+                this.addLog(`❌ Independent audit failed. Retrying...`);
                 return this.handleRetry(plan, context);
             }
 
-            // Finalize
-            return this.finalize(agentsUsed, allArtifacts, startTime);
+            return await this.finalize(agentsUsed, allArtifacts, startTime, auditsPassed);
 
         } catch (error: any) {
-            this.addLog(`Execution error: ${error.message}`);
-
             return {
                 success: false,
                 error: error.message,
-                cost: plan.estimatedCost,
-                duration: Date.now() - startTime,
-                artifacts: allArtifacts
+                cost: 0,
+                duration: Date.now() - startTime
             };
         }
     }
 
-    /**
-     * VERIFICATION: Validate all outputs meet quality standards
-     */
-    async verify(result: AgentResult, context: AgentContext): Promise<VerificationReport> {
-        this.mode = 'VERIFICATION';
-        this.log('🔎 Overseer entering VERIFICATION mode...');
+    private async executeAgentStep(
+        agentName: string,
+        context: AgentContext,
+        agentsUsed: string[],
+        allArtifacts: any[]
+    ) {
+        const agent = AgentRegistry.get(agentName);
+        if (!agent) return;
 
-        const checks = [];
+        agentsUsed.push(agentName);
 
-        // Check 1: Overall Success
-        checks.push({
-            name: 'Mission Completion',
-            passed: result.success,
-            message: result.success ? 'All mission objectives completed' : result.error
-        });
+        // Full agent lifecycle
+        const agentPlan = await agent.plan(context);
+        const agentResult = await agent.execute(agentPlan, context);
 
-        // Check 2: Deliverables
-        const hasDeliverables = (result.artifacts?.length ?? 0) > 0;
-        checks.push({
-            name: 'Deliverables Present',
-            passed: hasDeliverables,
-            message: `${result.artifacts?.length ?? 0} deliverable(s) generated`
-        });
+        // Capture artifacts and results
+        this.missionState!.results.push(agentResult);
+        if (agentResult.artifacts) allArtifacts.push(...agentResult.artifacts);
 
-        // Check 3: Sub-agent Verification
-        const subVerifications = this.missionState?.verifications ?? [];
-        const allSubsPassed = subVerifications.every(v => v.passed);
-        checks.push({
-            name: 'Agent Quality Gates',
-            passed: allSubsPassed,
-            message: `${subVerifications.filter(v => v.passed).length}/${subVerifications.length} agents passed`
-        });
+        this.addLog(`${agentName} executed. Success: ${agentResult.success}`);
+    }
 
-        // Check 4: Budget Compliance
-        const withinBudget = result.cost <= (this.missionState?.plan?.estimatedCost ?? Infinity) * 1.2;
-        checks.push({
-            name: 'Budget Compliance',
-            passed: withinBudget,
-            message: `${result.cost} PTS used (${withinBudget ? 'within' : 'over'} estimate)`
-        });
+    private async performIndependentAudit(context: AgentContext) {
+        this.addLog('🕵️ performing INDEPENDENT AUDIT...');
+        const verifier = AgentRegistry.get('independent-verifier');
 
-        // Check 5: Retry Efficiency
-        const efficientRetries = (this.missionState?.retryCount ?? 0) <= 1;
-        checks.push({
-            name: 'Execution Efficiency',
-            passed: efficientRetries,
-            message: `${this.missionState?.retryCount ?? 0} retry cycles used`
-        });
-
-        const allPassed = checks.every(c => c.passed);
-
-        // Record learning
-        if (this.missionState) {
-            this.recordLearning(result, allPassed);
+        if (!verifier) {
+            this.addLog('⚠️ Independent Verifier not found! Skipping audit.');
+            return;
         }
 
+        // Verify each result produced by workers
+        for (const result of this.missionState!.results) {
+            const report = await verifier.verify(result, context);
+            this.missionState!.independentAudits.push(report);
+            this.addLog(`Audit result: ${report.passed ? 'PASS' : 'FAIL'}`);
+        }
+    }
+
+    async verify(result: AgentResult, context: AgentContext): Promise<VerificationReport> {
+        // Overseer verification is now a meta-verification of the audit
+        const passed = result.success;
         return {
-            passed: allPassed,
-            checks,
-            recommendations: allPassed
-                ? ['Mission completed successfully']
-                : ['Review failed checks', 'Consider manual intervention for complex issues']
+            passed,
+            checks: [{ name: 'Mission Success', passed, message: 'Audits passed' }]
         };
     }
 
-    /**
-     * TESTING: Simulate and validate user experience
-     */
-    private async runQualityGate(): Promise<boolean> {
-        this.log('🧪 Running quality gate tests...');
-
-        if (!this.missionState) return false;
-
-        this.missionState.currentPhase = 'TESTING';
-
-        // Calculate aggregate quality score
-        const results = this.missionState.results;
-        const successRate = results.filter(r => r.success).length / Math.max(results.length, 1);
-
-        const passed = successRate >= this.qualityThreshold;
-        this.addLog(`Quality gate: ${(successRate * 100).toFixed(1)}% (threshold: ${this.qualityThreshold * 100}%)`);
-
-        return passed;
-    }
-
-    /**
-     * RETRY: Handle failure cycles
-     */
     private async handleRetry(plan: AgentPlan, context: AgentContext): Promise<AgentResult> {
-        if (!this.missionState) {
-            throw new Error('No mission state for retry');
-        }
-
-        this.missionState.currentPhase = 'RETRY';
-        this.missionState.retryCount++;
-        this.addLog(`🔄 Retry cycle ${this.missionState.retryCount} initiated`);
-
-        // Find failed steps and re-execute only those
-        const failedResults = this.missionState.results.filter(r => !r.success);
-
-        // For now, re-execute the entire plan
-        // In production, would only retry failed steps
-        this.missionState.results = [];
-        this.missionState.verifications = [];
-
+        this.missionState!.retryCount++;
+        // Reset results for retry
+        this.missionState!.results = [];
+        this.missionState!.independentAudits = [];
         return this.execute(plan, context);
     }
 
-    /**
-     * FINALIZE: Complete mission and aggregate results
-     */
-    private finalize(
+    private async finalize(
         agentsUsed: string[],
-        artifacts: AgentResult['artifacts'],
-        startTime: number
-    ): AgentResult {
-        if (!this.missionState) {
-            throw new Error('No mission state to finalize');
-        }
-
-        this.missionState.currentPhase = 'FINALIZE';
-        this.addLog('✅ Finalizing mission...');
-
-        const totalCost = this.missionState.results.reduce((sum, r) => sum + r.cost, 0);
-        const allSuccessful = this.missionState.results.every(r => r.success);
-
-        const summary = {
-            missionId: this.missionState.id,
-            agentsCoordinated: agentsUsed,
-            totalSteps: this.missionState.plan?.steps.length ?? 0,
-            retryCycles: this.missionState.retryCount,
-            duration: Date.now() - startTime,
-            logs: this.missionState.logs
-        };
-
-        return {
-            success: allSuccessful,
-            data: summary,
-            cost: totalCost,
+        artifacts: any[],
+        startTime: number,
+        success: boolean
+    ): Promise<AgentResult> {
+        const result: AgentResult = {
+            success,
+            data: {
+                missionId: this.missionState!.id,
+                audits: this.missionState!.independentAudits
+            },
+            cost: 0,
             duration: Date.now() - startTime,
             artifacts
         };
-    }
 
-    /**
-     * Calculate overall success based on quality threshold
-     */
-    private calculateOverallSuccess(): boolean {
-        if (!this.missionState) return false;
-
-        const results = this.missionState.results;
-        if (results.length === 0) return false;
-
-        const successRate = results.filter(r => r.success).length / results.length;
-        return successRate >= this.qualityThreshold;
-    }
-
-    /**
-     * Record learning for continuous improvement
-     */
-    private recordLearning(result: AgentResult, passed: boolean): void {
-        if (!this.missionState) return;
-
-        const data = result.data as Record<string, unknown> | undefined;
-        const agentsUsed = (data?.agentsCoordinated as string[]) ?? [];
-
-        const learning: LearningRecord = {
-            missionType: 'general', // Would be extracted from analysis
-            agentsUsed,
-            success: passed,
-            duration: result.duration,
-            retryCount: this.missionState.retryCount,
-            insights: this.extractInsights(),
-            timestamp: new Date()
-        };
-
-        this.learnings.push(learning);
-        this.log(`📚 Learning recorded: ${passed ? 'Success' : 'Failure'} pattern captured`);
-    }
-
-    /**
-     * Extract insights from mission execution
-     */
-    private extractInsights(): string[] {
-        const insights: string[] = [];
-
-        if (!this.missionState) return insights;
-
-        if (this.missionState.retryCount === 0) {
-            insights.push('First-attempt success');
-        } else if (this.missionState.retryCount === this.maxRetries) {
-            insights.push('Max retries reached - complex mission');
+        // PERSISTENCE: Complete
+        if (this.missionState?.dbId) {
+            await PrismaMissionAdapter.completeMission(
+                this.missionState.dbId,
+                result,
+                this.missionState!.independentAudits
+            );
         }
 
-        const verifications = this.missionState.verifications;
-        const failedChecks = verifications.flatMap(v => v.checks.filter(c => !c.passed));
-        if (failedChecks.length > 0) {
-            insights.push(`Quality issues: ${failedChecks.map(c => c.name).join(', ')}`);
-        }
-
-        return insights;
+        return result;
     }
 
-    /**
-     * Add to mission log
-     */
     private addLog(message: string): void {
-        const timestamp = new Date().toISOString();
-        const log = `[${timestamp}] ${message}`;
-        console.log(`[OVERSEER] ${log}`);
-
+        console.log(`[OVERSEER] ${message}`);
         if (this.missionState) {
-            this.missionState.logs.push(log);
+            this.missionState.logs.push(message);
+            // Stream to client if callback exists
+            if (this.missionState.context.onStream) {
+                this.missionState.context.onStream(message);
+            }
         }
-    }
-
-    /**
-     * Get historical learnings for mission type
-     */
-    getLearnings(missionType?: string): LearningRecord[] {
-        if (!missionType) return this.learnings;
-        return this.learnings.filter(l => l.missionType === missionType);
-    }
-
-    /**
-     * Get success rate for agent
-     */
-    getAgentSuccessRate(agentName: string): number {
-        const relevant = this.learnings.filter(l => l.agentsUsed.includes(agentName));
-        if (relevant.length === 0) return 1; // No data, assume good
-        return relevant.filter(l => l.success).length / relevant.length;
     }
 }

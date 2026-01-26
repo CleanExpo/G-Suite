@@ -151,7 +151,7 @@ export async function executorNode(state: ProjectStateType) {
   if (state.status === 'REJECTED' || !state.spec) return {};
 
   console.log(`🛠️ G-Pilot Fleet: Executing ${state.spec.tool}...`);
-  const results = [];
+  const results: any[] = [];
 
   try {
     // Real implementations
@@ -179,35 +179,42 @@ export async function executorNode(state: ProjectStateType) {
       const { performWebMasteryAudit } = await import('../tools/webMasteryAudit.js');
       results.push(await performWebMasteryAudit(state.spec.payload.url));
     }
-    // Agent Routing - Specialized Agent Execution
+    // Agent Routing - Unified through Mission Overseer
     else if (state.spec.tool.startsWith('agent:')) {
-      const agentName = state.spec.tool.replace('agent:', '');
-      console.log(`🤖 Routing to Agent: ${agentName}`);
+      const targetAgentName = state.spec.tool.replace('agent:', '');
+      console.log(`🤖 Unified Routing: Delegating ${targetAgentName} to Mission Overseer`);
 
       const { AgentRegistry, initializeAgents } = await import('../agents');
       await initializeAgents();
 
-      const agent = AgentRegistry.get(agentName);
-      if (agent) {
+      const overseer = AgentRegistry.get('mission-overseer');
+
+      if (overseer) {
+        // We wrap the specific agent call into a mission context for the Overseer
+        // The Overseer's new logic will see 'explicitAgents' and skip heuristic analysis
         const context = {
           userId: state.userId,
           mission: state.userRequest,
-          config: state.spec.payload
+          config: {
+            ...state.spec.payload,
+            explicitAgents: [targetAgentName] // <--- Force Overseer to use this agent
+          }
         };
 
-        // Execute agent in all modes
-        const plan = await agent.plan(context);
-        const result = await agent.execute(plan, context);
-        const verification = await agent.verify(result, context);
+        // Execute the unified loop: Plan -> Execute (w/ Independent Verify) -> Result
+        const plan = await overseer.plan(context);
+        const result = await overseer.execute(plan, context);
+        const verification = await overseer.verify(result, context);
 
         results.push({
-          agent: agentName,
-          plan,
-          result,
+          agent: 'mission-overseer',
+          targetAgent: targetAgentName,
+          unifiedResult: result,
           verification
         });
+
       } else {
-        results.push({ error: `Agent '${agentName}' not found` });
+        results.push({ error: 'Critical: Mission Overseer not found in registry.' });
       }
     }
     // Google API Enhanced Skills

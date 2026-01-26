@@ -58,48 +58,87 @@ export async function POST(request: NextRequest): Promise<Response> {
         }
 
         await initializeAgents();
-        const agent = AgentRegistry.get(agentName);
+        // Unified Entry: Delegate to Mission Overseer
+        const overseer = AgentRegistry.get('mission-overseer');
 
-        if (!agent) {
+        if (!overseer) {
             return NextResponse.json({
                 success: false,
-                error: `Agent not found: ${agentName}`
-            }, { status: 404 });
+                error: 'System Error: Mission Overseer not available'
+            }, { status: 500 });
         }
 
-        // Plan phase
-        const context = {
-            userId: userId || 'api-user',
-            mission,
-            config
-        };
+        const encoder = new TextEncoder();
 
-        const plan = await agent.plan(context);
+        const stream = new ReadableStream({
+            async start(controller) {
+                // Helper to stream logs
+                const sendLog = (msg: string) => {
+                    // Send as Server-Sent Event style or just raw text lines
+                    // Using a simple prefix convention for client parsing
+                    controller.enqueue(encoder.encode(`LOG:${msg}\n`));
+                };
 
-        // Execute phase
-        const result = await agent.execute(plan, context);
+                const context = {
+                    userId: userId || 'api-user',
+                    mission,
+                    config: {
+                        ...config,
+                        explicitAgents: [agentName]
+                    },
+                    onStream: sendLog
+                };
 
-        // Verify phase
-        const verification = await agent.verify(result, context);
+                try {
+                    // Execute unified loop
+                    sendLog(`Initializing Mission for ${agentName}...`);
 
-        return NextResponse.json({
-            success: true,
-            agentName,
-            mission,
-            plan: {
-                steps: plan.steps.length,
-                estimatedCost: plan.estimatedCost,
-                reasoning: plan.reasoning
-            },
-            result: {
-                success: result.success,
-                duration: result.duration,
-                cost: result.cost,
-                artifactCount: result.artifacts?.length || 0
-            },
-            verification: {
-                passed: verification.passed,
-                checks: verification.checks
+                    const plan = await overseer.plan(context);
+                    sendLog(`Plan created with ${plan.steps.length} steps.`);
+
+                    const result = await overseer.execute(plan, context);
+                    sendLog(`Execution complete. Success: ${result.success}`);
+
+                    const verification = await overseer.verify(result, context);
+                    sendLog(`Verification status: ${verification.passed ? 'PASSED' : 'FAILED'}`);
+
+                    // Send Final Result as JSON
+                    const finalResponse = {
+                        success: true,
+                        agentName: 'mission-overseer',
+                        targetAgent: agentName,
+                        mission,
+                        plan: {
+                            steps: plan.steps.length,
+                            estimatedCost: plan.estimatedCost,
+                            reasoning: plan.reasoning
+                        },
+                        result: {
+                            success: result.success,
+                            duration: result.duration,
+                            cost: result.cost,
+                            artifactCount: result.artifacts?.length || 0,
+                            audits: (result.data as any)?.audits
+                        },
+                        verification: {
+                            passed: verification.passed,
+                            checks: verification.checks
+                        }
+                    };
+
+                    controller.enqueue(encoder.encode(`RESULT:${JSON.stringify(finalResponse)}\n`));
+                } catch (error: any) {
+                    controller.enqueue(encoder.encode(`ERROR:${error.message}\n`));
+                } finally {
+                    controller.close();
+                }
+            }
+        });
+
+        return new Response(stream, {
+            headers: {
+                'Content-Type': 'text/plain; charset=utf-8',
+                'Transfer-Encoding': 'chunked'
             }
         });
 

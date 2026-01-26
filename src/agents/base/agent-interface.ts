@@ -12,6 +12,7 @@ export interface AgentContext {
     mission: string;
     previousResults?: AgentResult[];
     config?: Record<string, unknown>;
+    onStream?: (chunk: string) => void; // Support for streaming logs
 }
 
 export interface AgentPlan {
@@ -54,6 +55,24 @@ export interface VerificationCheck {
     name: string;
     passed: boolean;
     message?: string;
+}
+
+// New Types for Independent Verification
+export interface TaskOutput {
+    outputs: ReportedOutput[];
+    completion_criteria: CompletionCriterion[];
+}
+
+export interface ReportedOutput {
+    type: 'file' | 'test' | 'endpoint' | 'other';
+    path?: string;
+    description: string;
+}
+
+export interface CompletionCriterion {
+    type: 'file_exists' | 'content_contains' | 'test_passes' | 'endpoint_healthy';
+    target: string;
+    expected?: string;
 }
 
 /**
@@ -104,6 +123,10 @@ export abstract class BaseAgent implements IGPilotAgent {
 
     protected boundSkills: Map<string, Function> = new Map();
 
+    // Verification State
+    protected reportedOutputs: ReportedOutput[] = [];
+    protected completionCriteria: CompletionCriterion[] = [];
+
     /**
      * Bind a skill to this agent for execution
      */
@@ -127,6 +150,44 @@ export abstract class BaseAgent implements IGPilotAgent {
      */
     protected log(message: string, data?: unknown): void {
         console.log(`[${this.name}][${this.mode}] ${message}`, data ?? '');
+    }
+
+    // =========================================================================
+    // Independent Verification Helpers
+    // =========================================================================
+
+    /**
+     * Report an output artifact for independent verification
+     */
+    protected reportOutput(output: ReportedOutput): void {
+        this.reportedOutputs.push(output);
+        this.log(`Reported output: ${output.description}`);
+    }
+
+    /**
+     * Add a criterion that must be met for task completion
+     */
+    protected addCompletionCriterion(criterion: CompletionCriterion): void {
+        this.completionCriteria.push(criterion);
+    }
+
+    /**
+     * Get the structured task output for verification
+     * Call this at the end of execute() to populate the result.data
+     */
+    protected getTaskOutput(): TaskOutput {
+        return {
+            outputs: [...this.reportedOutputs],
+            completion_criteria: [...this.completionCriteria]
+        };
+    }
+
+    /**
+     * Clear verification state (useful when starting new task)
+     */
+    protected clearVerificationState(): void {
+        this.reportedOutputs = [];
+        this.completionCriteria = [];
     }
 
     abstract plan(context: AgentContext): Promise<AgentPlan>;

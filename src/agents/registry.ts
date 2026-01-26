@@ -142,7 +142,9 @@ export async function initializeAgents(): Promise<void> {
         const { DataCollectorAgent } = await import('./data-collector');
         const { GeoMarketingAgent } = await import('./geo-marketing-agent');
         const { AgentScoutAgent } = await import('./agent-scout');
+        const { IndependentVerifierAgent } = await import('./independent-verifier');
 
+        AgentRegistry.registerClass('independent-verifier', IndependentVerifierAgent);
         AgentRegistry.registerClass('marketing-strategist', MarketingStrategistAgent);
         AgentRegistry.registerClass('seo-analyst', SEOAnalystAgent);
         AgentRegistry.registerClass('social-commander', SocialCommanderAgent);

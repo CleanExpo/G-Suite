@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { X, Send, Loader2, Zap, Rocket, Shield, Target } from 'lucide-react';
+import { X, Send, Loader2, Zap, Rocket, Shield, Target, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { runMission } from '@/actions/mission.action';
+import { runMission } from '@/actions/mission.action'; // Keep for compat if needed, though we use fetch now
 
 interface MissionModalProps {
   isOpen: boolean;
@@ -21,7 +21,9 @@ export default function MissionModal({
   const [input, setInput] = useState('');
   const [isLaunching, setIsLaunching] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [logs, setLogs] = useState<string[]>([]);
 
+  // Reset input when initialInput changes
   useEffect(() => {
     if (initialInput) {
       setInput(initialInput);
@@ -31,19 +33,49 @@ export default function MissionModal({
   async function handleLaunch() {
     if (!input) return;
     setIsLaunching(true);
+    setLogs([]);
     setError(null);
 
     try {
-      const result = await runMission(input);
-      if (!result.success) throw new Error(result.error || 'Uplink Failure');
+      const response = await fetch('/api/agents', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          agentName: 'mission-overseer', // Trigger the unified loop directly
+          mission: input,
+        })
+      });
 
-      const firstResult = result.data?.[0];
-      const resultUrl = firstResult?.url || firstResult?.link;
-      if (resultUrl) window.open(resultUrl, '_blank');
+      if (!response.body) throw new Error('Uplink Failed');
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+        buffer += chunk;
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || '';
+
+        for (const line of lines) {
+          if (line.startsWith('LOG:')) {
+            setLogs(prev => [...prev, line.substring(4)]);
+          } else if (line.startsWith('RESULT:')) {
+            // Success
+            setLogs(prev => [...prev, 'Mission Complete.']);
+          } else if (line.startsWith('ERROR:')) {
+            throw new Error(line.substring(6));
+          }
+        }
+      }
 
       setInput('');
       onSuccess();
-      setTimeout(onClose, 100);
+      setTimeout(onClose, 1500); // Wait a bit to show success logs on terminal
+
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -67,9 +99,10 @@ export default function MissionModal({
             initial={{ scale: 0.95, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.95, opacity: 0, y: 20 }}
-            className="relative bg-white dark:bg-[#161b22] w-full max-w-2xl rounded-[3rem] shadow-2xl border border-gray-100 dark:border-white/5 overflow-hidden"
+            className="relative bg-white dark:bg-[#161b22] w-full max-w-2xl rounded-[3rem] shadow-2xl border border-gray-100 dark:border-white/5 overflow-hidden flex flex-col max-h-[90vh]"
           >
-            <div className="relative flex items-center justify-between p-10 border-b border-gray-50 dark:border-white/5">
+            {/* Header */}
+            <div className="relative flex items-center justify-between p-10 border-b border-gray-50 dark:border-white/5 shrink-0">
               <div className="flex items-center gap-4">
                 <div className="bg-blue-600 p-2 rounded-xl">
                   <Rocket className="w-5 h-5 text-white" />
@@ -91,23 +124,47 @@ export default function MissionModal({
               </button>
             </div>
 
-            <div className="p-10 space-y-10">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] flex items-center gap-2">
-                    <Target className="w-3 h-3 text-blue-600" /> Objective Description
-                  </label>
-                  <span className="text-[10px] font-black text-emerald-500 uppercase">
-                    Input Encrypted
-                  </span>
+            <div className="p-10 space-y-8 overflow-y-auto">
+              {!isLaunching ? (
+                /* Input Mode */
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] flex items-center gap-2">
+                      <Target className="w-3 h-3 text-blue-600" /> Objective Description
+                    </label>
+                    <span className="text-[10px] font-black text-emerald-500 uppercase">
+                      Input Encrypted
+                    </span>
+                  </div>
+                  <textarea
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    placeholder="e.g., 'Scan the market for G-Pilot mentions and draft a response blueprint...'"
+                    className="w-full h-48 bg-gray-50 dark:bg-white/[0.02] border border-gray-100 dark:border-white/10 rounded-3xl p-8 text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-blue-600/50 transition-all leading-relaxed text-lg resize-none"
+                  />
                 </div>
-                <textarea
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder="e.g., 'Scan the market for G-Pilot mentions and draft a response blueprint...'"
-                  className="w-full h-48 bg-gray-50 dark:bg-white/[0.02] border border-gray-100 dark:border-white/10 rounded-3xl p-8 text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-blue-600/50 transition-all leading-relaxed text-lg"
-                />
-              </div>
+              ) : (
+                /* Streaming Terminal Mode */
+                <div className="bg-black/90 rounded-3xl p-8 font-mono text-xs text-green-400 h-64 overflow-hidden flex flex-col relative">
+                  <div className="absolute top-0 right-0 p-4">
+                    <Loader2 className="w-4 h-4 animate-spin text-green-500" />
+                  </div>
+                  <div className="flex-1 overflow-y-auto space-y-1 scrollbar-hide">
+                    {logs.map((log, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        className="break-words"
+                      >
+                        <span className="text-green-600 mr-2">{'>'}</span>
+                        {log}
+                      </motion.div>
+                    ))}
+                    <div ref={(el) => el?.scrollIntoView({ behavior: 'smooth' })} />
+                  </div>
+                </div>
+              )}
 
               {error && (
                 <motion.div
@@ -123,17 +180,19 @@ export default function MissionModal({
                 <button
                   onClick={onClose}
                   disabled={isLaunching}
-                  className="flex-1 h-16 rounded-2xl font-black text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all uppercase tracking-widest text-xs"
+                  className={`flex-1 h-16 rounded-2xl font-black text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all uppercase tracking-widest text-xs ${isLaunching ? 'opacity-0 pointer-events-none' : ''}`}
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleLaunch}
                   disabled={isLaunching || !input}
-                  className="flex-[2] h-16 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-black transition-all shadow-xl shadow-blue-600/20 flex items-center justify-center gap-4 group"
+                  className="flex-[2] h-16 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-black transition-all shadow-xl shadow-blue-600/20 flex items-center justify-center gap-4 group disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isLaunching ? (
-                    <Loader2 className="w-6 h-6 animate-spin" />
+                    <span className="flex items-center gap-2">
+                      EXECUTING PROTOCOL <span className="animate-pulse">...</span>
+                    </span>
                   ) : (
                     <>
                       Deploy Mission{' '}
@@ -149,4 +208,4 @@ export default function MissionModal({
     </AnimatePresence>
   );
 }
-import { AlertCircle } from 'lucide-react';
+

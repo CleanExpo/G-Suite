@@ -1,5 +1,6 @@
 export * from './base';
 export * from './registry';
+export { IndependentVerifierAgent } from './independent-verifier';
 export { MarketingStrategistAgent } from './marketing-strategist';
 export { SEOAnalystAgent } from './seo-analyst';
 export { SocialCommanderAgent } from './social-commander';

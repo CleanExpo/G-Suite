@@ -62,3 +62,16 @@ model KanbanTask {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+
+// v8.2 Mission Persistence
+model Mission {
+  id        String   @id @default(uuid())
+  status    String   // PENDING, RUNNING, COMPLETED, FAILED
+  plan      Json?
+  result    Json?
+  audit     Json?    // Independent Verification Report
+  cost      Int
+  userId    String   // Corresponds to clerkId/User ID
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

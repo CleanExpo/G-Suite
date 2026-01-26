@@ -9,6 +9,7 @@
  */
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { notebookLMResearch, ResearchSource } from './notebookLMResearch';
 
 const genAI = new GoogleGenerativeAI(
     process.env.GOOGLE_AI_STUDIO_API_KEY || process.env.GOOGLE_API_KEY || ''
@@ -36,8 +37,9 @@ export async function gemini3Flash(
 }> {
     console.log(`[gemini3Flash] Processing for user ${userId}`);
 
+    // Use Gemini 3 Flash (2026 Standard)
     const model = genAI.getGenerativeModel({
-        model: 'gemini-3-flash', // Upgraded to Gemini 3
+        model: 'gemini-3-flash',
         systemInstruction: options.systemInstruction,
         generationConfig: {
             temperature: options.temperature ?? 0.7,
@@ -48,17 +50,25 @@ export async function gemini3Flash(
     try {
         const result = await model.generateContent(prompt);
         const response = result.response;
+        const text = response.text();
+
+        // Basic validation of output
+        if (!text) {
+            throw new Error('Empty response from model');
+        }
 
         return {
             success: true,
-            text: response.text(),
+            text,
             tokensUsed: response.usageMetadata?.totalTokenCount ?? 0
         };
     } catch (error: any) {
         console.error('[gemini3Flash] Error:', error.message);
+
+        // Return structured error for graceful degradation
         return {
             success: false,
-            text: error.message,
+            text: `Error generating content: ${error.message}. Please try again later.`,
             tokensUsed: 0
         };
     }
@@ -88,13 +98,41 @@ export async function deepResearch(
         depth?: 'shallow' | 'moderate' | 'deep';
         maxSources?: number;
         focusAreas?: string[];
+        sources?: ResearchSource[]; // Added: external sources
     } = {}
 ): Promise<DeepResearchResult> {
     console.log(`[deepResearch] Researching "${topic}" for user ${userId}`);
 
+    // Delegation: If sources are provided, use the robust NotebookLM logic
+    if (options.sources && options.sources.length > 0) {
+        const notebookResult = await notebookLMResearch(userId, topic, options.sources, {
+            depth: options.depth === 'shallow' ? 'quick' : options.depth === 'deep' ? 'comprehensive' : 'standard',
+            focusAreas: options.focusAreas,
+            outputFormat: 'detailed'
+        });
+
+        if (notebookResult.success) {
+            return {
+                success: true,
+                topic,
+                summary: notebookResult.synthesis.summary,
+                keyFindings: notebookResult.synthesis.keyFindings,
+                sources: notebookResult.sources.map(s => ({
+                    title: s.title,
+                    url: 'notebook_source',
+                    relevance: s.relevance
+                })),
+                synthesis: notebookResult.synthesis.detailedAnalysis || notebookResult.synthesis.summary,
+                tokensUsed: notebookResult.tokensUsed
+            };
+        }
+    }
+
+    // Default: Internal Knowledge Research using Gemini 3 Pro
+    // This model is much better at "internal search" than standard Flash
     const model = genAI.getGenerativeModel({
-        model: 'gemini-3-flash',
-        systemInstruction: 'You are a research analyst. Provide comprehensive, well-sourced analysis.'
+        model: 'gemini-3-pro',
+        systemInstruction: 'You are a research analyst. Provide comprehensive, well-sourced analysis based on your internal knowledge.'
     });
 
     const depth = options.depth ?? 'moderate';
@@ -141,7 +179,7 @@ export async function deepResearch(
         return {
             success: false,
             topic,
-            summary: error.message,
+            summary: `Research failed: ${error.message}`,
             keyFindings: [],
             sources: [],
             synthesis: '',
@@ -191,6 +229,8 @@ export async function veo31Generate(
         await new Promise(resolve => setTimeout(resolve, 2000));
 
         const videoId = `veo_${Date.now()}`;
+        // Realistic mock metadata for UI integration
+        const resolution = options.resolution ?? '1080p';
 
         return {
             success: true,
