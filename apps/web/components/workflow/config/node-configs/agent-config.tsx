@@ -4,22 +4,49 @@
  * Agent Node Configuration - Scientific Luxury Edition
  *
  * Configuration form for AI Agent nodes.
+ * Fetches available agents from GET /api/discovery/agents,
+ * falling back to a hardcoded list when the API is unreachable.
  */
 
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
+import { apiClient } from '@/lib/api/client';
 import type { NodeConfigProps } from '../node-config-panel';
 
-const AGENT_TYPES = [
-  { value: 'research', label: 'Research Agent', description: 'Web search and analysis' },
-  { value: 'coding', label: 'Coding Agent', description: 'Code generation and review' },
-  { value: 'data', label: 'Data Agent', description: 'Data processing and analysis' },
-  { value: 'orchestrator', label: 'Orchestrator', description: 'Coordinate other agents' },
-  { value: 'custom', label: 'Custom Agent', description: 'Custom behaviour' },
+interface AgentOption {
+  value: string;
+  label: string;
+  description: string;
+}
+
+interface DiscoveryAgent {
+  name: string;
+  capabilities: string[];
+}
+
+interface AgentListResponse {
+  agents: DiscoveryAgent[];
+  total: number;
+}
+
+const FALLBACK_AGENTS: AgentOption[] = [
+  { value: 'frontend', label: 'Frontend Agent', description: 'React, Next.js, UI tasks' },
+  { value: 'backend', label: 'Backend Agent', description: 'Python, FastAPI, API tasks' },
+  { value: 'database', label: 'Database Agent', description: 'SQL, migrations, queries' },
+  { value: 'devops', label: 'DevOps Agent', description: 'Docker, CI/CD, deployment' },
+  { value: 'general', label: 'General Agent', description: 'General-purpose tasks' },
 ];
+
+function toAgentOption(agent: DiscoveryAgent): AgentOption {
+  return {
+    value: agent.name,
+    label: agent.name.charAt(0).toUpperCase() + agent.name.slice(1) + ' Agent',
+    description: agent.capabilities.slice(0, 4).join(', ') || 'No capabilities listed',
+  };
+}
 
 export function AgentNodeConfig({ config, onChange }: NodeConfigProps) {
   const handleChange = useCallback(
@@ -29,27 +56,53 @@ export function AgentNodeConfig({ config, onChange }: NodeConfigProps) {
     [config, onChange]
   );
 
+  const [agentTypes, setAgentTypes] = useState<AgentOption[]>(FALLBACK_AGENTS);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    apiClient
+      .get<AgentListResponse>('/api/discovery/agents')
+      .then((data) => {
+        if (!cancelled && data.agents.length > 0) {
+          setAgentTypes(data.agents.map(toAgentOption));
+        }
+      })
+      .catch(() => {
+        // Keep fallback list
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const selectedValue = (config.agentType as string) || agentTypes[0]?.value || 'general';
+
   return (
     <div className="space-y-4">
       {/* Agent Type */}
       <div>
         <Label className="text-[10px] tracking-[0.2em] text-white/40 uppercase">Agent Type</Label>
-        <select
-          value={(config.agentType as string) || 'research'}
-          onChange={(e) => handleChange('agentType', e.target.value)}
-          className="mt-2 w-full rounded-sm border-[0.5px] border-white/[0.06] bg-[#050505] px-3 py-2 text-sm text-white/90"
-        >
-          {AGENT_TYPES.map((type) => (
-            <option key={type.value} value={type.value}>
-              {type.label}
-            </option>
-          ))}
-        </select>
+        {loading ? (
+          <div className="mt-2 h-9 w-full animate-pulse rounded-sm bg-white/[0.04]" />
+        ) : (
+          <select
+            value={selectedValue}
+            onChange={(e) => handleChange('agentType', e.target.value)}
+            className="mt-2 w-full rounded-sm border-[0.5px] border-white/[0.06] bg-[#050505] px-3 py-2 text-sm text-white/90"
+          >
+            {agentTypes.map((type) => (
+              <option key={type.value} value={type.value}>
+                {type.label}
+              </option>
+            ))}
+          </select>
+        )}
         <p className="mt-1 text-[10px] text-white/30">
-          {
-            AGENT_TYPES.find((t) => t.value === ((config.agentType as string) || 'research'))
-              ?.description
-          }
+          {agentTypes.find((t) => t.value === selectedValue)?.description}
         </p>
       </div>
 

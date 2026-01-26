@@ -4,17 +4,38 @@
  * Tool Node Configuration - Scientific Luxury Edition
  *
  * Configuration form for tool execution nodes.
+ * Fetches available tools from GET /api/discovery/tools,
+ * falling back to a hardcoded list when the API is unreachable.
  */
 
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Plus, Trash2 } from 'lucide-react';
+import { apiClient } from '@/lib/api/client';
 import type { NodeConfigProps } from '../node-config-panel';
 
-const BUILT_IN_TOOLS = [
+interface ToolOption {
+  value: string;
+  label: string;
+  description: string;
+}
+
+interface DiscoveryTool {
+  name: string;
+  description: string;
+  categories: string[];
+  has_handler: boolean;
+}
+
+interface ToolListResponse {
+  tools: DiscoveryTool[];
+  total: number;
+}
+
+const FALLBACK_TOOLS: ToolOption[] = [
   { value: 'web_search', label: 'Web Search', description: 'Search the web for information' },
   { value: 'web_scrape', label: 'Web Scrape', description: 'Extract content from URLs' },
   { value: 'file_read', label: 'File Read', description: 'Read file contents' },
@@ -24,6 +45,16 @@ const BUILT_IN_TOOLS = [
   { value: 'slack_message', label: 'Slack Message', description: 'Post to Slack channels' },
   { value: 'custom', label: 'Custom Tool', description: 'Define a custom tool' },
 ];
+
+function toToolOption(tool: DiscoveryTool): ToolOption {
+  const label = tool.name.replace(/[._]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+  const suffix = tool.has_handler ? '' : ' (no handler)';
+  return {
+    value: tool.name,
+    label: label + suffix,
+    description: tool.description || tool.categories.join(', ') || 'No description',
+  };
+}
 
 interface Parameter {
   name: string;
@@ -38,8 +69,38 @@ export function ToolNodeConfig({ config, onChange }: NodeConfigProps) {
     [config, onChange]
   );
 
+  const [toolOptions, setToolOptions] = useState<ToolOption[]>(FALLBACK_TOOLS);
+  const [toolsLoading, setToolsLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    apiClient
+      .get<ToolListResponse>('/api/discovery/tools')
+      .then((data) => {
+        if (!cancelled && data.tools.length > 0) {
+          const fetched = data.tools.map(toToolOption);
+          // Always keep the "custom" option at the end
+          fetched.push({
+            value: 'custom',
+            label: 'Custom Tool',
+            description: 'Define a custom tool',
+          });
+          setToolOptions(fetched);
+        }
+      })
+      .catch(() => {
+        // Keep fallback list
+      })
+      .finally(() => {
+        if (!cancelled) setToolsLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const parameters = useMemo(() => (config.parameters as Parameter[]) || [], [config.parameters]);
-  const selectedTool = (config.tool as string) || 'web_search';
+  const selectedTool = (config.tool as string) || toolOptions[0]?.value || 'web_search';
 
   const addParameter = useCallback(() => {
     handleChange('parameters', [...parameters, { name: '', value: '' }]);
@@ -69,19 +130,23 @@ export function ToolNodeConfig({ config, onChange }: NodeConfigProps) {
       {/* Tool Selection */}
       <div>
         <Label className="text-[10px] tracking-[0.2em] text-white/40 uppercase">Tool</Label>
-        <select
-          value={selectedTool}
-          onChange={(e) => handleChange('tool', e.target.value)}
-          className="mt-2 w-full rounded-sm border-[0.5px] border-white/[0.06] bg-[#050505] px-3 py-2 text-sm text-white/90"
-        >
-          {BUILT_IN_TOOLS.map((tool) => (
-            <option key={tool.value} value={tool.value}>
-              {tool.label}
-            </option>
-          ))}
-        </select>
+        {toolsLoading ? (
+          <div className="mt-2 h-9 w-full animate-pulse rounded-sm bg-white/[0.04]" />
+        ) : (
+          <select
+            value={selectedTool}
+            onChange={(e) => handleChange('tool', e.target.value)}
+            className="mt-2 w-full rounded-sm border-[0.5px] border-white/[0.06] bg-[#050505] px-3 py-2 text-sm text-white/90"
+          >
+            {toolOptions.map((tool) => (
+              <option key={tool.value} value={tool.value}>
+                {tool.label}
+              </option>
+            ))}
+          </select>
+        )}
         <p className="mt-1 text-[10px] text-white/30">
-          {BUILT_IN_TOOLS.find((t) => t.value === selectedTool)?.description}
+          {toolOptions.find((t) => t.value === selectedTool)?.description}
         </p>
       </div>
 

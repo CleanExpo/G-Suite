@@ -130,32 +130,69 @@ async def handle_agent(
     state: ExecutionState,
 ) -> dict[str, Any]:
     """
-    AGENT node — delegates to the orchestrator agent system.
+    AGENT node — delegates to a registered agent via AgentRegistry.
+
+    Lookup order:
+      1. Exact name match via ``get_agent(name)``
+      2. Intelligent routing via ``get_agent_for_task(task)``
+      3. Fallback to the ``general`` agent
+
+    The workflow engine provides its own execution logging, so we call
+    the agent's ``execute()`` directly rather than going through the
+    orchestrator's verification loop.
 
     Config:
-        agent_name: str
-        task_description: str
-        max_iterations: int
+        agent_name / agentName: str
+        task_description / taskDescription: str
+        max_iterations / maxIterations: int
     """
     agent_name = config.get("agent_name") or config.get("agentName", "default")
     task_desc = config.get("task_description") or config.get("taskDescription", "")
     resolved_task = _resolve_string(task_desc, state)
 
     try:
-        from src.agents.orchestrator import OrchestratorAgent
+        from src.agents.registry import AgentRegistry
 
-        orchestrator = OrchestratorAgent()
-        result = await orchestrator.execute(
-            task=resolved_task,
+        registry = AgentRegistry()
+
+        # 1. Exact name match
+        agent = registry.get_agent(agent_name)
+
+        # 2. Intelligent routing by task description
+        if agent is None and resolved_task:
+            agent = registry.get_agent_for_task(resolved_task)
+
+        # 3. Fallback to general
+        if agent is None:
+            agent = registry.get_agent("general")
+
+        if agent is None:
+            return {
+                "result": None,
+                "agent": agent_name,
+                "error": "No suitable agent found in registry",
+            }
+
+        result = await agent.execute(
+            task_description=resolved_task,
             context={
-                "agent_name": agent_name,
+                "requested_agent": agent_name,
                 "variables": state.variables,
                 "node_outputs": state.node_outputs,
             },
         )
+
+        # Normalise response — agents return dicts
+        if isinstance(result, dict):
+            return {
+                "result": result,
+                "agent": agent.name,
+                "status": result.get("status", "completed"),
+            }
+
         return {
-            "result": result.outputs if hasattr(result, "outputs") else str(result),
-            "agent": agent_name,
+            "result": str(result),
+            "agent": agent.name,
             "status": "completed",
         }
     except Exception as e:
@@ -497,8 +534,15 @@ async def handle_tool(
     """
     TOOL node — calls a registered tool.
 
+    Three outcomes:
+      1. Tool found + handler exists → execute handler, record usage.
+      2. Tool found + handler is None → return tool metadata with
+         ``handler_missing: True`` so the workflow can continue and
+         the user sees what parameters the tool expects.
+      3. Tool not found → error output.
+
     Config:
-        tool_name: str
+        tool_name / toolName: str
         parameters: dict
     """
     tool_name = config.get("tool_name") or config.get("toolName", "")
@@ -510,10 +554,25 @@ async def handle_tool(
         registry = get_registry()
         tool = registry.get(tool_name)
 
-        if not tool or not tool.handler:
-            return {"error": f"Tool not found: {tool_name}", "success": False}
+        # Case 3: tool not in registry at all
+        if tool is None:
+            return {"error": f"Tool not found: {tool_name}", "tool": tool_name, "success": False}
 
+        # Case 2: tool exists but has no handler implementation
+        if tool.handler is None:
+            return {
+                "tool": tool_name,
+                "description": tool.description,
+                "parameters_schema": tool.input_schema,
+                "categories": [c.value for c in tool.categories],
+                "handler_missing": True,
+                "success": False,
+                "note": "Tool is registered but has no executable handler yet",
+            }
+
+        # Case 1: execute the handler
         result = await tool.handler(**parameters)
+        registry.record_usage(tool_name)
         return {"result": result, "tool": tool_name, "success": True}
     except Exception as e:
         logger.error("Tool node failed", tool=tool_name, error=str(e))
