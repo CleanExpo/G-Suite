@@ -29,12 +29,14 @@ import {
   SelectionMode,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 import { Button } from '@/components/ui/button';
 import { Save, Play, ZoomIn, ZoomOut, Maximize2, Undo2, Redo2 } from 'lucide-react';
 import { SPECTRAL, BACKGROUNDS, EASINGS, DURATIONS } from '@/lib/design-tokens';
 import { NODE_SPECTRAL_COLOURS, NodeType } from '@/types/workflow';
+import type { ExecutionStatus } from '@/hooks/use-workflow-execution';
+import type { NodeVisualStatus } from '@/types/workflow';
 
 // Import custom node components
 import { WorkflowNodeComponent } from '../nodes/workflow-node';
@@ -42,6 +44,7 @@ import { NodePalette } from '../sidebar/node-palette';
 import { NodeConfigPanel, type NodeData } from '../config/node-config-panel';
 import { NodeContextMenu, type ContextMenuPosition } from '../context-menu/node-context-menu';
 import { CollaboratorCursors, CollaborationStatus } from '../collaboration';
+import { ExecutionPanel } from '../execution/execution-panel';
 import { useCollaboration } from '@/hooks/use-collaboration';
 
 // Define node types mapping
@@ -70,7 +73,6 @@ interface CollaborativeCanvasProps {
   initialNodes?: Node[];
   initialEdges?: Edge[];
   onSave?: (nodes: Node[], edges: Edge[]) => Promise<void>;
-  onExecute?: () => Promise<void>;
   readonly?: boolean;
   collaborationEnabled?: boolean;
 }
@@ -89,7 +91,6 @@ function CollaborativeCanvasInner({
   ],
   initialEdges = [],
   onSave,
-  onExecute,
   readonly = false,
   collaborationEnabled = true,
 }: CollaborativeCanvasProps) {
@@ -126,6 +127,9 @@ function CollaborativeCanvasInner({
   // Node configuration panel state
   const [selectedNode, setSelectedNode] = useState<NodeData | null>(null);
   const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(false);
+
+  // Execution panel state
+  const [isExecutionPanelOpen, setIsExecutionPanelOpen] = useState(false);
 
   // Context menu state
   const [contextMenuPosition, setContextMenuPosition] = useState<ContextMenuPosition | null>(null);
@@ -347,6 +351,43 @@ function CollaborativeCanvasInner({
     [setEdges, saveToHistory]
   );
 
+  // Map backend execution status to frontend visual status
+  const toVisualStatus = useCallback((status: ExecutionStatus): NodeVisualStatus => {
+    switch (status) {
+      case 'pending':
+        return 'awaiting';
+      case 'running':
+        return 'running';
+      case 'completed':
+        return 'completed';
+      case 'failed':
+        return 'failed';
+      case 'cancelled':
+        return 'idle';
+      default:
+        return 'idle';
+    }
+  }, []);
+
+  // Update node visual status during execution
+  const handleNodeStatusChange = useCallback(
+    (nodeStatuses: Map<string, ExecutionStatus>) => {
+      setNodes((nds) =>
+        nds.map((node) => {
+          const execStatus = nodeStatuses.get(node.id);
+          if (execStatus) {
+            const visualStatus = toVisualStatus(execStatus);
+            if (node.data.status !== visualStatus) {
+              return { ...node, data: { ...node.data, status: visualStatus } };
+            }
+          }
+          return node;
+        })
+      );
+    },
+    [setNodes, toVisualStatus]
+  );
+
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -436,12 +477,6 @@ function CollaborativeCanvasInner({
   const handleSave = async () => {
     if (onSave) {
       await onSave(nodes, edges);
-    }
-  };
-
-  const handleExecute = async () => {
-    if (onExecute) {
-      await onExecute();
     }
   };
 
@@ -598,15 +633,17 @@ function CollaborativeCanvasInner({
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: DURATIONS.normal, ease: EASINGS.outExpo }}
               >
-                {onExecute && (
-                  <Button
-                    onClick={handleExecute}
-                    className="border-[0.5px] border-[#00F5FF]/30 bg-[#00F5FF]/10 text-[#00F5FF] hover:bg-[#00F5FF]/20"
-                  >
-                    <Play className="mr-2 h-4 w-4" />
-                    Execute
-                  </Button>
-                )}
+                <Button
+                  onClick={() => setIsExecutionPanelOpen((prev) => !prev)}
+                  className={`border-[0.5px] ${
+                    isExecutionPanelOpen
+                      ? 'border-[#00F5FF]/50 bg-[#00F5FF]/20 text-[#00F5FF]'
+                      : 'border-[#00F5FF]/30 bg-[#00F5FF]/10 text-[#00F5FF] hover:bg-[#00F5FF]/20'
+                  }`}
+                >
+                  <Play className="mr-2 h-4 w-4" />
+                  {isExecutionPanelOpen ? 'Close' : 'Execute'}
+                </Button>
                 {onSave && (
                   <Button
                     onClick={handleSave}
@@ -662,6 +699,21 @@ function CollaborativeCanvasInner({
           />
         )}
       </div>
+
+      {/* Execution Panel — right sidebar */}
+      <AnimatePresence>
+        {isExecutionPanelOpen && workflowId && (
+          <motion.div
+            className="h-full w-80 flex-shrink-0"
+            initial={{ width: 0, opacity: 0 }}
+            animate={{ width: 320, opacity: 1 }}
+            exit={{ width: 0, opacity: 0 }}
+            transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+          >
+            <ExecutionPanel workflowId={workflowId} onNodeStatusChange={handleNodeStatusChange} />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

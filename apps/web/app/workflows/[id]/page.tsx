@@ -11,6 +11,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { WorkflowCanvasV2 } from '@/components/workflow/canvas/workflow-canvas-v2';
+import { CollaborativeCanvas } from '@/components/workflow/canvas/collaborative-canvas';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -21,11 +22,13 @@ import type { Node, Edge } from '@xyflow/react';
 import Link from 'next/link';
 import { BACKGROUNDS, SPECTRAL, EASINGS, DURATIONS } from '@/lib/design-tokens';
 import { formatAustralianDateTime } from '@/types/workflow';
+import { useAuth } from '@/hooks/use-auth';
 
 export default function WorkflowEditorPage() {
   const params = useParams();
   const router = useRouter();
   const workflowId = params.id as string;
+  const { user: authUser } = useAuth();
 
   const [workflow, setWorkflow] = useState<WorkflowDefinition | null>(null);
   const [loading, setLoading] = useState(true);
@@ -374,12 +377,23 @@ export default function WorkflowEditorPage() {
         )}
 
         {/* Workflow Canvas */}
-        <WorkflowCanvasV2
-          workflowId={workflow.id}
-          initialNodes={initialNodes.length > 0 ? initialNodes : undefined}
-          initialEdges={initialEdges}
-          onSave={handleSave}
-        />
+        {workflow.id && authUser ? (
+          <CollaborativeCanvas
+            workflowId={workflow.id}
+            userId={authUser.id}
+            userName={authUser.email || 'User'}
+            initialNodes={initialNodes.length > 0 ? initialNodes : undefined}
+            initialEdges={initialEdges}
+            onSave={handleSave}
+          />
+        ) : (
+          <WorkflowCanvasV2
+            workflowId={workflow.id}
+            initialNodes={initialNodes.length > 0 ? initialNodes : undefined}
+            initialEdges={initialEdges}
+            onSave={handleSave}
+          />
+        )}
       </div>
     </div>
   );
