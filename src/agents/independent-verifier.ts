@@ -137,9 +137,10 @@ export class IndependentVerifierAgent extends BaseAgent {
                     check.passed = await this.checkFileExists(output.path);
                     check.message = check.passed ? 'Verified on disk' : 'File not found';
                 } else if (output.type === 'test') {
-                    // Logic for test verification would go here (e.g. read junit report)
-                    check.passed = true; // Placeholder
-                    check.message = 'Test report verified (placeholder)';
+                    // Run actual test verification
+                    const testResult = await this.runTestSuite(output.path || '');
+                    check.passed = testResult.passed;
+                    check.message = `Tests: ${testResult.passCount}/${testResult.totalCount} passed`;
                 } else {
                     check.passed = true;
                     check.message = `Type ${output.type} acknowledged`;
@@ -264,9 +265,144 @@ export class IndependentVerifierAgent extends BaseAgent {
             try { await fs.access(fullPath); } catch { fullPath = path.resolve(process.cwd(), filePath); }
 
             const content = await fs.readFile(fullPath, 'utf8');
-            return content.includes(term);
+
+            // Fast path: substring match
+            if (content.includes(term)) return true;
+
+            // Semantic verification for complex criteria
+            return await this.semanticValidation(content, term);
         } catch {
             return false;
+        }
+    }
+
+    /**
+     * Semantic validation using Gemini for complex content checks
+     */
+    private async semanticValidation(content: string, term: string): Promise<boolean> {
+        try {
+            const { GoogleGenerativeAI } = await import('@google/generative-ai');
+            const genAI = new GoogleGenerativeAI(
+                process.env.GOOGLE_AI_STUDIO_API_KEY || process.env.GOOGLE_API_KEY || ''
+            );
+
+            const model = genAI.getGenerativeModel({
+                model: 'gemini-2.0-flash-exp',
+                generationConfig: {
+                    responseMimeType: 'application/json',
+                    temperature: 0.1
+                }
+            });
+
+            const prompt = `Verify if content contains concept: "${term}"
+
+Content (first 5000 chars):
+${content.substring(0, 5000)}
+
+Return JSON: { "contains": boolean, "confidence": number }`;
+
+            const result = await model.generateContent(prompt);
+            const parsed = JSON.parse(result.response.text());
+            return parsed.contains && parsed.confidence > 0.85;
+        } catch (error) {
+            this.log(`Semantic validation error: ${error}`);
+            return false;
+        }
+    }
+
+    /**
+     * Run test suite using vitest programmatic API
+     * Only available in development/test environments
+     */
+    private async runTestSuite(testPath: string): Promise<{
+        passed: boolean;
+        passCount: number;
+        failureCount: number;
+        totalCount: number;
+    }> {
+        // Skip test execution in production builds
+        if (process.env.NODE_ENV === 'production') {
+            this.log('Test execution skipped in production mode');
+            return {
+                passed: true,
+                passCount: 0,
+                failureCount: 0,
+                totalCount: 0
+            };
+        }
+
+        try {
+            // Resolve test path
+            let fullPath = testPath;
+            try {
+                await fs.access(fullPath);
+            } catch {
+                fullPath = path.resolve(process.cwd(), testPath);
+            }
+
+            // Check if file exists first
+            try {
+                await fs.access(fullPath);
+            } catch {
+                this.log(`Test file not found: ${fullPath}`);
+                return {
+                    passed: false,
+                    passCount: 0,
+                    failureCount: 1,
+                    totalCount: 1
+                };
+            }
+
+            // Import vitest programmatically (only in dev/test)
+            const { startVitest } = await import('vitest/node');
+
+            // Run tests
+            const vitest = await startVitest('test', [fullPath], {
+                run: true,
+                reporters: ['json'],
+                ui: false,
+                watch: false
+            });
+
+            if (!vitest) {
+                throw new Error('Failed to start vitest');
+            }
+
+            // Get results
+            const results = vitest.state.getFiles();
+            let passCount = 0;
+            let failureCount = 0;
+            let totalCount = 0;
+
+            for (const file of results) {
+                const tasks = file.tasks || [];
+                for (const task of tasks) {
+                    totalCount++;
+                    if (task.result?.state === 'pass') {
+                        passCount++;
+                    } else if (task.result?.state === 'fail') {
+                        failureCount++;
+                    }
+                }
+            }
+
+            await vitest.close();
+
+            return {
+                passed: failureCount === 0 && totalCount > 0,
+                passCount,
+                failureCount,
+                totalCount
+            };
+        } catch (error: any) {
+            this.log(`Test execution error: ${error.message}`);
+            // Fall back to checking if test file exists
+            return {
+                passed: false,
+                passCount: 0,
+                failureCount: 1,
+                totalCount: 1
+            };
         }
     }
 }

@@ -120,6 +120,69 @@ export async function createResearchNotebook(
 }
 
 // =============================================================================
+// SERP INTEGRATION
+// =============================================================================
+
+/**
+ * Perform NotebookLM research enhanced with real-time SERP data
+ * Combines web search grounding with deep synthesis
+ */
+export async function notebookLMResearchWithSERP(
+    userId: string,
+    topic: string,
+    options: NotebookLMResearchOptions & {
+        enableSERP?: boolean;
+        maxSerpResults?: number;
+    } = {}
+): Promise<NotebookLMResearchResult> {
+    console.log(`[notebookLMResearchWithSERP] Researching "${topic}" with SERP for user ${userId}`);
+
+    const sources: ResearchSource[] = [];
+
+    if (options.enableSERP !== false) {
+        try {
+            // Import SERP tools dynamically to avoid circular dependencies
+            const { serp_collector, web_unlocker } = await import('./webIntelligenceSkills');
+
+            // Get SERP results
+            const serpResults = await serp_collector(userId, topic, {
+                numResults: options.maxSerpResults ?? 10
+            });
+
+            if (serpResults.success && serpResults.results) {
+                // Convert SERP results to research sources
+                for (const result of serpResults.results.slice(0, options.maxSources ?? 10)) {
+                    try {
+                        // Fetch content from each URL
+                        const content = await web_unlocker(userId, result.url, {});
+
+                        if (content.success && content.html) {
+                            sources.push({
+                                type: 'url',
+                                content: content.html,
+                                title: result.title,
+                                metadata: {
+                                    url: result.url,
+                                    rank: result.position,
+                                    snippet: result.snippet
+                                }
+                            });
+                        }
+                    } catch (error) {
+                        console.log(`[notebookLMResearchWithSERP] Failed to fetch ${result.url}`);
+                    }
+                }
+            }
+        } catch (error: any) {
+            console.error('[notebookLMResearchWithSERP] SERP integration error:', error.message);
+        }
+    }
+
+    // Perform NotebookLM research with collected sources
+    return await notebookLMResearch(userId, topic, sources, options);
+}
+
+// =============================================================================
 // DEEP RESEARCH SYNTHESIS
 // =============================================================================
 
@@ -369,6 +432,7 @@ export async function notebookLMAudioOverview(
 export const notebookLMSkills = {
     createResearchNotebook,
     notebookLMResearch,
+    notebookLMResearchWithSERP,
     notebookLMQuery,
     notebookLMAudioOverview
 };

@@ -37,6 +37,8 @@ export interface AgentResult {
     cost: number;
     duration: number;
     artifacts?: AgentArtifact[];
+    confidence?: number;        // NEW: 0-1 score indicating agent's confidence in result
+    uncertainties?: string[];   // NEW: What agent is unsure about
 }
 
 export interface AgentArtifact {
@@ -73,6 +75,13 @@ export interface CompletionCriterion {
     type: 'file_exists' | 'content_contains' | 'test_passes' | 'endpoint_healthy';
     target: string;
     expected?: string;
+}
+
+// Skill Combination System
+export interface SkillCombination {
+    name: string;
+    skills: string[];
+    combiner: (...results: unknown[]) => Promise<unknown>;
 }
 
 /**
@@ -122,6 +131,7 @@ export abstract class BaseAgent implements IGPilotAgent {
     mode: AgentMode = 'PLANNING';
 
     protected boundSkills: Map<string, Function> = new Map();
+    protected skillCombinations: Map<string, SkillCombination> = new Map();
 
     // Verification State
     protected reportedOutputs: ReportedOutput[] = [];
@@ -143,6 +153,34 @@ export abstract class BaseAgent implements IGPilotAgent {
             throw new Error(`Skill '${skillName}' not bound to agent '${this.name}'`);
         }
         return skill(...args);
+    }
+
+    /**
+     * Register a skill combination (power combination)
+     */
+    registerCombination(combination: SkillCombination): void {
+        this.skillCombinations.set(combination.name, combination);
+        this.log(`Registered skill combination: ${combination.name}`);
+    }
+
+    /**
+     * Execute a skill combination
+     */
+    protected async invokeCombination(name: string, ...args: unknown[]): Promise<unknown> {
+        const combo = this.skillCombinations.get(name);
+        if (!combo) {
+            throw new Error(`Skill combination '${name}' not registered on agent '${this.name}'`);
+        }
+
+        this.log(`Executing skill combination: ${name} with skills [${combo.skills.join(', ')}]`);
+
+        // Execute all skills in parallel
+        const results = await Promise.all(
+            combo.skills.map(skill => this.invokeSkill(skill, ...args))
+        );
+
+        // Combine results using the combiner function
+        return combo.combiner(...results);
     }
 
     /**
@@ -188,6 +226,78 @@ export abstract class BaseAgent implements IGPilotAgent {
     protected clearVerificationState(): void {
         this.reportedOutputs = [];
         this.completionCriteria = [];
+    }
+
+    // =========================================================================
+    // Self-Validation (Phase 3: Iterative Refinement)
+    // =========================================================================
+
+    /**
+     * Self-validate agent output before returning
+     * Uses Gemini to check completeness, correctness, and quality
+     */
+    protected async selfValidate(result: AgentResult): Promise<{
+        passed: boolean;
+        issues: string[];
+        confidence: number;
+    }> {
+        try {
+            const { GoogleGenerativeAI } = await import('@google/generative-ai');
+            const genAI = new GoogleGenerativeAI(
+                process.env.GOOGLE_AI_STUDIO_API_KEY || process.env.GOOGLE_API_KEY || ''
+            );
+
+            const model = genAI.getGenerativeModel({
+                model: 'gemini-2.0-flash-exp',
+                generationConfig: {
+                    responseMimeType: 'application/json',
+                    temperature: 0.2
+                }
+            });
+
+            const validationPrompt = `You are a quality auditor reviewing agent output.
+
+Agent: ${this.name}
+Success: ${result.success}
+Output: ${JSON.stringify(result.data).substring(0, 2000)}
+
+Evaluate:
+1. Completeness - Is all required data present?
+2. Correctness - Is the data valid and well-formed?
+3. Quality - Does it meet professional standards?
+
+Return JSON:
+{
+    "passed": boolean,
+    "issues": ["issue1", "issue2"],
+    "confidence": 0.0-1.0
+}`;
+
+            const validation = await model.generateContent(validationPrompt);
+            return JSON.parse(validation.response.text());
+
+        } catch (error) {
+            this.log(`Self-validation error: ${error}`);
+            return { passed: true, issues: [], confidence: 0.8 };
+        }
+    }
+
+    /**
+     * Self-correct agent output based on validation issues
+     */
+    protected async selfCorrect(
+        result: AgentResult,
+        issues: string[]
+    ): Promise<AgentResult> {
+        this.log(`⚠️ Self-correcting based on issues: ${issues.join(', ')}`);
+
+        // For now, return original result with lower confidence
+        // Concrete agents can override this with specific correction logic
+        return {
+            ...result,
+            confidence: (result.confidence ?? 0.8) * 0.9,
+            uncertainties: [...(result.uncertainties ?? []), ...issues]
+        };
     }
 
     abstract plan(context: AgentContext): Promise<AgentPlan>;

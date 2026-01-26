@@ -80,3 +80,21 @@ model Mission {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }
+
+// Phase 4: Cross-Mission Intelligence
+model MissionLearning {
+  id              String   @id @default(uuid())
+  missionType     String   // Classification: marketing, seo, content, research, etc.
+  agentsUsed      String[] // List of agent names used in this mission
+  success         Boolean  // Whether mission completed successfully
+  duration        Int      // Duration in milliseconds
+  retryCount      Int      // Number of retries needed
+  insights        String[] // Extracted insights and learnings
+  qualityScore    Float?   // Quality score (0-100)
+  failureMode     String?  // If failed, what was the failure category
+  timestamp       DateTime @default(now())
+
+  @@index([missionType])
+  @@index([success])
+  @@index([timestamp])
+}

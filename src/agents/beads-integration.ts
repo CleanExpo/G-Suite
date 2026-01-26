@@ -9,13 +9,13 @@
  */
 
 import { BeadsLite, BeadsTask, TaskPriority } from '@/lib/beads-lite';
-import { MissionContext, PlanStep, ExecutionResult } from './base/agent-interface';
+import { AgentContext, PlanStep, AgentResult } from './base/agent-interface';
 
 // ============================================================================
 // TYPES
 // ============================================================================
 
-export interface BeadsMissionContext extends MissionContext {
+export interface BeadsMissionContext extends AgentContext {
   beadsTaskId?: string;           // Associated Beads task ID
   beadsAutoTrack?: boolean;       // Enable auto-tracking (default: true)
 }
@@ -85,12 +85,12 @@ export class BeadsMissionTracker {
       }
 
       const stepTask = await this.beads.create({
-        title: `${step.agent}: ${this.truncate(step.description, 60)}`,
-        description: step.description,
+        title: `${step.tool}: ${this.truncate(step.action, 60)}`,
+        description: step.action,
         parent: parentTaskId,
         dependencies,
         priority: this.mapStepPriority(step),
-        assignee: step.agent,
+        assignee: step.tool,
         tags: ['plan-step', missionId]
       });
 
@@ -142,7 +142,7 @@ export class BeadsMissionTracker {
    */
   async completeMission(
     missionId: string,
-    result: ExecutionResult
+    result: AgentResult
   ): Promise<void> {
     const mapping = this.mappings.get(missionId);
     if (!mapping) {
@@ -207,8 +207,8 @@ export class BeadsMissionTracker {
 
   private inferPriority(context: BeadsMissionContext): TaskPriority {
     // Check for priority hints in config
-    if (context.config?.priority !== undefined) {
-      return context.config.priority as TaskPriority;
+    if (context.config && typeof context.config === 'object' && 'priority' in context.config) {
+      return (context.config as any).priority as TaskPriority;
     }
 
     // Default to medium
@@ -218,7 +218,8 @@ export class BeadsMissionTracker {
   private mapStepPriority(step: PlanStep): TaskPriority {
     // Map step to priority based on agent type
     const criticalAgents = ['independent-verifier', 'genesis-architect'];
-    if (criticalAgents.includes(step.agent)) {
+    const agentName = step.tool.replace('agent:', '').replace('audit:', '');
+    if (criticalAgents.includes(agentName)) {
       return 0; // Urgent
     }
 
@@ -228,7 +229,8 @@ export class BeadsMissionTracker {
   private isParallelizable(step: PlanStep): boolean {
     // Some agents can run in parallel (SEO, Marketing, Social)
     const parallelAgents = ['seo-analyst', 'marketing-strategist', 'social-commander'];
-    return parallelAgents.includes(step.agent);
+    const agentName = step.tool.replace('agent:', '');
+    return parallelAgents.includes(agentName);
   }
 }
 

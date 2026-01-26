@@ -57,21 +57,38 @@ export class ContentOrchestratorAgent extends BaseAgent {
 
         const steps = [];
 
-        // Always start with deep research (enhanced)
+        // Real-time search grounding (Phase 2 Enhancement)
+        steps.push({
+            id: 'search_grounding',
+            action: 'Ground research with real-time search',
+            tool: 'serp_collector',
+            payload: { query: context.mission, maxResults: 5 }
+        });
+
+        // Always start with deep research (enhanced with search grounding)
         steps.push({
             id: 'research',
             action: 'Deep research and synthesis',
-            tool: 'deep_research',
-            payload: { topic: context.mission, depth: 'deep' }
+            tool: 'notebook_lm_research_with_serp',
+            payload: {
+                topic: context.mission,
+                depth: 'comprehensive',
+                enableSERP: true,
+                maxSerpResults: 10
+            },
+            dependencies: ['search_grounding']
         });
 
-        // Generate content strategy with Gemini 3
+        // Generate content strategy with Gemini 3 (grounded with search data)
         steps.push({
             id: 'content_strategy',
-            action: 'AI content strategy and outline',
+            action: 'AI content strategy with grounded data',
             tool: 'gemini_3_flash',
             payload: {
-                prompt: `Create a content strategy and outline for: ${context.mission}. Include key messages, target audience insights, and narrative structure.`
+                prompt: `Create a content strategy and outline for: ${context.mission}.
+                Use the latest search results and research to ground your recommendations.
+                Include key messages, target audience insights, and narrative structure.`,
+                groundWithSearch: true
             },
             dependencies: ['research']
         });
