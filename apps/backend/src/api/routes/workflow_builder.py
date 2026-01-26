@@ -12,9 +12,9 @@ Scientific Luxury Design System compliant.
 Australian localisation (en-AU).
 """
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from math import ceil
-from typing import Annotated, Optional
+from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, status
@@ -24,38 +24,37 @@ from sqlalchemy.orm import selectinload
 
 from src.api.deps import get_current_user, get_optional_user
 from src.api.schemas import (
-    # Node schemas
-    WorkflowNodeCreate,
-    WorkflowNodeUpdate,
-    WorkflowNodeResponse,
+    CollaboratorAddRequest,
+    # Collaboration schemas
+    CollaboratorResponse,
+    # Workflow schemas
+    WorkflowCreate,
+    WorkflowDetailResponse,
     # Edge schemas
     WorkflowEdgeCreate,
     WorkflowEdgeResponse,
-    # Workflow schemas
-    WorkflowCreate,
-    WorkflowUpdate,
-    WorkflowResponse,
-    WorkflowDetailResponse,
-    WorkflowListResponse,
     # Execution schemas
     WorkflowExecuteRequest,
-    WorkflowExecutionResponse,
     WorkflowExecutionDetailResponse,
-    # Collaboration schemas
-    CollaboratorResponse,
-    CollaboratorAddRequest,
+    WorkflowExecutionResponse,
+    WorkflowListResponse,
+    # Node schemas
+    WorkflowNodeCreate,
+    WorkflowNodeResponse,
+    WorkflowNodeUpdate,
+    WorkflowResponse,
+    WorkflowUpdate,
 )
 from src.config.database import get_async_db
 from src.db import (
     User,
     Workflow,
-    WorkflowNode,
+    WorkflowCollaborator,
     WorkflowEdge,
     WorkflowExecution,
-    WorkflowExecutionLog,
-    WorkflowCollaborator,
-    WorkflowNodeType,
     WorkflowExecutionStatus,
+    WorkflowNode,
+    WorkflowNodeType,
 )
 from src.utils import get_logger
 
@@ -166,9 +165,9 @@ async def create_workflow(
 async def list_workflows(
     page: Annotated[int, Query(ge=1)] = 1,
     page_size: Annotated[int, Query(ge=1, le=100)] = 20,
-    is_published: Optional[bool] = Query(None, description="Filter by published status"),
-    is_template: Optional[bool] = Query(None, description="Filter by template status"),
-    tag: Optional[str] = Query(None, description="Filter by tag"),
+    is_published: bool | None = Query(None, description="Filter by published status"),
+    is_template: bool | None = Query(None, description="Filter by template status"),
+    tag: str | None = Query(None, description="Filter by tag"),
     db: AsyncSession = Depends(get_async_db),
     current_user: User = Depends(get_current_user),
 ) -> WorkflowListResponse:
@@ -265,7 +264,7 @@ async def update_workflow(
 
     # Handle publish timestamp
     if updates.is_published and not workflow.published_at:
-        workflow.published_at = datetime.now(timezone.utc)
+        workflow.published_at = datetime.now(UTC)
 
     await db.commit()
     await db.refresh(workflow)
@@ -788,9 +787,9 @@ async def remove_collaborator(
 async def list_templates(
     page: Annotated[int, Query(ge=1)] = 1,
     page_size: Annotated[int, Query(ge=1, le=100)] = 20,
-    tag: Optional[str] = Query(None, description="Filter by tag"),
+    tag: str | None = Query(None, description="Filter by tag"),
     db: AsyncSession = Depends(get_async_db),
-    current_user: Optional[User] = Depends(get_optional_user),
+    current_user: User | None = Depends(get_optional_user),
 ) -> WorkflowListResponse:
     """List public workflow templates."""
     query = select(Workflow).where(
