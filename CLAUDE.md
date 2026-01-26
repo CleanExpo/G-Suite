@@ -32,10 +32,15 @@ pnpm verify                 # Full verification + dependency check
 pnpm verify:fix             # Auto-fix dependency issues
 pnpm deps:clean             # Clean install dependencies
 
-# Beads - AI Agent Memory (NEW)
+# Beads - AI Agent Memory
 .bin/bd.exe ready           # Show unblocked tasks
 .bin/bd.exe create "Title"  # Create new task
 .bin/bd.exe sync            # Sync to git
+
+# Claude Code Hooks
+claude /hooks               # View configured hooks
+claude --debug              # Debug hook execution
+powershell -ExecutionPolicy Bypass -File .claude/hooks/install-hooks.ps1  # Install hooks
 ```
 
 ## 🏗️ Architecture Overview
@@ -545,6 +550,83 @@ git status  # Must show "up to date with origin/main"
 
 ---
 
+## 🪝 Claude Code Hooks - Automated Workflows
+
+This project uses **Claude Code Hooks** for automated shell command execution at key lifecycle points.
+
+**Location**: `.claude/hooks/scripts/` | Configuration: `.claude/settings.json`
+
+### Installed Hooks
+
+| Hook Event | Script | Purpose |
+|------------|--------|---------|
+| **SessionStart** | `session-start-context.ps1` | Loads git status, Beads tasks, PROGRESS.md, Australian locale |
+| **PostToolUse** | `post-edit-format.ps1` | Auto-formats files after Edit/Write (Prettier, Black) |
+| **PreToolUse** | `pre-bash-validate.py` | Validates bash commands, blocks dangerous ones, suggests alternatives |
+| **Notification** | `notification-alert.ps1` | Windows toast notifications when Claude needs input |
+| **Stop** | `stop-verify-todos.py` | Verifies work completion before allowing stop |
+
+### Quick Commands
+
+```powershell
+# Install/verify hooks (one-time)
+powershell -ExecutionPolicy Bypass -File .claude/hooks/install-hooks.ps1
+
+# View configured hooks in Claude Code
+claude /hooks
+
+# Debug mode - see hook execution
+claude --debug
+
+# Toggle verbose mode (during session)
+# Press Ctrl+O
+```
+
+### How Hooks Work
+
+1. **SessionStart** - Fires when Claude Code starts, loads project context automatically
+2. **PostToolUse (Edit|Write)** - After any file edit, auto-runs Prettier/Black
+3. **PreToolUse (Bash)** - Before bash commands, validates for safety
+4. **Notification** - On permission prompts, shows Windows toast alert
+5. **Stop** - Before Claude stops, checks for uncommitted work
+
+### Blocked Commands
+
+The `pre-bash-validate.py` hook blocks dangerous commands:
+
+- `rm -rf /` - Filesystem destruction
+- `sudo rm -rf` - Elevated destructive commands
+- Fork bombs and disk writes
+- Direct device access
+
+**Suggestions** are provided for:
+
+- `grep` → `rg` (ripgrep)
+- `find -name` → `fd`
+- `cat` → `bat` (syntax highlighting)
+
+### Configuration
+
+Hooks are configured in `.claude/settings.json` under the `"hooks"` key. Each hook specifies:
+
+- **matcher**: Tool pattern to match (e.g., `"Edit|Write"`, `"Bash"`)
+- **type**: `"command"` for shell execution
+- **command**: The script to run
+- **timeout**: Maximum execution time in seconds
+
+### Creating Custom Hooks
+
+1. Create script in `.claude/hooks/scripts/`
+2. Add configuration to `.claude/settings.json`
+3. Test with `claude --debug`
+
+**Hook Input**: JSON via stdin with `tool_name`, `tool_input`, `session_id`
+**Hook Output**: Exit code 0 (success), 2 (block), or JSON with decisions
+
+**Full Documentation**: [Claude Code Hooks Reference](https://code.claude.com/docs/en/hooks)
+
+---
+
 ## 📚 Documentation
 
 | Document                                                         | Purpose                         |
@@ -555,6 +637,7 @@ git status  # Must show "up to date with origin/main"
 | [`docs/OPTIONAL_SERVICES.md`](docs/OPTIONAL_SERVICES.md)         | Deployment guides               |
 | [`docs/DESIGN_SYSTEM.md`](docs/DESIGN_SYSTEM.md)                 | Scientific Luxury design system |
 | [`docs/BEADS.md`](docs/BEADS.md)                                 | AI agent memory system          |
+| [Claude Code Hooks](https://code.claude.com/docs/en/hooks)       | Automated workflow hooks        |
 | [`docs/new-project-checklist.md`](docs/new-project-checklist.md) | 3-step setup                    |
 
 ## 🔧 Troubleshooting
