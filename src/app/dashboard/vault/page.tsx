@@ -1,27 +1,79 @@
 'use client';
 
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Shield, Key, RefreshCw, Lock, CheckCircle2 } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { Shield, Key, RefreshCw, Lock, CheckCircle2, AlertCircle, History } from 'lucide-react';
+
+interface VaultCredential {
+  name: string;
+  active: boolean;
+  currentVersion: boolean;
+}
+
+interface RotationEntry {
+  version: number;
+  rotatedAt: string;
+  rotatedBy: string;
+  keysRotated: number;
+}
+
+interface VaultData {
+  keyVersion: number;
+  credentials: VaultCredential[];
+  rotationHistory: RotationEntry[];
+  encryptionStandard: string;
+}
 
 export default function VaultPage() {
-  const [rotationStatus, setRotationStatus] = useState<'idle' | 'rotating' | 'success'>('idle');
+  const [rotationStatus, setRotationStatus] = useState<'idle' | 'rotating' | 'success' | 'error'>('idle');
+  const [vault, setVault] = useState<VaultData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState('');
 
-  const handleRotateKeys = () => {
+  const fetchVault = useCallback(async () => {
+    try {
+      const res = await fetch('/api/vault');
+      const data = await res.json();
+      if (data.success) {
+        setVault(data);
+      }
+    } catch {
+      // Vault not initialized yet — show defaults
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchVault();
+  }, [fetchVault]);
+
+  const handleRotateKeys = async () => {
     setRotationStatus('rotating');
-    // Simulate API call
-    setTimeout(() => {
-      setRotationStatus('success');
-      setTimeout(() => setRotationStatus('idle'), 3000);
-    }, 2000);
+    setErrorMsg('');
+
+    try {
+      const res = await fetch('/api/vault/rotate', { method: 'POST' });
+      const data = await res.json();
+
+      if (data.success) {
+        setRotationStatus('success');
+        // Refresh vault data
+        await fetchVault();
+        setTimeout(() => setRotationStatus('idle'), 3000);
+      } else {
+        setErrorMsg(data.error || 'Rotation failed');
+        setRotationStatus('error');
+        setTimeout(() => setRotationStatus('idle'), 5000);
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Network error');
+      setRotationStatus('error');
+      setTimeout(() => setRotationStatus('idle'), 5000);
+    }
   };
 
-  const keys = [
-    { name: 'Google Gemini Pro', status: 'ACTIVE', lastRotated: '2 days ago' },
-    { name: 'Firebase Admin SDK', status: 'ACTIVE', lastRotated: '5 days ago' },
-    { name: 'Stripe Payments', status: 'ACTIVE', lastRotated: '1 week ago' },
-    { name: 'Supabase Auth', status: 'ACTIVE', lastRotated: '1 week ago' },
-  ];
+  const credentials = vault?.credentials ?? [];
+  const rotationHistory = vault?.rotationHistory ?? [];
 
   return (
     <div className="min-h-screen bg-white dark:bg-[#0b0e14] p-6 md:p-12 lg:pt-32">
@@ -35,7 +87,7 @@ export default function VaultPage() {
               The Vault
             </h1>
             <p className="text-gray-500 font-medium mt-2">
-              Military-Grade Encryption (AES-256) • Zero-Knowledge Architecture
+              Military-Grade Encryption ({vault?.encryptionStandard || 'AES-256-GCM'}) • Zero-Knowledge Architecture
             </p>
           </div>
         </div>
@@ -55,8 +107,8 @@ export default function VaultPage() {
                   <Lock className="w-5 h-5 text-gray-400" />
                 </div>
                 <div>
-                  <p className="font-bold text-gray-900 dark:text-white">Master Key</p>
-                  <p className="text-xs text-gray-500">Hardware Security Module (HSM)</p>
+                  <p className="font-bold text-gray-900 dark:text-white">Key Version</p>
+                  <p className="text-xs text-gray-500">v{vault?.keyVersion ?? 1}</p>
                 </div>
               </div>
               <div className="flex items-center gap-4">
@@ -65,7 +117,7 @@ export default function VaultPage() {
                 </div>
                 <div>
                   <p className="font-bold text-gray-900 dark:text-white">Encryption Layer</p>
-                  <p className="text-xs text-gray-500">AES-256-GCM</p>
+                  <p className="text-xs text-gray-500">{vault?.encryptionStandard || 'AES-256-GCM'}</p>
                 </div>
               </div>
             </div>
@@ -81,9 +133,16 @@ export default function VaultPage() {
               <h3 className="text-blue-200 text-[10px] font-black uppercase tracking-[0.3em]">Emergency Protocol</h3>
               <h2 className="text-3xl font-black italic uppercase tracking-tighter leading-none">Rotate All Secrets</h2>
               <p className="text-blue-100/80 text-sm max-w-xs">
-                Initiate global key rotation. This will regenerate all API keys and re-encrypt sensitive datastores.
+                Initiate global key rotation. Re-encrypts all secrets with AES-256-GCM and fresh initialization vectors.
               </p>
             </div>
+
+            {errorMsg && (
+              <div className="relative z-10 mt-4 flex items-center gap-2 text-red-200 text-xs">
+                <AlertCircle className="w-4 h-4" />
+                {errorMsg}
+              </div>
+            )}
 
             <button
               onClick={handleRotateKeys}
@@ -105,31 +164,71 @@ export default function VaultPage() {
                   <CheckCircle2 className="w-4 h-4" /> Rotated
                 </>
               )}
+              {rotationStatus === 'error' && (
+                <>
+                  <AlertCircle className="w-4 h-4" /> Failed
+                </>
+              )}
             </button>
           </div>
         </div>
 
+        {/* Active Credentials */}
         <div className="bg-white dark:bg-[#161b22] rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-sm overflow-hidden">
           <div className="px-8 py-6 border-b border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.01]">
             <h3 className="text-gray-900 dark:text-white font-black italic uppercase tracking-tighter text-xl">Active Credentials</h3>
           </div>
           <div className="divide-y divide-gray-100 dark:divide-white/5">
-            {keys.map((key) => (
-              <div key={key.name} className="px-8 py-6 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-white/[0.02] transition-colors">
-                <div className="flex items-center gap-4">
-                  <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
-                  <span className="font-bold text-gray-900 dark:text-white">{key.name}</span>
+            {loading ? (
+              <div className="px-8 py-6 text-gray-400 text-sm">Loading vault...</div>
+            ) : credentials.length === 0 ? (
+              <div className="px-8 py-6 text-gray-400 text-sm">No credentials stored. Complete onboarding to add API keys.</div>
+            ) : (
+              credentials.map((cred) => (
+                <div key={cred.name} className="px-8 py-6 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-white/[0.02] transition-colors">
+                  <div className="flex items-center gap-4">
+                    <div className={`w-2 h-2 rounded-full ${cred.active ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]' : 'bg-gray-400'}`} />
+                    <span className="font-bold text-gray-900 dark:text-white">{cred.name}</span>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    {cred.currentVersion ? (
+                      <span className="text-[10px] font-black uppercase tracking-widest text-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 px-3 py-1 rounded-full border border-emerald-100 dark:border-emerald-800">
+                        Current
+                      </span>
+                    ) : (
+                      <span className="text-[10px] font-black uppercase tracking-widest text-amber-500 bg-amber-50 dark:bg-amber-900/20 px-3 py-1 rounded-full border border-amber-100 dark:border-amber-800">
+                        Legacy
+                      </span>
+                    )}
+                  </div>
                 </div>
-                <div className="flex items-center gap-8">
-                  <span className="text-xs font-mono text-gray-400 uppercase">{key.lastRotated}</span>
-                  <span className="text-[10px] font-black uppercase tracking-widest text-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 px-3 py-1 rounded-full border border-emerald-100 dark:border-emerald-800">
-                    {key.status}
-                  </span>
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
+
+        {/* Rotation History */}
+        {rotationHistory.length > 0 && (
+          <div className="bg-white dark:bg-[#161b22] rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-sm overflow-hidden">
+            <div className="px-8 py-6 border-b border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.01] flex items-center gap-3">
+              <History className="w-5 h-5 text-gray-400" />
+              <h3 className="text-gray-900 dark:text-white font-black italic uppercase tracking-tighter text-xl">Rotation History</h3>
+            </div>
+            <div className="divide-y divide-gray-100 dark:divide-white/5">
+              {[...rotationHistory].reverse().map((entry, i) => (
+                <div key={i} className="px-8 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-white/[0.02] transition-colors">
+                  <div className="flex items-center gap-4">
+                    <span className="text-xs font-mono font-bold text-gray-900 dark:text-white">v{entry.version}</span>
+                    <span className="text-xs text-gray-500">{entry.keysRotated} key{entry.keysRotated !== 1 ? 's' : ''} rotated</span>
+                  </div>
+                  <span className="text-xs font-mono text-gray-400">
+                    {new Date(entry.rotatedAt).toLocaleString()}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
