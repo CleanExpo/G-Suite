@@ -53,15 +53,21 @@ export class JobProcessor {
     // Lifecycle hooks — sync to Prisma
     worker.on('active', (job: Job<QueueJobData>) => {
       this.syncJobStatus(job, 'active').catch(() => {});
+      // UNI-168: Update agent status
+      this.updateAgentStatusOnActive(job).catch(() => {});
     });
 
     worker.on('completed', (job: Job<QueueJobData>, result: unknown) => {
       this.syncJobCompleted(job, result).catch(() => {});
+      // UNI-168: Update agent status to idle
+      this.updateAgentStatusOnCompleted(job).catch(() => {});
     });
 
     worker.on('failed', (job: Job<QueueJobData> | undefined, error: Error) => {
       if (job) {
         this.handleJobFailure(job, error).catch(() => {});
+        // UNI-168: Track agent failure
+        this.updateAgentStatusOnFailed(job).catch(() => {});
       }
     });
 
@@ -223,6 +229,59 @@ export class JobProcessor {
       } catch (dlqErr: any) {
         console.error('[JobProcessor] DLQ insertion failed:', dlqErr.message);
       }
+    }
+  }
+
+  // ===========================================================================
+  // UNI-168: Agent Status Monitoring Hooks
+  // ===========================================================================
+
+  private async updateAgentStatusOnActive(job: Job<QueueJobData>): Promise<void> {
+    try {
+      const { updateAgentStatus } = await import('@/lib/monitoring');
+      const agentName = job.data?.payload?.agentName as string | undefined;
+      const userId = job.data?.userId;
+
+      if (agentName && userId) {
+        await updateAgentStatus(agentName, 'active', job.id, userId);
+      }
+    } catch (err: any) {
+      console.warn('[JobProcessor] Agent status update failed (non-blocking):', err.message);
+    }
+  }
+
+  private async updateAgentStatusOnCompleted(job: Job<QueueJobData>): Promise<void> {
+    try {
+      const { updateAgentStatus, updateAgentPerformanceMetrics } = await import('@/lib/monitoring');
+      const agentName = job.data?.payload?.agentName as string | undefined;
+      const userId = job.data?.userId;
+
+      if (agentName && userId) {
+        // Update status to idle
+        await updateAgentStatus(agentName, 'idle', undefined, userId);
+
+        // Update performance metrics if we have timing data
+        if (job.finishedOn && job.processedOn) {
+          const duration = job.finishedOn - job.processedOn;
+          await updateAgentPerformanceMetrics(agentName, userId, duration);
+        }
+      }
+    } catch (err: any) {
+      console.warn('[JobProcessor] Agent status update failed (non-blocking):', err.message);
+    }
+  }
+
+  private async updateAgentStatusOnFailed(job: Job<QueueJobData>): Promise<void> {
+    try {
+      const { incrementAgentFailureCount } = await import('@/lib/monitoring');
+      const agentName = job.data?.payload?.agentName as string | undefined;
+      const userId = job.data?.userId;
+
+      if (agentName && userId) {
+        await incrementAgentFailureCount(agentName, userId);
+      }
+    } catch (err: any) {
+      console.warn('[JobProcessor] Agent failure tracking failed (non-blocking):', err.message);
     }
   }
 

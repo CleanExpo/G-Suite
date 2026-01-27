@@ -256,3 +256,116 @@ model ConnectorState {
 
   @@index([isHealthy, circuitState])
 }
+
+// ─── UNI-168: Monitoring Dashboard ─────────────────────────────────────
+
+// Alert Rule Definition
+model AlertRule {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+
+  // Rule type and configuration
+  ruleType    String                              // threshold, rate_of_change
+  metric      String                              // error_rate, queue_depth, cost_per_hour
+  condition   String                              // gt, lt, gte, lte
+  threshold   Float
+
+  // Evaluation window
+  windowMinutes Int    @default(5)
+
+  // Alert channels
+  channels    String[]                            // ["webhook", "email"]
+  webhookIds  String[]                            // Webhook endpoint IDs
+
+  // State
+  isActive    Boolean  @default(true)
+  isFiring    Boolean  @default(false)
+  lastFiredAt DateTime?
+
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  firings     AlertFiring[]
+
+  @@index([userId, isActive])
+  @@index([isFiring])
+}
+
+// Alert Firing History
+model AlertFiring {
+  id          String   @id @default(uuid())
+  ruleId      String
+  rule        AlertRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+
+  triggeredAt DateTime @default(now())
+  resolvedAt  DateTime?
+
+  metricValue Float
+  message     String
+  metadata    Json?
+
+  notificationsSent String[]
+
+  userId      String
+
+  @@index([ruleId, resolvedAt])
+  @@index([triggeredAt])
+  @@index([userId])
+}
+
+// Metrics Snapshot (time-series)
+model MetricSnapshot {
+  id          String   @id @default(uuid())
+
+  timestamp   DateTime                            // Rounded to nearest minute
+
+  // Queue metrics
+  queueDepth  Int      @default(0)
+  activeJobs  Int      @default(0)
+  failedJobs  Int      @default(0)
+  completedJobs Int    @default(0)
+
+  // Agent metrics
+  activeAgents Int     @default(0)
+  idleAgents  Int      @default(0)
+
+  // Throughput
+  jobsPerMinute Float  @default(0)
+
+  // Cost
+  costPerHour Float    @default(0)
+  tokensPerMinute Float @default(0)
+
+  // Errors
+  errorRate   Float    @default(0)
+
+  userId      String
+
+  @@unique([timestamp, userId])
+  @@index([userId, timestamp])
+}
+
+// Agent Status Tracking
+model AgentStatus {
+  id          String   @id @default(uuid())
+  agentName   String
+
+  status      String   @default("idle")           // idle, active, failed, unknown
+
+  currentJobId String?
+  startedAt   DateTime?
+
+  lastActiveAt DateTime @default(now())
+  consecutiveFailures Int @default(0)
+
+  avgDuration Float    @default(0)
+  totalExecutions Int  @default(0)
+
+  userId      String
+  updatedAt   DateTime @updatedAt
+
+  @@unique([agentName, userId])
+  @@index([userId, status])
+}

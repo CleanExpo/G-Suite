@@ -12,7 +12,10 @@ export type WebhookEventType =
   | 'mission.started'
   | 'agent.invoked'
   | 'wallet.topup'
-  | 'webhook.test';
+  | 'webhook.test'
+  | 'monitoring.alert.triggered' // UNI-168
+  | 'monitoring.alert.resolved' // UNI-168
+  | 'monitoring.health.degraded'; // UNI-168
 
 export interface WebhookEvent {
   type: WebhookEventType;
