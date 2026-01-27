@@ -19,6 +19,11 @@ import {
 import { AgentRegistry, initializeAgents } from './registry';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { PrismaMissionAdapter } from '../lib/prisma-mission-adapter';
+import {
+    createMissionStatus,
+    updateMissionStatus,
+    addMissionLog
+} from '../tools/firebaseSkills';
 
 // Extended mode type for the Overseer
 export type OverseerMode = AgentMode | 'ANALYZE' | 'TESTING' | 'RETRY' | 'FINALIZE';
@@ -38,6 +43,7 @@ interface LearningRecord {
 interface MissionState {
     id: string; // Internal/In-memory ID
     dbId?: string; // Database Persistence ID
+    firebaseMissionId?: string; // Firebase Firestore mission tracking ID
     context: AgentContext;
     currentPhase: OverseerMode;
     plan?: AgentPlan;
@@ -163,8 +169,10 @@ export class MissionOverseerAgent extends BaseAgent {
         this.log('📋 Overseer entering PLANNING mode...');
 
         // Initialize mission state
+        const firebaseMissionId = `mission_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         this.missionState = {
             id: `mission_${Date.now()}`,
+            firebaseMissionId,
             context,
             currentPhase: 'ANALYZE',
             results: [],
@@ -174,6 +182,10 @@ export class MissionOverseerAgent extends BaseAgent {
             startTime: Date.now(),
             logs: []
         };
+
+        // Firebase: Create real-time mission status tracking
+        await createMissionStatus(firebaseMissionId, context.userId);
+        this.log(`🔥 Firebase tracking initialized: ${firebaseMissionId}`);
 
         // PERSISTENCE: Create initial log
         const dbId = await PrismaMissionAdapter.createMission(context.userId);
@@ -238,6 +250,16 @@ export class MissionOverseerAgent extends BaseAgent {
         const allArtifacts: AgentResult['artifacts'] = [];
         const agentsUsed: string[] = [];
 
+        // Firebase: Update mission status to in_progress
+        if (this.missionState.firebaseMissionId) {
+            await updateMissionStatus(this.missionState.firebaseMissionId, {
+                status: 'in_progress',
+                currentStep: 'Executing plan',
+                progress: 10
+            } as any);
+            await addMissionLog(this.missionState.firebaseMissionId, 'Execution started');
+        }
+
         try {
             // Phase 5: Parallel agent execution for independent steps
             const { parallelSteps, sequentialSteps } = this.analyzeParallelization(plan.steps);
@@ -257,7 +279,19 @@ export class MissionOverseerAgent extends BaseAgent {
             }
 
             // Execute sequential steps (including ones with dependencies)
-            for (const step of sequentialSteps) {
+            const totalSteps = sequentialSteps.length;
+            for (let i = 0; i < sequentialSteps.length; i++) {
+                const step = sequentialSteps[i];
+
+                // Firebase: Update progress
+                if (this.missionState.firebaseMissionId) {
+                    const progress = Math.round((i / totalSteps) * 70) + 10; // 10-80%
+                    await updateMissionStatus(this.missionState.firebaseMissionId, {
+                        currentStep: step.action,
+                        progress
+                    } as any);
+                }
+
                 if (step.tool.startsWith('agent:')) {
                     const agentName = step.tool.replace('agent:', '');
                     await this.executeAgentStep(agentName, context, agentsUsed, allArtifacts);
@@ -294,9 +328,32 @@ export class MissionOverseerAgent extends BaseAgent {
                 };
             }
 
+            // Firebase: Update mission status to completed
+            if (this.missionState.firebaseMissionId) {
+                await updateMissionStatus(this.missionState.firebaseMissionId, {
+                    status: result.success ? 'completed' : 'failed',
+                    progress: 100,
+                    endTime: new Date()
+                } as any);
+                await addMissionLog(
+                    this.missionState.firebaseMissionId,
+                    `Mission ${result.success ? 'completed successfully' : 'failed'}`
+                );
+            }
+
             return result;
 
         } catch (error: any) {
+            // Firebase: Update mission status to failed
+            if (this.missionState?.firebaseMissionId) {
+                await updateMissionStatus(this.missionState.firebaseMissionId, {
+                    status: 'failed',
+                    progress: 100,
+                    endTime: new Date()
+                } as any);
+                await addMissionLog(this.missionState.firebaseMissionId, `Mission failed: ${error.message}`);
+            }
+
             return {
                 success: false,
                 error: error.message,
@@ -317,6 +374,11 @@ export class MissionOverseerAgent extends BaseAgent {
 
         agentsUsed.push(agentName);
 
+        // Firebase: Log agent execution start
+        if (this.missionState?.firebaseMissionId) {
+            await addMissionLog(this.missionState.firebaseMissionId, `Starting ${agentName} execution`);
+        }
+
         // Full agent lifecycle
         const agentPlan = await agent.plan(context);
         const agentResult = await agent.execute(agentPlan, context);
@@ -326,6 +388,14 @@ export class MissionOverseerAgent extends BaseAgent {
         if (agentResult.artifacts) allArtifacts.push(...agentResult.artifacts);
 
         this.addLog(`${agentName} executed. Success: ${agentResult.success}`);
+
+        // Firebase: Log agent execution completion
+        if (this.missionState?.firebaseMissionId) {
+            await addMissionLog(
+                this.missionState.firebaseMissionId,
+                `Completed ${agentName}: ${agentResult.success ? 'SUCCESS' : 'FAILED'}`
+            );
+        }
     }
 
     private async performIndependentAudit(context: AgentContext) {
