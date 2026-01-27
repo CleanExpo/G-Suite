@@ -43,7 +43,7 @@ export class MarketingStrategistAgent extends BaseAgent {
 
     // Gemini 3 Flash for PhD-level marketing reasoning
     private readonly model = genAI.getGenerativeModel({
-        model: 'gemini-3-flash',
+        model: 'gemini-3-flash-preview',
         systemInstruction: 'You are an elite marketing strategist with expertise in digital campaigns, growth hacking, and multi-channel marketing. Think like a CMO at a Fortune 500 company.'
     });
 

@@ -56,7 +56,7 @@ export async function generateVideo(userId: string, prompt: string) {
 export async function webIntel(userId: string, query: string) {
   console.log(`🔍 Performing Web Intel for ${userId}: ${query}`);
 
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-3-flash-preview' });
 
   const prompt = `Perform deep research on: ${query}. 
     Provide a detailed analysis, current trends, and strategic recommendations. 

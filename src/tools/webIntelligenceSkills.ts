@@ -367,7 +367,7 @@ export async function deep_lookup(
     const entityType = options.entityType || 'unknown';
 
     // Use Gemini to generate enrichment data
-    const model = genAI.getGenerativeModel({ model: 'gemini-3-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-3-flash-preview' });
 
     try {
         const result = await model.generateContent(`

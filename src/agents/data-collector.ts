@@ -124,7 +124,7 @@ export class DataCollectorAgent extends BaseAgent {
 
     // Gemini 3 for entity enrichment
     private readonly model = genAI.getGenerativeModel({
-        model: 'gemini-3-flash',
+        model: 'gemini-3-flash-preview',
         systemInstruction: 'You are a data enrichment specialist. Augment and validate structured data.'
     });
 

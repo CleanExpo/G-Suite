@@ -44,7 +44,7 @@ export class SocialCommanderAgent extends BaseAgent {
 
     // Gemini 3 Flash for social content
     private readonly model = genAI.getGenerativeModel({
-        model: 'gemini-3-flash',
+        model: 'gemini-3-flash-preview',
         systemInstruction: 'You are a viral social media strategist. Create engaging, platform-optimized content that drives engagement.'
     });
 

@@ -41,7 +41,7 @@ export class SEOAnalystAgent extends BaseAgent {
 
     // Gemini 3 Flash for advanced SEO analysis
     private readonly model = genAI.getGenerativeModel({
-        model: 'gemini-3-flash',
+        model: 'gemini-3-flash-preview',
         systemInstruction: 'You are an elite SEO specialist with 15+ years of experience. You understand technical SEO, content strategy, and algorithmic patterns deeply. Provide actionable insights.'
     });
 

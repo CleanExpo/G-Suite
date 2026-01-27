@@ -96,7 +96,7 @@ export class WebScraperAgent extends BaseAgent {
 
     // Gemini 3 for intelligent extraction
     private readonly model = genAI.getGenerativeModel({
-        model: 'gemini-3-flash',
+        model: 'gemini-3-flash-preview',
         systemInstruction: 'You are a data extraction specialist. Analyze web pages and extract structured data.'
     });
 

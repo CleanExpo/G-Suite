@@ -42,7 +42,7 @@ export class ContentOrchestratorAgent extends BaseAgent {
 
     // Gemini 3 Flash for content planning and writing
     private readonly model = genAI.getGenerativeModel({
-        model: 'gemini-3-flash',
+        model: 'gemini-3-flash-preview',
         systemInstruction: 'You are a content strategist and creative director. Create compelling narratives and visual stories that captivate audiences.'
     });
 

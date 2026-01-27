@@ -276,7 +276,7 @@ async function scanWithAI(
 ): Promise<AgentDossier[]> {
     console.log(`[agent_discovery:ai] AI-scanning ${source} for "${query}"`);
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-3-flash-preview' });
 
     const sourceDescriptions: Record<string, string> = {
         langchain_hub: 'LangChain Hub - repository of prompts, chains, and agents',

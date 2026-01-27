@@ -90,7 +90,7 @@ export async function createResearchNotebook(
         };
 
         // Generate initial summary
-        const model = genAI.getGenerativeModel({ model: 'gemini-3-pro' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-3-pro-preview' });
 
         const sourceContent = sources.map(s => s.content).join('\n\n---\n\n');
         const summaryPrompt = `
@@ -202,7 +202,7 @@ export async function notebookLMResearch(
 
     try {
         const model = genAI.getGenerativeModel({
-            model: 'gemini-3-pro',
+            model: 'gemini-3-pro-preview',
             systemInstruction: `You are a research analyst synthesizing information like Google NotebookLM. 
                                 Provide comprehensive analysis with clear citations to sources.`
         });
@@ -320,7 +320,7 @@ export async function notebookLMQuery(
 
     try {
         const model = genAI.getGenerativeModel({
-            model: 'gemini-3-flash',
+            model: 'gemini-3-flash-preview',
             systemInstruction: 'Answer questions based only on the provided sources. Cite sources explicitly.'
         });
 
@@ -387,7 +387,7 @@ export async function notebookLMAudioOverview(
     const voices = options.voices ?? 'conversation';
 
     try {
-        const model = genAI.getGenerativeModel({ model: 'gemini-3-flash' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-3-flash-preview' });
 
         const prompt = `
             Create a ${duration} ${voices === 'conversation' ? 'two-person podcast' : 'narrated'} script 

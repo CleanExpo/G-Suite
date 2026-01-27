@@ -207,7 +207,7 @@ export class AgentScoutAgent extends BaseAgent {
         dossiers: AgentDossier[],
         missionType: ScoutMissionType
     ): Promise<IntelligenceBrief> {
-        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-3-flash-preview' });
 
         const prompt = `
       Analyze these discovered AI agents and generate a trend intelligence brief:

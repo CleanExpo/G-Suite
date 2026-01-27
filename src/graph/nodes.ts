@@ -52,7 +52,7 @@ const genAI = new GoogleGenerativeAI(
   process.env.GOOGLE_AI_STUDIO_API_KEY || process.env.GOOGLE_API_KEY || '',
 );
 const model = genAI.getGenerativeModel({
-  model: 'gemini-1.5-pro',
+  model: 'gemini-3-pro-preview',
   systemInstruction: `You are the G-Pilot Fleet Architect. Your core directive is "Mission Sovereignty". 
     You convert vague user desires into high-precision, executable JSON specs. 
     You outperform manual prompting by anticipating needs:

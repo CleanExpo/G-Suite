@@ -81,7 +81,7 @@ export class GeoMarketingAgent extends BaseAgent {
 
     // Gemini 3 Flash with GEO-focused system instruction
     private readonly model = genAI.getGenerativeModel({
-        model: 'gemini-3-flash',
+        model: 'gemini-3-flash-preview',
         systemInstruction: `You are the Synthex GEO Strategist, an elite specialist in Generative Engine Optimization.
 Your mission is to position brands as PRIMARY AUTHORITY CITATIONS in Large Language Models.
 

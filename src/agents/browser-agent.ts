@@ -96,7 +96,7 @@ export class BrowserAgent extends BaseAgent {
      * Parse mission into browser operations
      */
     private async parseMission(context: AgentContext): Promise<BrowserOperation[]> {
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-3-flash-preview' });
 
         const prompt = `
       You are a Browser Agent. Parse this mission into a sequence of browser operations:

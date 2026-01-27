@@ -90,7 +90,7 @@ export class UIAuditorAgent extends BaseAgent {
         ],
         qualityThreshold: 100,
         maxIterations: 5,
-        visionModel: 'gemini-2.0-flash'
+        visionModel: 'gemini-3-flash-preview'
     };
 
     // Current audit state

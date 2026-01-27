@@ -120,7 +120,7 @@ export class GenesisArchitectAgent extends BaseAgent {
     private async deepUnderstand(context: AgentContext): Promise<DeepUnderstanding> {
         this.log('🧠 Layer 1: Semantic Analysis...');
 
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-3-pro-preview' });
 
         const prompt = `
       You are the Genesis Architect - a meta-cognitive system.
@@ -354,7 +354,7 @@ export class GenesisArchitectAgent extends BaseAgent {
 
         // Phase 2: Generate new agents/skills for remaining gaps
         this.log(`Generating capabilities for ${gaps.length} remaining gap(s)...`);
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-3-pro-preview' });
 
         for (const gap of gaps) {
             this.log(`Generating capability for gap: ${gap}`);

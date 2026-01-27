@@ -88,7 +88,7 @@ export async function imagen3Generate(
     try {
         // In production, this would call the Imagen 3 API via Vertex AI
         // For now, we use Gemini to generate an image prompt and simulate the API
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-3-flash-preview' });
 
         const enhancedPrompt = await model.generateContent(`
             Enhance this image generation prompt for best results:

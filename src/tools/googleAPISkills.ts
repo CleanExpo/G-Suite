@@ -40,7 +40,7 @@ export async function gemini3Flash(
 
     // Use Gemini 3 Flash (2026 Standard)
     const model = genAI.getGenerativeModel({
-        model: 'gemini-3-flash',
+        model: 'gemini-3-flash-preview',
         systemInstruction: options.systemInstruction,
         generationConfig: {
             temperature: options.temperature ?? 0.7,
@@ -101,7 +101,7 @@ export async function gemini3FlashStructured<T>(
             const temperature = options.temperature ?? 0.3 + (attempt * 0.1);
 
             const model = genAI.getGenerativeModel({
-                model: 'gemini-2.0-flash-exp',
+                model: 'gemini-3-flash-preview',
                 systemInstruction: options.systemInstruction,
                 generationConfig: {
                     responseMimeType: 'application/json',
@@ -204,7 +204,7 @@ export async function deepResearch(
     // Default: Internal Knowledge Research using Gemini 3 Pro
     // This model is much better at "internal search" than standard Flash
     const model = genAI.getGenerativeModel({
-        model: 'gemini-3-pro',
+        model: 'gemini-3-pro-preview',
         systemInstruction: 'You are a research analyst. Provide comprehensive, well-sourced analysis based on your internal knowledge.'
     });
 
