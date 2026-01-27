@@ -1,6 +1,7 @@
 
 import prisma from '../prisma';
 import { AgentPlan, AgentResult, VerificationReport } from '../agents/base';
+import type { AgentCostsMap } from './telemetry/agent-cost-collector';
 
 /**
  * PrismaMissionAdapter
@@ -52,11 +53,13 @@ export class PrismaMissionAdapter {
 
     /**
      * Finalizes the mission with results and audit reports.
+     * Phase 9.2: Accepts per-agent cost breakdown for telemetry.
      */
     static async completeMission(
         missionId: string,
         result: AgentResult,
-        audit: VerificationReport[] | null
+        audit: VerificationReport[] | null,
+        agentCosts?: AgentCostsMap
     ): Promise<void> {
         if (!missionId) return;
         try {
@@ -65,6 +68,8 @@ export class PrismaMissionAdapter {
                 data: {
                     result: result as any,
                     audit: audit ? (audit as any) : undefined,
+                    agentCosts: agentCosts ? (agentCosts as any) : undefined,
+                    cost: result.cost || 0,
                     status: result.success ? 'COMPLETED' : 'FAILED',
                     updatedAt: new Date()
                 }

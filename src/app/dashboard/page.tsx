@@ -16,6 +16,7 @@ import {
   Shield,
   History,
   Lock as LockIcon,
+  BarChart3,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import MissionModal from '@/components/MissionModal';
@@ -122,6 +123,11 @@ function AuthenticatedDashboard({
         >
           <div className="absolute top-0 right-0 p-6 md:p-10 flex flex-col items-end gap-4 md:gap-6">
             <div className="flex gap-4">
+              <Link href="/dashboard/telemetry">
+                <button className="bg-gray-50 dark:bg-white/5 hover:bg-purple-600 hover:text-white p-2 md:p-3 rounded-xl transition-all active:scale-90 border border-gray-100 dark:border-white/10 group/telemetry">
+                  <BarChart3 className="w-4 h-4 md:w-5 md:h-5" />
+                </button>
+              </Link>
               <Link href="/dashboard/vault">
                 <button className="bg-gray-50 dark:bg-white/5 hover:bg-blue-600 hover:text-white p-2 md:p-3 rounded-xl transition-all active:scale-90 border border-gray-100 dark:border-white/10 group/vault">
                   <Shield className="w-4 h-4 md:w-5 md:h-5" />

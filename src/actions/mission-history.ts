@@ -10,6 +10,7 @@ export interface MissionHistoryItem {
     result: any;
     audit: any;
     cost: number;
+    agentCosts: any; // Phase 9.2: Per-agent cost breakdown
     createdAt: Date;
 }
 

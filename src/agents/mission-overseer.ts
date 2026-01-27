@@ -19,6 +19,7 @@ import {
 import { AgentRegistry, initializeAgents } from './registry';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { PrismaMissionAdapter } from '../lib/prisma-mission-adapter';
+import { CostCollector } from '../lib/telemetry/agent-cost-collector';
 import {
     createMissionStatus,
     updateMissionStatus,
@@ -53,6 +54,7 @@ interface MissionState {
     retryCount: number;
     startTime: number;
     logs: string[];
+    costCollector: CostCollector; // Phase 9.2: Per-agent cost telemetry
 }
 
 const genAI = new GoogleGenerativeAI(
@@ -180,7 +182,8 @@ export class MissionOverseerAgent extends BaseAgent {
             independentAudits: [],
             retryCount: 0,
             startTime: Date.now(),
-            logs: []
+            logs: [],
+            costCollector: new CostCollector(),
         };
 
         // Firebase: Create real-time mission status tracking
@@ -379,21 +382,27 @@ export class MissionOverseerAgent extends BaseAgent {
             await addMissionLog(this.missionState.firebaseMissionId, `Starting ${agentName} execution`);
         }
 
+        // Phase 9.2: Start per-agent cost tracking
+        const tracker = this.missionState!.costCollector.startAgent(agentName);
+
         // Full agent lifecycle
         const agentPlan = await agent.plan(context);
         const agentResult = await agent.execute(agentPlan, context);
+
+        // Phase 9.2: Stop cost tracking and record entry
+        tracker.stop(agentResult);
 
         // Capture artifacts and results
         this.missionState!.results.push(agentResult);
         if (agentResult.artifacts) allArtifacts.push(...agentResult.artifacts);
 
-        this.addLog(`${agentName} executed. Success: ${agentResult.success}`);
+        this.addLog(`${agentName} executed. Success: ${agentResult.success}, Cost: ${agentResult.cost}, Duration: ${agentResult.duration}ms`);
 
         // Firebase: Log agent execution completion
         if (this.missionState?.firebaseMissionId) {
             await addMissionLog(
                 this.missionState.firebaseMissionId,
-                `Completed ${agentName}: ${agentResult.success ? 'SUCCESS' : 'FAILED'}`
+                `Completed ${agentName}: ${agentResult.success ? 'SUCCESS' : 'FAILED'} (${agentResult.duration}ms)`
             );
         }
     }
@@ -697,25 +706,35 @@ export class MissionOverseerAgent extends BaseAgent {
         const qualityScore = this.calculateQualityScore(this.missionState!.independentAudits);
         const confidence = qualityScore / 100; // Convert percentage to 0-1 score
 
+        // Phase 9.2: Collect per-agent cost telemetry
+        const agentCosts = this.missionState!.costCollector.toMap();
+        const totalCost = this.missionState!.costCollector.getTotalCost();
+        const totalTokens = this.missionState!.costCollector.getTotalTokens();
+
+        this.addLog(`📊 Cost Telemetry: ${totalCost} credits, ${totalTokens} tokens across ${Object.keys(agentCosts).length} agents`);
+
         const result: AgentResult = {
             success,
             data: {
                 missionId: this.missionState!.id,
                 audits: this.missionState!.independentAudits,
-                qualityScore
+                qualityScore,
+                agentCosts,
+                totalTokens,
             },
-            cost: 0,
+            cost: totalCost,
             duration: Date.now() - startTime,
             artifacts,
             confidence
         };
 
-        // PERSISTENCE: Complete
+        // PERSISTENCE: Complete (Phase 9.2: includes agentCosts)
         if (this.missionState?.dbId) {
             await PrismaMissionAdapter.completeMission(
                 this.missionState.dbId,
                 result,
-                this.missionState!.independentAudits
+                this.missionState!.independentAudits,
+                agentCosts
             );
         }
 
