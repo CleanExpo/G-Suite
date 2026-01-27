@@ -157,3 +157,102 @@ model DeadLetterEntry {
   @@index([userId])
   @@index([resolvedAt])
 }
+
+// UNI-169: API Gateway & External Integrations
+// ─── API Gateway ────────────────────────────────────────────────────────
+
+model ApiKey {
+  id          String    @id @default(uuid())
+  name        String
+  keyHash     String    @unique                   // SHA-256 hash of API key
+  keyPrefix   String                              // First 15 chars (e.g., "gp_live_abc1234")
+  scopes      String[]                            // ["missions:read", "agents:execute"]
+  userId      String
+
+  rateLimitTier String  @default("standard")     // standard, premium, enterprise
+  isActive    Boolean   @default(true)
+
+  lastUsedAt  DateTime?
+  expiresAt   DateTime?
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([keyPrefix])
+}
+
+model RateLimitBucket {
+  id          String    @id @default(uuid())
+  identifier  String                              // userId, IP, or API key hash
+  endpoint    String                              // "/api/agents", "*" for global
+
+  requestCount Int      @default(0)
+  windowStart DateTime
+
+  @@unique([identifier, endpoint])
+  @@index([windowStart])
+}
+
+// ─── Webhooks ───────────────────────────────────────────────────────────
+
+model WebhookEndpoint {
+  id          String    @id @default(uuid())
+  url         String
+  secret      String                              // Encrypted HMAC secret
+
+  events      String[]                            // ["mission.completed", "wallet.topup"]
+  isActive    Boolean   @default(true)
+
+  userId      String
+  metadata    Json?
+
+  deliveries  WebhookDelivery[]
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([userId, isActive])
+}
+
+model WebhookDelivery {
+  id           String    @id @default(uuid())
+  endpointId   String
+  endpoint     WebhookEndpoint @relation(fields: [endpointId], references: [id])
+
+  eventType    String                             // "mission.completed"
+  payload      Json
+
+  status       String    @default("pending")      // pending, sent, failed, retrying
+  attempts     Int       @default(0)
+  maxAttempts  Int       @default(3)
+
+  responseCode Int?
+  responseBody String?
+  error        String?
+
+  sentAt       DateTime?
+  createdAt    DateTime  @default(now())
+
+  @@index([endpointId, status])
+  @@index([createdAt])
+}
+
+// ─── Connectors ─────────────────────────────────────────────────────────
+
+model ConnectorState {
+  id           String    @id @default(uuid())
+  connectorName String   @unique                  // "stripe", "google-slides"
+
+  isHealthy    Boolean   @default(true)
+  failureCount Int       @default(0)
+  lastFailure  DateTime?
+  circuitState String    @default("closed")       // closed, open, half-open
+
+  metadata     Json?
+
+  lastCheckedAt DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([isHealthy, circuitState])
+}

@@ -1,0 +1,119 @@
+# G-Pilot GraphQL Schema
+# REST/GraphQL API Gateway
+
+scalar JSON
+scalar DateTime
+
+# ─── Queries ────────────────────────────────────────────────────────────────
+
+type Query {
+  # Agent queries
+  agents: [Agent!]!
+  agent(name: String!): Agent
+
+  # Mission queries
+  missions(limit: Int, status: String): [Mission!]!
+  mission(id: ID!): Mission
+
+  # Job queue queries
+  jobs(queue: String, status: String, limit: Int): [Job!]!
+  job(id: ID!): Job
+
+  # System health
+  health: HealthStatus!
+}
+
+# ─── Mutations ──────────────────────────────────────────────────────────────
+
+type Mutation {
+  # Agent execution
+  invokeAgent(agentName: String!, mission: String!, config: JSON): MissionResult!
+
+  # Job queue
+  createJob(queue: String!, name: String!, payload: JSON!, priority: Int, delay: Int): JobResult!
+
+  # Webhooks
+  createWebhook(url: String!, events: [String!]!, secret: String): Webhook!
+}
+
+# ─── Types ──────────────────────────────────────────────────────────────────
+
+type Agent {
+  name: String!
+  description: String!
+  capabilities: [String!]!
+  requiredSkills: [String!]!
+  status: String!
+}
+
+type Mission {
+  id: ID!
+  status: String!
+  plan: JSON
+  result: JSON
+  audit: JSON
+  cost: Int!
+  agentCosts: JSON
+  userId: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type Job {
+  id: ID!
+  queue: String!
+  name: String!
+  status: String!
+  priority: Int!
+  payload: JSON!
+  result: JSON
+  error: String
+  attempts: Int!
+  maxAttempts: Int!
+  scheduledFor: DateTime
+  startedAt: DateTime
+  completedAt: DateTime
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type HealthStatus {
+  status: String!
+  timestamp: DateTime!
+  version: String!
+  uptime: Int!
+  agents: AgentHealth!
+  googleProducts: [GoogleProduct!]!
+}
+
+type AgentHealth {
+  total: Int!
+  ready: Int!
+  names: [String!]!
+}
+
+type GoogleProduct {
+  name: String!
+  status: String!
+}
+
+type MissionResult {
+  success: Boolean!
+  missionId: ID
+  error: String
+}
+
+type JobResult {
+  success: Boolean!
+  jobId: String
+  dbJobId: String
+  error: String
+}
+
+type Webhook {
+  id: ID!
+  url: String!
+  events: [String!]!
+  isActive: Boolean!
+  createdAt: DateTime!
+}
