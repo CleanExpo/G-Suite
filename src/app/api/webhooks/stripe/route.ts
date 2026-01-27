@@ -51,7 +51,7 @@ export async function POST(req: Request) {
 
     // 3. Update the Ledger (Atomic)
     try {
-      await prisma.$transaction(async (tx) => {
+      await prisma.$transaction(async (tx: any) => {
         // Upsert Wallet (Create if doesn't exist)
         const wallet = await tx.userWallet.upsert({
           where: { clerkId: userId },

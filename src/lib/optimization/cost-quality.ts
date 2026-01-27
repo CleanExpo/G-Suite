@@ -54,7 +54,7 @@ export async function optimizeMissionStrategy(
         }
 
         // Build cost-quality data points
-        const dataPoints = learnings.map(l => ({
+        const dataPoints = learnings.map((l: any) => ({
             agents: l.agentsUsed,
             cost: l.duration / 1000, // Simplified cost estimate
             quality: l.qualityScore ?? 0,

@@ -30,6 +30,8 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@ai-sdk/google": "^3.0.13",
+    "@ai-sdk/react": "^3.0.52",
     "@clerk/nextjs": "^6.36.8",
     "@clerk/themes": "^2.4.48",
     "@google/generative-ai": "^0.24.1",

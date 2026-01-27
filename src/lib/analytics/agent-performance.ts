@@ -67,15 +67,15 @@ export async function getAgentPerformance(
         }
 
         // Calculate metrics
-        const successful = learnings.filter(l => l.success);
+        const successful = learnings.filter((l: any) => l.success);
         const successRate = (successful.length / learnings.length) * 100;
-        const avgDuration = learnings.reduce((sum, l) => sum + l.duration, 0) / learnings.length;
+        const avgDuration = learnings.reduce((sum: number, l: any) => sum + l.duration, 0) / learnings.length;
         const avgQualityScore = learnings
-            .filter(l => l.qualityScore !== null)
-            .reduce((sum, l) => sum + (l.qualityScore ?? 0), 0) / learnings.length;
+            .filter((l: any) => l.qualityScore !== null)
+            .reduce((sum: number, l: any) => sum + (l.qualityScore ?? 0), 0) / learnings.length;
 
         // Extract failure patterns
-        const failed = learnings.filter(l => !l.success);
+        const failed = learnings.filter((l: any) => !l.success);
         const failurePatterns = extractFailurePatterns(failed);
 
         // Extract best use cases
@@ -157,11 +157,11 @@ export async function getSystemPerformance(
             };
         }
 
-        const successful = learnings.filter(l => l.success);
+        const successful = learnings.filter((l: any) => l.success);
         const successRate = (successful.length / learnings.length) * 100;
         const avgQualityScore = learnings
-            .filter(l => l.qualityScore !== null)
-            .reduce((sum, l) => sum + (l.qualityScore ?? 0), 0) / learnings.length;
+            .filter((l: any) => l.qualityScore !== null)
+            .reduce((sum: number, l: any) => sum + (l.qualityScore ?? 0), 0) / learnings.length;
 
         // Find top performing agents
         const agentScores = new Map<string, { count: number; successCount: number }>();
@@ -189,7 +189,7 @@ export async function getSystemPerformance(
             improvementAreas.push('Average quality below threshold');
         }
 
-        const avgRetries = learnings.reduce((sum, l) => sum + l.retryCount, 0) / learnings.length;
+        const avgRetries = learnings.reduce((sum: number, l: any) => sum + l.retryCount, 0) / learnings.length;
         if (avgRetries > 1) {
             improvementAreas.push('High retry rate');
         }

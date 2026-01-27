@@ -25,7 +25,7 @@ async function main() {
   console.log('\n📜 Transaction History:');
   console.log('------------------------------------------');
 
-  wallet.transactions.forEach((tx) => {
+  wallet.transactions.forEach((tx: any) => {
     const symbol = tx.amount > 0 ? '➕' : '➖';
     console.log(
       `${tx.createdAt.toISOString()} | ${symbol} ${Math.abs(tx.amount).toString().padEnd(6)} | ${tx.description}`,

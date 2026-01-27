@@ -35,7 +35,7 @@ export async function billingGate(userId: string, actionType: keyof typeof COST_
   }
 
   // 3. Deduct Credits (Atomic Transaction)
-  return await prisma.$transaction(async (tx) => {
+  return await prisma.$transaction(async (tx: any) => {
     // Deduct money
     const updatedWallet = await tx.userWallet.update({
       where: { clerkId: userId },

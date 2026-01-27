@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { X, Send, Loader2, Zap, Rocket, Shield, Target, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { X, Send, Loader2, Rocket, Target, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { runMission } from '@/actions/mission.action'; // Keep for compat if needed, though we use fetch now
+import { useChat } from '@ai-sdk/react';
+import { DefaultChatTransport } from 'ai';
 
 interface MissionModalProps {
   isOpen: boolean;
@@ -19,9 +20,20 @@ export default function MissionModal({
   initialInput,
 }: MissionModalProps) {
   const [input, setInput] = useState('');
-  const [isLaunching, setIsLaunching] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [logs, setLogs] = useState<string[]>([]);
+
+  const transport = useMemo(() => new DefaultChatTransport({
+    api: '/api/agents',
+    body: { agentName: 'mission-overseer' },
+  }), []);
+
+  const { messages, sendMessage, status, error, setMessages } = useChat({
+    transport,
+    onFinish: () => {
+      setInput('');
+      onSuccess();
+      setTimeout(onClose, 1500);
+    },
+  });
 
   // Reset input when initialInput changes
   useEffect(() => {
@@ -30,57 +42,31 @@ export default function MissionModal({
     }
   }, [initialInput]);
 
-  async function handleLaunch() {
-    if (!input) return;
-    setIsLaunching(true);
-    setLogs([]);
-    setError(null);
-
-    try {
-      const response = await fetch('/api/agents', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          agentName: 'mission-overseer', // Trigger the unified loop directly
-          mission: input,
-        })
-      });
-
-      if (!response.body) throw new Error('Uplink Failed');
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let buffer = '';
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        const chunk = decoder.decode(value, { stream: true });
-        buffer += chunk;
-        const lines = buffer.split('\n');
-        buffer = lines.pop() || '';
-
-        for (const line of lines) {
-          if (line.startsWith('LOG:')) {
-            setLogs(prev => [...prev, line.substring(4)]);
-          } else if (line.startsWith('RESULT:')) {
-            // Success
-            setLogs(prev => [...prev, 'Mission Complete.']);
-          } else if (line.startsWith('ERROR:')) {
-            throw new Error(line.substring(6));
-          }
-        }
-      }
-
-      setInput('');
-      onSuccess();
-      setTimeout(onClose, 1500); // Wait a bit to show success logs on terminal
-
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setIsLaunching(false);
+  // Clear chat state when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setMessages([]);
     }
+  }, [isOpen, setMessages]);
+
+  const isLaunching = status === 'submitted' || status === 'streaming';
+
+  // Derive log lines from the last assistant message
+  const logs = useMemo(() => {
+    const lastAssistant = [...messages].reverse().find(m => m.role === 'assistant');
+    if (!lastAssistant?.parts) return [];
+
+    const text = lastAssistant.parts
+      .filter((p): p is { type: 'text'; text: string } => p.type === 'text')
+      .map(p => p.text)
+      .join('');
+
+    return text.split('\n').filter(Boolean);
+  }, [messages]);
+
+  function handleLaunch() {
+    if (!input || isLaunching) return;
+    sendMessage({ text: input });
   }
 
   return (
@@ -172,7 +158,7 @@ export default function MissionModal({
                   animate={{ opacity: 1 }}
                   className="p-4 bg-rose-50 dark:bg-rose-900/10 border border-rose-100 dark:border-rose-800 text-rose-600 dark:text-rose-400 text-xs font-bold rounded-2xl flex items-center gap-3"
                 >
-                  <AlertCircle className="w-4 h-4" /> {error}
+                  <AlertCircle className="w-4 h-4" /> {error.message}
                 </motion.div>
               )}
 
@@ -208,4 +194,3 @@ export default function MissionModal({
     </AnimatePresence>
   );
 }
-

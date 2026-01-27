@@ -10,7 +10,7 @@
 import { adminFirestore, adminMessaging } from '@/lib/firebase-admin';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { app } from '@/lib/firebase';
-import { Timestamp } from 'firebase-admin/firestore';
+import { Timestamp, FieldValue } from 'firebase-admin/firestore';
 
 // =============================================================================
 // FIRESTORE: REAL-TIME MISSION STATUS
@@ -87,7 +87,7 @@ export async function addMissionLog(
         const docRef = adminFirestore.collection('missions').doc(missionId);
 
         await docRef.update({
-            agentLogs: adminFirestore.FieldValue.arrayUnion(
+            agentLogs: FieldValue.arrayUnion(
                 `[${new Date().toISOString()}] ${logMessage}`
             ),
             updatedAt: Timestamp.now()

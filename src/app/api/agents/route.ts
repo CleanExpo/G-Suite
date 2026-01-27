@@ -1,13 +1,16 @@
 /**
  * Agents API
- * 
+ *
  * REST API for agent invocation, status, and management.
+ * Uses Vercel AI SDK UIMessageStream protocol for real-time streaming.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { createUIMessageStream, createUIMessageStreamResponse } from 'ai';
 import { AgentRegistry, initializeAgents } from '@/agents/registry';
 
 export const dynamic = 'force-dynamic';
+export const maxDuration = 60;
 
 /**
  * GET /api/agents - List all available agents
@@ -43,22 +46,50 @@ export async function GET(): Promise<Response> {
 }
 
 /**
- * POST /api/agents - Invoke an agent mission
+ * POST /api/agents - Invoke an agent mission via AI SDK UIMessageStream
+ *
+ * Accepts both:
+ * - useChat format: { messages: [...], agentName?, config? }
+ * - Legacy format:  { agentName, mission, userId?, config? }
  */
 export async function POST(request: NextRequest): Promise<Response> {
     try {
         const body = await request.json();
-        const { agentName, mission, userId, config } = body;
 
-        if (!agentName || !mission) {
+        // Support both useChat format (messages array) and legacy format (mission string)
+        let mission: string;
+        const agentName = body.agentName || 'mission-overseer';
+        const userId = body.userId;
+        const config = body.config;
+
+        if (body.messages && Array.isArray(body.messages)) {
+            // useChat format: extract mission from last user message
+            const lastUserMsg = [...body.messages].reverse().find(
+                (m: any) => m.role === 'user'
+            );
+            if (lastUserMsg?.parts) {
+                const textPart = lastUserMsg.parts.find((p: any) => p.type === 'text');
+                mission = textPart?.text || '';
+            } else if (lastUserMsg?.content) {
+                // Fallback for older message format
+                mission = typeof lastUserMsg.content === 'string'
+                    ? lastUserMsg.content
+                    : '';
+            } else {
+                mission = '';
+            }
+        } else {
+            mission = body.mission || '';
+        }
+
+        if (!mission) {
             return NextResponse.json({
                 success: false,
-                error: 'Missing required fields: agentName, mission'
+                error: 'Missing required field: mission'
             }, { status: 400 });
         }
 
         await initializeAgents();
-        // Unified Entry: Delegate to Mission Overseer
         const overseer = AgentRegistry.get('mission-overseer');
 
         if (!overseer) {
@@ -68,15 +99,15 @@ export async function POST(request: NextRequest): Promise<Response> {
             }, { status: 500 });
         }
 
-        const encoder = new TextEncoder();
+        const stream = createUIMessageStream({
+            execute: async ({ writer }) => {
+                const textId = 'mission-log';
 
-        const stream = new ReadableStream({
-            async start(controller) {
-                // Helper to stream logs
+                writer.write({ type: 'start' });
+                writer.write({ type: 'text-start', id: textId });
+
                 const sendLog = (msg: string) => {
-                    // Send as Server-Sent Event style or just raw text lines
-                    // Using a simple prefix convention for client parsing
-                    controller.enqueue(encoder.encode(`LOG:${msg}\n`));
+                    writer.write({ type: 'text-delta', delta: msg + '\n', id: textId });
                 };
 
                 const context = {
@@ -90,7 +121,6 @@ export async function POST(request: NextRequest): Promise<Response> {
                 };
 
                 try {
-                    // Execute unified loop
                     sendLog(`Initializing Mission for ${agentName}...`);
 
                     const plan = await overseer.plan(context);
@@ -102,7 +132,6 @@ export async function POST(request: NextRequest): Promise<Response> {
                     const verification = await overseer.verify(result, context);
                     sendLog(`Verification status: ${verification.passed ? 'PASSED' : 'FAILED'}`);
 
-                    // Send Final Result as JSON
                     const finalResponse = {
                         success: true,
                         agentName: 'mission-overseer',
@@ -126,21 +155,22 @@ export async function POST(request: NextRequest): Promise<Response> {
                         }
                     };
 
-                    controller.enqueue(encoder.encode(`RESULT:${JSON.stringify(finalResponse)}\n`));
+                    sendLog(`RESULT:${JSON.stringify(finalResponse)}`);
+                    sendLog('Mission Complete.');
                 } catch (error: any) {
-                    controller.enqueue(encoder.encode(`ERROR:${error.message}\n`));
-                } finally {
-                    controller.close();
+                    sendLog(`ERROR: ${error.message}`);
                 }
+
+                writer.write({ type: 'text-end', id: textId });
+                writer.write({ type: 'finish', finishReason: 'stop' });
+            },
+            onError: (error) => {
+                console.error('[Agents API] Stream error:', error);
+                return error instanceof Error ? error.message : 'Stream error';
             }
         });
 
-        return new Response(stream, {
-            headers: {
-                'Content-Type': 'text/plain; charset=utf-8',
-                'Transfer-Encoding': 'chunked'
-            }
-        });
+        return createUIMessageStreamResponse({ stream });
 
     } catch (error: any) {
         return NextResponse.json({

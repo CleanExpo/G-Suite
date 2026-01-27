@@ -859,11 +859,11 @@ export class MissionOverseerAgent extends BaseAgent {
             }
 
             // Calculate success rate
-            const successful = learnings.filter(l => l.success);
+            const successful = learnings.filter((l: any) => l.success);
             const successRate = (successful.length / learnings.length) * 100;
 
             // Calculate average duration
-            const avgDuration = learnings.reduce((sum, l) => sum + l.duration, 0) / learnings.length;
+            const avgDuration = learnings.reduce((sum: number, l: any) => sum + l.duration, 0) / learnings.length;
 
             // Find most successful agent combination
             const agentCombos = new Map<string, { count: number; successCount: number }>();
@@ -891,7 +891,7 @@ export class MissionOverseerAgent extends BaseAgent {
             const bestAgents = bestCombo ? bestCombo.split(',') : [];
 
             // Determine complexity based on average retry count
-            const avgRetries = learnings.reduce((sum, l) => sum + l.retryCount, 0) / learnings.length;
+            const avgRetries = learnings.reduce((sum: number, l: any) => sum + l.retryCount, 0) / learnings.length;
             const avgComplexity: 'low' | 'medium' | 'high' =
                 avgRetries < 0.5 ? 'low' : avgRetries > 1.5 ? 'high' : 'medium';
 
