@@ -98,3 +98,62 @@ model MissionLearning {
   @@index([success])
   @@index([timestamp])
 }
+
+// UNI-167: Task Queue & Scheduling System
+model QueueJob {
+  id           String    @id @default(uuid())
+  queue        String                          // e.g. "missions", "agents", "maintenance"
+  name         String                          // job name/type
+  status       String    @default("waiting")   // waiting, active, completed, failed, delayed
+  priority     Int       @default(0)           // BullMQ: lower = higher priority (0 is highest)
+  payload      Json
+  result       Json?
+  error        String?
+  attempts     Int       @default(0)
+  maxAttempts  Int       @default(3)
+  scheduledFor DateTime?
+  startedAt    DateTime?
+  completedAt  DateTime?
+  userId       String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([queue, status])
+  @@index([userId])
+  @@index([scheduledFor])
+}
+
+model CronSchedule {
+  id         String    @id @default(uuid())
+  name       String                            // human-readable identifier
+  pattern    String                            // cron expression: "0 */6 * * *"
+  queue      String                            // target queue
+  jobName    String                            // job type to create
+  payload    Json
+  isActive   Boolean   @default(true)
+  nextRunAt  DateTime?
+  lastRunAt  DateTime?
+  userId     String
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@unique([name, userId])
+  @@index([isActive, nextRunAt])
+}
+
+model DeadLetterEntry {
+  id         String    @id @default(uuid())
+  queue      String
+  jobName    String
+  bullmqId   String?                           // original BullMQ job ID
+  payload    Json
+  error      String
+  attempts   Int
+  failedAt   DateTime  @default(now())
+  resolvedAt DateTime?                         // null = unresolved
+  userId     String
+
+  @@index([queue])
+  @@index([userId])
+  @@index([resolvedAt])
+}
