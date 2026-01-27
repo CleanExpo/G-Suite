@@ -20,6 +20,8 @@ import { AgentRegistry, initializeAgents } from './registry';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { PrismaMissionAdapter } from '../lib/prisma-mission-adapter';
 import { CostCollector } from '../lib/telemetry/agent-cost-collector';
+import { ExecutionPool } from '../lib/scheduler';
+import type { SchedulerTask, SchedulerResult } from '../lib/scheduler';
 import {
     createMissionStatus,
     updateMissionStatus,
@@ -264,45 +266,57 @@ export class MissionOverseerAgent extends BaseAgent {
         }
 
         try {
-            // Phase 5: Parallel agent execution for independent steps
-            const { parallelSteps, sequentialSteps } = this.analyzeParallelization(plan.steps);
+            // Phase 9.3: DAG-based parallel execution with scheduling pool
+            const pool = new ExecutionPool({
+                maxConcurrency: this.getOptimalConcurrency(plan.steps.length),
+                taskTimeoutMs: 300_000,
+                failFast: false,
+                onTaskStart: async (task: SchedulerTask) => {
+                    this.addLog(`▶ Starting: ${task.step.action}`);
+                    if (this.missionState?.firebaseMissionId) {
+                        await addMissionLog(
+                            this.missionState.firebaseMissionId,
+                            `Starting: ${task.step.action}`
+                        );
+                    }
+                },
+                onTaskComplete: async (task: SchedulerTask) => {
+                    const duration = (task.completedAt ?? 0) - (task.startedAt ?? 0);
+                    this.addLog(`✓ Completed: ${task.step.action} (${duration}ms)`);
+                },
+                onProgress: async (completed: number, total: number) => {
+                    if (this.missionState?.firebaseMissionId) {
+                        // Map progress to 10-80% range (same as previous behavior)
+                        const progress = Math.round((completed / total) * 70) + 10;
+                        await updateMissionStatus(this.missionState.firebaseMissionId, {
+                            currentStep: `Completed ${completed}/${total} tasks`,
+                            progress,
+                        } as any);
+                    }
+                },
+                onTaskFail: async (task: SchedulerTask) => {
+                    this.addLog(`✗ Failed: ${task.step.action} — ${task.error}`);
+                    if (this.missionState?.firebaseMissionId) {
+                        await addMissionLog(
+                            this.missionState.firebaseMissionId,
+                            `Failed: ${task.step.action}`
+                        );
+                    }
+                },
+            });
 
-            if (parallelSteps.length > 1) {
-                this.addLog(`⚡ Executing ${parallelSteps.length} independent steps in parallel`);
+            // Build task executor that bridges scheduler → agent system
+            const taskExecutor = this.buildTaskExecutor(context, agentsUsed, allArtifacts);
 
-                const parallelResults = await Promise.all(
-                    parallelSteps.map(step => {
-                        if (step.tool.startsWith('agent:')) {
-                            const agentName = step.tool.replace('agent:', '');
-                            return this.executeAgentStep(agentName, context, agentsUsed, allArtifacts);
-                        }
-                        return Promise.resolve();
-                    })
-                );
-            }
+            const schedulerResult: SchedulerResult = await pool.execute(plan.steps, taskExecutor);
 
-            // Execute sequential steps (including ones with dependencies)
-            const totalSteps = sequentialSteps.length;
-            for (let i = 0; i < sequentialSteps.length; i++) {
-                const step = sequentialSteps[i];
-
-                // Firebase: Update progress
-                if (this.missionState.firebaseMissionId) {
-                    const progress = Math.round((i / totalSteps) * 70) + 10; // 10-80%
-                    await updateMissionStatus(this.missionState.firebaseMissionId, {
-                        currentStep: step.action,
-                        progress
-                    } as any);
-                }
-
-                if (step.tool.startsWith('agent:')) {
-                    const agentName = step.tool.replace('agent:', '');
-                    await this.executeAgentStep(agentName, context, agentsUsed, allArtifacts);
-                }
-                else if (step.tool === 'audit:independent-verifier') {
-                    await this.performIndependentAudit(context);
-                }
-            }
+            // Log scheduler summary
+            this.addLog(
+                `📊 Scheduler: ${schedulerResult.completedCount} completed, ` +
+                `${schedulerResult.failedCount} failed, ` +
+                `${schedulerResult.cancelledCount} cancelled. ` +
+                `Wall: ${schedulerResult.totalDurationMs}ms, Critical Path: ${schedulerResult.criticalPathMs}ms`
+            );
 
             // Check Audit Results with Quality Score
             const qualityScore = this.calculateQualityScore(this.missionState.independentAudits);
@@ -330,6 +344,21 @@ export class MissionOverseerAgent extends BaseAgent {
                     }
                 };
             }
+
+            // Attach scheduler metrics to result
+            result.data = {
+                ...(typeof result.data === 'object' ? result.data : {}),
+                schedulerMetrics: {
+                    totalDurationMs: schedulerResult.totalDurationMs,
+                    criticalPathMs: schedulerResult.criticalPathMs,
+                    parallelEfficiency: schedulerResult.totalDurationMs > 0
+                        ? Math.round((schedulerResult.criticalPathMs / schedulerResult.totalDurationMs) * 100)
+                        : 100,
+                    completedTasks: schedulerResult.completedCount,
+                    failedTasks: schedulerResult.failedCount,
+                    cancelledTasks: schedulerResult.cancelledCount,
+                },
+            };
 
             // Firebase: Update mission status to completed
             if (this.missionState.firebaseMissionId) {
@@ -405,6 +434,41 @@ export class MissionOverseerAgent extends BaseAgent {
                 `Completed ${agentName}: ${agentResult.success ? 'SUCCESS' : 'FAILED'} (${agentResult.duration}ms)`
             );
         }
+    }
+
+    /**
+     * Phase 9.3: Build a task executor closure that bridges the scheduler
+     * to the existing agent execution system.
+     * Routes agent: steps to executeAgentStep() and audit: steps to performIndependentAudit().
+     */
+    private buildTaskExecutor(
+        context: AgentContext,
+        agentsUsed: string[],
+        allArtifacts: any[]
+    ): (task: SchedulerTask) => Promise<void> {
+        return async (task: SchedulerTask) => {
+            const { step } = task;
+
+            if (step.tool.startsWith('agent:')) {
+                const agentName = step.tool.replace('agent:', '');
+                await this.executeAgentStep(agentName, context, agentsUsed, allArtifacts);
+                // Attach the last result to the scheduler task for reference
+                const lastResult = this.missionState!.results[this.missionState!.results.length - 1];
+                task.result = lastResult;
+            } else if (step.tool === 'audit:independent-verifier') {
+                await this.performIndependentAudit(context);
+            }
+        };
+    }
+
+    /**
+     * Phase 9.3: Determine optimal concurrency based on step count.
+     * Small missions don't need high concurrency; larger ones benefit from more workers.
+     */
+    private getOptimalConcurrency(stepCount: number): number {
+        if (stepCount <= 2) return 2;
+        if (stepCount <= 5) return 4;
+        return 6; // Cap at 6 to avoid overwhelming API rate limits
     }
 
     private async performIndependentAudit(context: AgentContext) {
@@ -941,7 +1005,8 @@ export class MissionOverseerAgent extends BaseAgent {
     // =========================================================================
 
     /**
-     * Analyze which steps can run in parallel
+     * @deprecated Phase 9.3: Replaced by DAG scheduler with ExecutionPool.
+     * Kept for rollback safety. Use ExecutionPool.execute() instead.
      */
     private analyzeParallelization(steps: PlanStep[]): {
         parallelSteps: PlanStep[];
