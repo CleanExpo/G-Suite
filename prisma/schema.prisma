@@ -942,3 +942,149 @@ model Payment {
   @@index([paymentDate])
   @@index([deletedAt])
 }
+
+// ─── UNI-174: Workflow Automation ───────────────────────────────────
+
+// WorkflowTemplate Model
+model WorkflowTemplate {
+  id     String @id @default(uuid())
+  userId String
+
+  // Basic Info
+  name         String
+  description  String?
+  type         String // approval, notification, automation
+  triggerEvent String // invoice.created, deal.won, inventory.low
+
+  // Workflow Definition (JSONB)
+  steps Json // Array of workflow steps
+  /**
+   * Example steps structure:
+   * [
+   *   {
+   *     stepId: "step-1",
+   *     type: "approval",
+   *     name: "Manager Approval",
+   *     assigneeRole: "manager",
+   *     condition: { field: "invoice.total", operator: "gt", value: 100000 },
+   *     actions: [
+   *       { type: "email", template: "approval-request" }
+   *     ]
+   *   },
+   *   {
+   *     stepId: "step-2",
+   *     type: "notification",
+   *     name: "Notify Finance",
+   *     actions: [
+   *       { type: "email", to: "finance@company.com" }
+   *     ]
+   *   }
+   * ]
+   */
+
+  // Settings
+  slaHours        Int?     // SLA in hours for completion
+  escalationRules Json?    // Escalation logic
+  isActive        Boolean  @default(true)
+
+  // Instances
+  instances WorkflowInstance[]
+
+  // Audit
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  createdBy String
+  updatedBy String
+  deletedAt DateTime?
+
+  @@index([userId, isActive])
+  @@index([type])
+  @@index([triggerEvent])
+  @@index([deletedAt])
+}
+
+// WorkflowInstance Model
+model WorkflowInstance {
+  id     String @id @default(uuid())
+  userId String
+
+  // Relationships
+  templateId String
+  template   WorkflowTemplate @relation(fields: [templateId], references: [id])
+
+  // Instance Info
+  referenceType String  // invoice, deal, etc.
+  referenceId   String  // ID of the related entity
+  status        String  @default("pending") // pending, in_progress, completed, cancelled, failed
+  currentStepId String?
+
+  // Steps Status
+  stepsStatus Json // Track completion status of each step
+  /**
+   * Example:
+   * {
+   *   "step-1": { status: "approved", approvedBy: "user-123", approvedAt: "..." },
+   *   "step-2": { status: "pending" }
+   * }
+   */
+
+  // SLA Tracking
+  slaDeadline DateTime?
+  isOverdue   Boolean   @default(false)
+
+  // Completion
+  completedAt  DateTime?
+  cancelledAt  DateTime?
+  cancelReason String?
+
+  // Metadata
+  metadata Json? // Additional context for workflow execution
+
+  // Audit
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, status])
+  @@index([templateId])
+  @@index([referenceType, referenceId])
+  @@index([slaDeadline, isOverdue])
+  @@index([createdAt])
+}
+
+// Notification Model
+model Notification {
+  id     String @id @default(uuid())
+  userId String
+
+  // Notification Details
+  type       String // email, in_app, sms, webhook
+  channel    String? // For email: recipient email
+  subject    String
+  body       String
+  templateId String?
+
+  // Trigger
+  triggerEvent  String // workflow.approved, invoice.overdue, etc.
+  referenceType String?
+  referenceId   String?
+
+  // Delivery Status
+  status        String    @default("pending") // pending, sent, failed, delivered, bounced
+  sentAt        DateTime?
+  deliveredAt   DateTime?
+  failureReason String?
+  retryCount    Int       @default(0)
+
+  // Metadata
+  metadata Json? // Additional context
+
+  // Audit
+  createdAt DateTime @default(now())
+  readAt    DateTime? // For in_app notifications
+
+  @@index([userId, status])
+  @@index([type])
+  @@index([sentAt])
+  @@index([createdAt])
+  @@index([referenceType, referenceId])
+}
