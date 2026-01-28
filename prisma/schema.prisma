@@ -370,3 +370,41 @@ model AgentStatus {
   @@index([userId, status])
 }
 
+// ─── GEO Free Audit Lead Generation ─────────────────────────────────────
+
+model AuditLead {
+  id String @id @default(uuid())
+
+  // Captured data
+  url   String
+  email String? // Null for lite, required for full
+
+  // Auto-extracted data
+  extractedName    String?
+  extractedAddress String?
+  extractedPhone   String?
+  extractedFrom    String? // "schema" | "footer" | "contact" | "none"
+  confidence       Int? // 0-100
+
+  // Audit results
+  liteScore Int?
+  fullScore Int?
+  auditType String // "lite" | "full"
+
+  // Lead management
+  status String @default("new") // new, contacted, converted, lost
+  source String @default("web")
+
+  // Engagement tracking
+  viewedFullReport Boolean @default(false)
+
+  metadata Json? // Store lite results
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+  @@index([status])
+  @@index([createdAt])
+}
+
