@@ -8,9 +8,9 @@ datasource db {
 }
 
 model UserWallet {
-  id        String        @id @default(uuid())
-  clerkId   String        @unique
-  balance   Int           @default(0) // Stored in 'credits' (100 = $1.00)
+  id           String        @id @default(uuid())
+  clerkId      String        @unique
+  balance      Int           @default(0) // Stored in 'credits' (100 = $1.00)
   transactions Transaction[]
 }
 
@@ -18,81 +18,81 @@ model Transaction {
   id          String     @id @default(uuid())
   walletId    String
   wallet      UserWallet @relation(fields: [walletId], references: [id])
-  amount      Int        // Negative for usage, positive for top-up
+  amount      Int // Negative for usage, positive for top-up
   description String
   metadata    Json?
   createdAt   DateTime   @default(now())
 }
 
 model UserProfile {
-  id                  String   @id @default(uuid())
-  clerkId             String   @unique
-  websiteUrl          String?
-  brandConfig         Json?    // Stores extracted logo, fonts, colors (The Mirror)
+  id          String  @id @default(uuid())
+  clerkId     String  @unique
+  websiteUrl  String?
+  brandConfig Json? // Stores extracted logo, fonts, colors (The Mirror)
 
   // Encrypted Keys (The Vault)
-  googleApiKey        String?  // Google AI Studio / Gemini Key
-  shopifyAccessToken  String?  // For Shopify sync
-  redditApiKey        String?  // For Reddit scraping/posting
-  socialApiKeys       Json?    // Encrypted map of other social keys (X, LinkedIn, etc.)
+  googleApiKey       String? // Google AI Studio / Gemini Key
+  shopifyAccessToken String? // For Shopify sync
+  redditApiKey       String? // For Reddit scraping/posting
+  socialApiKeys      Json? // Encrypted map of other social keys (X, LinkedIn, etc.)
 
   // Vault Security (Phase 9.1)
-  keyVersion          Int      @default(1)  // Current encryption key version
-  keyRotationHistory  Json?    // Audit trail of key rotations: [{ version, rotatedAt, rotatedBy }]
+  keyVersion         Int   @default(1) // Current encryption key version
+  keyRotationHistory Json? // Audit trail of key rotations: [{ version, rotatedAt, rotatedBy }]
 
-  integrations        Json?    // Connection status & metadata
-  onboardingCompleted Boolean  @default(false)
+  integrations        Json? // Connection status & metadata
+  onboardingCompleted Boolean @default(false)
 
-  tasks               KanbanTask[]
+  tasks KanbanTask[]
 
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model KanbanTask {
-  id          String   @id @default(uuid())
-  clerkId     String
-  profile     UserProfile @relation(fields: [clerkId], references: [clerkId])
-  
+  id      String      @id @default(uuid())
+  clerkId String
+  profile UserProfile @relation(fields: [clerkId], references: [clerkId])
+
   title       String
   description String?
-  status      String   @default("OBLIGATION") // OBLIGATION, EXECUTION, VALIDATION, ARCHIVE
-  priority    String   @default("MEDIUM")     // LOW, MEDIUM, HIGH, KINETIC
-  
-  dueDate     DateTime?
-  payload     Json?    // Mission data (tool options, specs)
-  resultUrl   String?
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  status      String  @default("OBLIGATION") // OBLIGATION, EXECUTION, VALIDATION, ARCHIVE
+  priority    String  @default("MEDIUM") // LOW, MEDIUM, HIGH, KINETIC
+
+  dueDate   DateTime?
+  payload   Json? // Mission data (tool options, specs)
+  resultUrl String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // v8.2 Mission Persistence
 model Mission {
   id         String   @id @default(uuid())
-  status     String   // PENDING, RUNNING, COMPLETED, FAILED
+  status     String // PENDING, RUNNING, COMPLETED, FAILED
   plan       Json?
   result     Json?
-  audit      Json?    // Independent Verification Report
-  cost       Int      // Total cost in credits
-  agentCosts Json?    // Phase 9.2: Per-agent cost breakdown { agentName: { tokens, cost, duration } }
-  userId     String   // Corresponds to clerkId/User ID
+  audit      Json? // Independent Verification Report
+  cost       Int // Total cost in credits
+  agentCosts Json? // Phase 9.2: Per-agent cost breakdown { agentName: { tokens, cost, duration } }
+  userId     String // Corresponds to clerkId/User ID
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }
 
 // Phase 4: Cross-Mission Intelligence
 model MissionLearning {
-  id              String   @id @default(uuid())
-  missionType     String   // Classification: marketing, seo, content, research, etc.
-  agentsUsed      String[] // List of agent names used in this mission
-  success         Boolean  // Whether mission completed successfully
-  duration        Int      // Duration in milliseconds
-  retryCount      Int      // Number of retries needed
-  insights        String[] // Extracted insights and learnings
-  qualityScore    Float?   // Quality score (0-100)
-  failureMode     String?  // If failed, what was the failure category
-  timestamp       DateTime @default(now())
+  id           String   @id @default(uuid())
+  missionType  String // Classification: marketing, seo, content, research, etc.
+  agentsUsed   String[] // List of agent names used in this mission
+  success      Boolean // Whether mission completed successfully
+  duration     Int // Duration in milliseconds
+  retryCount   Int // Number of retries needed
+  insights     String[] // Extracted insights and learnings
+  qualityScore Float? // Quality score (0-100)
+  failureMode  String? // If failed, what was the failure category
+  timestamp    DateTime @default(now())
 
   @@index([missionType])
   @@index([success])
@@ -102,10 +102,10 @@ model MissionLearning {
 // UNI-167: Task Queue & Scheduling System
 model QueueJob {
   id           String    @id @default(uuid())
-  queue        String                          // e.g. "missions", "agents", "maintenance"
-  name         String                          // job name/type
-  status       String    @default("waiting")   // waiting, active, completed, failed, delayed
-  priority     Int       @default(0)           // BullMQ: lower = higher priority (0 is highest)
+  queue        String // e.g. "missions", "agents", "maintenance"
+  name         String // job name/type
+  status       String    @default("waiting") // waiting, active, completed, failed, delayed
+  priority     Int       @default(0) // BullMQ: lower = higher priority (0 is highest)
   payload      Json
   result       Json?
   error        String?
@@ -124,18 +124,18 @@ model QueueJob {
 }
 
 model CronSchedule {
-  id         String    @id @default(uuid())
-  name       String                            // human-readable identifier
-  pattern    String                            // cron expression: "0 */6 * * *"
-  queue      String                            // target queue
-  jobName    String                            // job type to create
-  payload    Json
-  isActive   Boolean   @default(true)
-  nextRunAt  DateTime?
-  lastRunAt  DateTime?
-  userId     String
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  id        String    @id @default(uuid())
+  name      String // human-readable identifier
+  pattern   String // cron expression: "0 */6 * * *"
+  queue     String // target queue
+  jobName   String // job type to create
+  payload   Json
+  isActive  Boolean   @default(true)
+  nextRunAt DateTime?
+  lastRunAt DateTime?
+  userId    String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   @@unique([name, userId])
   @@index([isActive, nextRunAt])
@@ -145,12 +145,12 @@ model DeadLetterEntry {
   id         String    @id @default(uuid())
   queue      String
   jobName    String
-  bullmqId   String?                           // original BullMQ job ID
+  bullmqId   String? // original BullMQ job ID
   payload    Json
   error      String
   attempts   Int
   failedAt   DateTime  @default(now())
-  resolvedAt DateTime?                         // null = unresolved
+  resolvedAt DateTime? // null = unresolved
   userId     String
 
   @@index([queue])
@@ -162,33 +162,33 @@ model DeadLetterEntry {
 // ─── API Gateway ────────────────────────────────────────────────────────
 
 model ApiKey {
-  id          String    @id @default(uuid())
-  name        String
-  keyHash     String    @unique                   // SHA-256 hash of API key
-  keyPrefix   String                              // First 15 chars (e.g., "gp_live_abc1234")
-  scopes      String[]                            // ["missions:read", "agents:execute"]
-  userId      String
+  id        String   @id @default(uuid())
+  name      String
+  keyHash   String   @unique // SHA-256 hash of API key
+  keyPrefix String // First 15 chars (e.g., "gp_live_abc1234")
+  scopes    String[] // ["missions:read", "agents:execute"]
+  userId    String
 
-  rateLimitTier String  @default("standard")     // standard, premium, enterprise
-  isActive    Boolean   @default(true)
+  rateLimitTier String  @default("standard") // standard, premium, enterprise
+  isActive      Boolean @default(true)
 
-  lastUsedAt  DateTime?
-  expiresAt   DateTime?
+  lastUsedAt DateTime?
+  expiresAt  DateTime?
 
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId])
   @@index([keyPrefix])
 }
 
 model RateLimitBucket {
-  id          String    @id @default(uuid())
-  identifier  String                              // userId, IP, or API key hash
-  endpoint    String                              // "/api/agents", "*" for global
+  id         String @id @default(uuid())
+  identifier String // userId, IP, or API key hash
+  endpoint   String // "/api/agents", "*" for global
 
   requestCount Int      @default(0)
-  windowStart DateTime
+  windowStart  DateTime
 
   @@unique([identifier, endpoint])
   @@index([windowStart])
@@ -197,42 +197,42 @@ model RateLimitBucket {
 // ─── Webhooks ───────────────────────────────────────────────────────────
 
 model WebhookEndpoint {
-  id          String    @id @default(uuid())
-  url         String
-  secret      String                              // Encrypted HMAC secret
+  id     String @id @default(uuid())
+  url    String
+  secret String // Encrypted HMAC secret
 
-  events      String[]                            // ["mission.completed", "wallet.topup"]
-  isActive    Boolean   @default(true)
+  events   String[] // ["mission.completed", "wallet.topup"]
+  isActive Boolean  @default(true)
 
-  userId      String
-  metadata    Json?
+  userId   String
+  metadata Json?
 
-  deliveries  WebhookDelivery[]
+  deliveries WebhookDelivery[]
 
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId, isActive])
 }
 
 model WebhookDelivery {
-  id           String    @id @default(uuid())
-  endpointId   String
-  endpoint     WebhookEndpoint @relation(fields: [endpointId], references: [id])
+  id         String          @id @default(uuid())
+  endpointId String
+  endpoint   WebhookEndpoint @relation(fields: [endpointId], references: [id])
 
-  eventType    String                             // "mission.completed"
-  payload      Json
+  eventType String // "mission.completed"
+  payload   Json
 
-  status       String    @default("pending")      // pending, sent, failed, retrying
-  attempts     Int       @default(0)
-  maxAttempts  Int       @default(3)
+  status      String @default("pending") // pending, sent, failed, retrying
+  attempts    Int    @default(0)
+  maxAttempts Int    @default(3)
 
   responseCode Int?
   responseBody String?
   error        String?
 
-  sentAt       DateTime?
-  createdAt    DateTime  @default(now())
+  sentAt    DateTime?
+  createdAt DateTime  @default(now())
 
   @@index([endpointId, status])
   @@index([createdAt])
@@ -241,18 +241,18 @@ model WebhookDelivery {
 // ─── Connectors ─────────────────────────────────────────────────────────
 
 model ConnectorState {
-  id           String    @id @default(uuid())
-  connectorName String   @unique                  // "stripe", "google-slides"
+  id            String @id @default(uuid())
+  connectorName String @unique // "stripe", "google-slides"
 
   isHealthy    Boolean   @default(true)
   failureCount Int       @default(0)
   lastFailure  DateTime?
-  circuitState String    @default("closed")       // closed, open, half-open
+  circuitState String    @default("closed") // closed, open, half-open
 
-  metadata     Json?
+  metadata Json?
 
   lastCheckedAt DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  updatedAt     DateTime @updatedAt
 
   @@index([isHealthy, circuitState])
 }
@@ -261,33 +261,33 @@ model ConnectorState {
 
 // Alert Rule Definition
 model AlertRule {
-  id          String   @id @default(uuid())
+  id          String  @id @default(uuid())
   name        String
   description String?
 
   // Rule type and configuration
-  ruleType    String                              // threshold, rate_of_change
-  metric      String                              // error_rate, queue_depth, cost_per_hour
-  condition   String                              // gt, lt, gte, lte
-  threshold   Float
+  ruleType  String // threshold, rate_of_change
+  metric    String // error_rate, queue_depth, cost_per_hour
+  condition String // gt, lt, gte, lte
+  threshold Float
 
   // Evaluation window
-  windowMinutes Int    @default(5)
+  windowMinutes Int @default(5)
 
   // Alert channels
-  channels    String[]                            // ["webhook", "email"]
-  webhookIds  String[]                            // Webhook endpoint IDs
+  channels   String[] // ["webhook", "email"]
+  webhookIds String[] // Webhook endpoint IDs
 
   // State
-  isActive    Boolean  @default(true)
-  isFiring    Boolean  @default(false)
+  isActive    Boolean   @default(true)
+  isFiring    Boolean   @default(false)
   lastFiredAt DateTime?
 
-  userId      String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  firings     AlertFiring[]
+  firings AlertFiring[]
 
   @@index([userId, isActive])
   @@index([isFiring])
@@ -295,11 +295,11 @@ model AlertRule {
 
 // Alert Firing History
 model AlertFiring {
-  id          String   @id @default(uuid())
-  ruleId      String
-  rule        AlertRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+  id     String    @id @default(uuid())
+  ruleId String
+  rule   AlertRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
 
-  triggeredAt DateTime @default(now())
+  triggeredAt DateTime  @default(now())
   resolvedAt  DateTime?
 
   metricValue Float
@@ -308,7 +308,7 @@ model AlertFiring {
 
   notificationsSent String[]
 
-  userId      String
+  userId String
 
   @@index([ruleId, resolvedAt])
   @@index([triggeredAt])
@@ -317,31 +317,31 @@ model AlertFiring {
 
 // Metrics Snapshot (time-series)
 model MetricSnapshot {
-  id          String   @id @default(uuid())
+  id String @id @default(uuid())
 
-  timestamp   DateTime                            // Rounded to nearest minute
+  timestamp DateTime // Rounded to nearest minute
 
   // Queue metrics
-  queueDepth  Int      @default(0)
-  activeJobs  Int      @default(0)
-  failedJobs  Int      @default(0)
-  completedJobs Int    @default(0)
+  queueDepth    Int @default(0)
+  activeJobs    Int @default(0)
+  failedJobs    Int @default(0)
+  completedJobs Int @default(0)
 
   // Agent metrics
-  activeAgents Int     @default(0)
-  idleAgents  Int      @default(0)
+  activeAgents Int @default(0)
+  idleAgents   Int @default(0)
 
   // Throughput
-  jobsPerMinute Float  @default(0)
+  jobsPerMinute Float @default(0)
 
   // Cost
-  costPerHour Float    @default(0)
+  costPerHour     Float @default(0)
   tokensPerMinute Float @default(0)
 
   // Errors
-  errorRate   Float    @default(0)
+  errorRate Float @default(0)
 
-  userId      String
+  userId String
 
   @@unique([timestamp, userId])
   @@index([userId, timestamp])
@@ -349,23 +349,256 @@ model MetricSnapshot {
 
 // Agent Status Tracking
 model AgentStatus {
-  id          String   @id @default(uuid())
-  agentName   String
+  id        String @id @default(uuid())
+  agentName String
 
-  status      String   @default("idle")           // idle, active, failed, unknown
+  status String @default("idle") // idle, active, failed, unknown
 
   currentJobId String?
-  startedAt   DateTime?
+  startedAt    DateTime?
 
-  lastActiveAt DateTime @default(now())
-  consecutiveFailures Int @default(0)
+  lastActiveAt        DateTime @default(now())
+  consecutiveFailures Int      @default(0)
 
-  avgDuration Float    @default(0)
-  totalExecutions Int  @default(0)
+  avgDuration     Float @default(0)
+  totalExecutions Int   @default(0)
 
-  userId      String
-  updatedAt   DateTime @updatedAt
+  userId    String
+  updatedAt DateTime @updatedAt
 
   @@unique([agentName, userId])
   @@index([userId, status])
+}
+
+// ─── UNI-171: Core CRM Module ──────────────────────────────────────
+
+// Contact Model
+model Contact {
+  id     String @id @default(uuid())
+  userId String
+
+  // Basic Info
+  firstName  String
+  lastName   String
+  email      String?
+  phone      String?
+  mobile     String?
+  title      String? // Job title
+  department String?
+
+  // Company Relationship
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+  isPrimary Boolean  @default(false)
+
+  // Address
+  addressLine1 String?
+  addressLine2 String?
+  city         String?
+  state        String?
+  postalCode   String?
+  country      String?
+
+  // Metadata
+  source    String? // Website, Referral, Cold Call
+  leadScore Int      @default(0)
+  status    String   @default("lead") // lead, prospect, customer, inactive
+  tags      String[]
+
+  // Relationships
+  dealId       String?
+  deal         Deal?         @relation(fields: [dealId], references: [id])
+  interactions Interaction[]
+  crmTasks     CRMTask[]
+
+  // Custom Fields (JSONB for flexibility)
+  customFields Json?
+
+  // Audit
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  createdBy String
+  updatedBy String
+  deletedAt DateTime?
+
+  @@unique([email, userId])
+  @@index([userId, status])
+  @@index([companyId])
+  @@index([leadScore])
+  @@index([deletedAt])
+}
+
+// Company Model
+model Company {
+  id     String @id @default(uuid())
+  userId String
+
+  // Basic Info
+  name          String
+  legalName     String?
+  industry      String?
+  website       String?
+  employeeCount String? // "1-10", "11-50", etc.
+  annualRevenue String?
+
+  // Contact Info
+  phone String?
+  email String?
+
+  // Address (Headquarters)
+  addressLine1 String?
+  addressLine2 String?
+  city         String?
+  state        String?
+  postalCode   String?
+  country      String?
+
+  // Metadata
+  status          String    @default("active") // active, inactive, prospect
+  parentCompanyId String?
+  parentCompany   Company?  @relation("CompanyHierarchy", fields: [parentCompanyId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  childCompanies  Company[] @relation("CompanyHierarchy")
+
+  // Relationships
+  contacts Contact[]
+  deals    Deal[]
+
+  // Custom Fields
+  customFields Json?
+
+  // Audit
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  createdBy String
+  updatedBy String
+  deletedAt DateTime?
+
+  @@index([userId, status])
+  @@index([parentCompanyId])
+  @@index([industry])
+  @@index([deletedAt])
+}
+
+// Deal (Pipeline) Model
+model Deal {
+  id     String @id @default(uuid())
+  userId String
+
+  // Basic Info
+  name        String
+  description String?
+  value       Int // Stored in cents
+  currency    String  @default("USD")
+
+  // Pipeline
+  stage             String // lead, qualified, proposal, negotiation, closed_won, closed_lost
+  probability       Int       @default(0) // 0-100
+  expectedCloseDate DateTime?
+  actualCloseDate   DateTime?
+
+  // Relationships
+  companyId String?
+  company   Company?  @relation(fields: [companyId], references: [id])
+  contacts  Contact[]
+  ownerId   String // Assigned sales rep
+
+  // Metadata
+  source       String?
+  lostReason   String?
+  tags         String[]
+  customFields Json?
+
+  // Audit
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  createdBy String
+  updatedBy String
+  deletedAt DateTime?
+
+  @@index([userId, stage])
+  @@index([ownerId])
+  @@index([companyId])
+  @@index([expectedCloseDate])
+  @@index([deletedAt])
+}
+
+// Interaction Model
+model Interaction {
+  id     String @id @default(uuid())
+  userId String
+
+  // Basic Info
+  type        String // call, email, meeting, note
+  subject     String
+  description String?
+  outcome     String?
+
+  // Timing
+  scheduledAt DateTime?
+  completedAt DateTime?
+  duration    Int? // Duration in minutes
+
+  // Relationships
+  contactId String?
+  contact   Contact? @relation(fields: [contactId], references: [id])
+  companyId String?
+  dealId    String?
+
+  // Participants
+  participants String[] // Array of user IDs
+
+  // Metadata
+  status      String  @default("completed") // scheduled, completed, cancelled
+  direction   String? // inbound, outbound
+  attachments Json? // File URLs
+
+  // Audit
+  createdAt DateTime  @default(now())
+  createdBy String
+  deletedAt DateTime?
+
+  @@index([userId, type])
+  @@index([contactId])
+  @@index([scheduledAt])
+  @@index([deletedAt])
+}
+
+// CRM Task Model (separate from KanbanTask)
+model CRMTask {
+  id     String @id @default(uuid())
+  userId String
+
+  // Basic Info
+  title       String
+  description String?
+  priority    String  @default("medium") // low, medium, high, urgent
+  status      String  @default("todo") // todo, in_progress, completed, cancelled
+
+  // Timing
+  dueDate     DateTime?
+  completedAt DateTime?
+  reminderAt  DateTime?
+
+  // Relationships
+  contactId  String?
+  contact    Contact? @relation(fields: [contactId], references: [id])
+  companyId  String?
+  dealId     String?
+  assigneeId String
+
+  // Metadata
+  tags         String[]
+  customFields Json?
+
+  // Audit
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  createdBy String
+  deletedAt DateTime?
+
+  @@index([userId, status])
+  @@index([assigneeId])
+  @@index([dueDate])
+  @@index([contactId])
+  @@index([deletedAt])
 }
