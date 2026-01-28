@@ -26,6 +26,15 @@ export async function proxy(request: NextRequest) {
     let apiKeyScopes: string[] | undefined;
     let apiKeyPrefix: string | undefined;
 
+    // ─── Public/Test endpoints (no auth required) ───────────────────────────
+    const publicEndpoints = ['/api/webhooks', '/api/health', '/api/geo/test'];
+    const isPublicEndpoint = publicEndpoints.some(ep => pathname.startsWith(ep));
+
+    if (isPublicEndpoint) {
+      // Skip authentication for public endpoints
+      return NextResponse.next();
+    }
+
     // ─── API Key Authentication ────────────────────────────────────────────
 
     const apiKeyHeader = request.headers.get('x-api-key');
@@ -63,9 +72,14 @@ export async function proxy(request: NextRequest) {
       }
     } else {
       // ─── Clerk Authentication (fallback) ────────────────────────────────
-
-      const {userId: clerkUserId} = await auth();
-      userId = clerkUserId;
+      try {
+        const {userId: clerkUserId} = await auth();
+        userId = clerkUserId;
+      } catch (error) {
+        // Clerk not configured - allow unauthenticated access for development
+        console.warn('[Proxy] Clerk authentication failed, allowing unauthenticated access');
+        userId = null;
+      }
     }
 
     // ─── Rate Limiting ──────────────────────────────────────────────────────
