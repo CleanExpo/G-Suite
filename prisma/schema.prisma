@@ -410,6 +410,7 @@ model Contact {
   deal         Deal?         @relation(fields: [dealId], references: [id])
   interactions Interaction[]
   crmTasks     CRMTask[]
+  invoices     Invoice[]
 
   // Custom Fields (JSONB for flexibility)
   customFields Json?
@@ -462,6 +463,7 @@ model Company {
   // Relationships
   contacts Contact[]
   deals    Deal[]
+  invoices Invoice[]
 
   // Custom Fields
   customFields Json?
@@ -639,6 +641,7 @@ model Product {
   // Relationships
   stockLocations        StockLocation[]
   inventoryTransactions InventoryTransaction[]
+  invoiceLineItems      InvoiceLineItem[]
 
   // Custom Fields
   customFields Json?
@@ -788,5 +791,154 @@ model InventoryTransaction {
   @@index([warehouseId])
   @@index([createdAt])
   @@index([referenceType, referenceId])
+  @@index([deletedAt])
+}
+
+// ─── UNI-173: Invoicing & Financial Module ─────────────────────────
+
+// Invoice Model
+model Invoice {
+  id     String @id @default(uuid())
+  userId String
+
+  // Invoice Number (Sequential per user)
+  invoiceNumber String // Format: INV-2026-0001
+  invoiceDate   DateTime @default(now())
+  dueDate       DateTime
+
+  // Customer Information
+  customerId String?
+  customer   Contact? @relation(fields: [customerId], references: [id])
+  companyId  String?
+  company    Company? @relation(fields: [companyId], references: [id])
+
+  // Customer details snapshot (for historical accuracy)
+  customerName    String
+  customerEmail   String?
+  customerAddress Json? // { line1, line2, city, state, postalCode, country }
+
+  // Billing Details
+  subtotal       Int    @default(0) // In cents
+  taxRate        Float  @default(0) // e.g., 0.08 for 8%
+  taxAmount      Int    @default(0) // In cents
+  discountAmount Int    @default(0) // In cents
+  total          Int    @default(0) // In cents
+  currency       String @default("USD")
+
+  // Payment Tracking
+  status     String @default("draft") // draft, sent, paid, overdue, cancelled, refunded
+  paidAmount Int    @default(0) // In cents
+  balance    Int    @default(0) // total - paidAmount (in cents)
+
+  // Stripe Integration
+  stripeCustomerId      String?
+  stripePaymentIntentId String?
+  stripeInvoiceId       String?
+
+  // Metadata
+  notes  String? // Internal notes
+  terms  String? // Payment terms displayed on invoice
+  footer String? // Footer text on invoice
+  customFields Json? // Additional custom fields
+
+  // Relationships
+  lineItems InvoiceLineItem[]
+  payments  Payment[]
+
+  // Audit
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  createdBy String
+  updatedBy String
+  deletedAt DateTime?
+  sentAt    DateTime? // When invoice was sent to customer
+  paidAt    DateTime? // When fully paid
+
+  @@unique([invoiceNumber, userId])
+  @@index([userId, status])
+  @@index([customerId])
+  @@index([companyId])
+  @@index([invoiceDate])
+  @@index([dueDate])
+  @@index([stripePaymentIntentId])
+  @@index([deletedAt])
+}
+
+// Invoice Line Item Model
+model InvoiceLineItem {
+  id     String @id @default(uuid())
+  userId String
+
+  invoiceId String
+  invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  // Line Item Details
+  description String
+  quantity    Int @default(1)
+  unitPrice   Int // In cents
+  amount      Int // quantity * unitPrice (in cents)
+
+  // Optional Product Link
+  productId String?
+  product   Product? @relation(fields: [productId], references: [id])
+
+  // Tax handling per line item
+  taxable   Boolean @default(true)
+  taxRate   Float   @default(0)
+  taxAmount Int     @default(0) // In cents
+
+  // Metadata
+  sortOrder    Int  @default(0)
+  customFields Json?
+
+  // Audit
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([invoiceId])
+  @@index([productId])
+  @@index([deletedAt])
+}
+
+// Payment Model
+model Payment {
+  id     String @id @default(uuid())
+  userId String
+
+  invoiceId String
+  invoice   Invoice @relation(fields: [invoiceId], references: [id])
+
+  // Payment Details
+  amount        Int      @default(0) // In cents
+  paymentDate   DateTime @default(now())
+  paymentMethod String // stripe, bank_transfer, cash, check, credit_card
+
+  // Stripe Integration
+  stripePaymentIntentId String?
+  stripeChargeId        String?
+  stripeRefundId        String?
+
+  // Reference Numbers
+  referenceNumber String? // Check number, transaction ID, etc.
+
+  // Payment Status
+  status String @default("completed") // pending, completed, failed, refunded
+
+  // Metadata
+  notes        String?
+  customFields Json?
+
+  // Audit
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  createdBy String
+  updatedBy String
+  deletedAt DateTime?
+
+  @@index([invoiceId])
+  @@index([userId, status])
+  @@index([stripePaymentIntentId])
+  @@index([paymentDate])
   @@index([deletedAt])
 }
