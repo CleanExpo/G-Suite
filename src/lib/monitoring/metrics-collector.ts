@@ -8,6 +8,7 @@
  */
 
 import prisma from '@/prisma';
+import { Prisma } from '@prisma/client';
 import { taskQueue } from '@/lib/queue/task-queue';
 import type {
   SystemMetrics,
@@ -194,7 +195,7 @@ export class MetricsCollector {
         userId,
         updatedAt: { gte: since },
         status: 'COMPLETED',
-        agentCosts: { not: prisma.DbNull },
+        agentCosts: { not: Prisma.JsonNull },
       },
       select: { agentCosts: true },
     });
