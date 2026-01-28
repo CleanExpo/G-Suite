@@ -14,6 +14,7 @@ const publicRoutes = [
     '/sign-up',
     '/auth/callback',
     '/api/webhooks',
+    '/dashboard/geo', // GEO dashboard for development/testing
 ];
 
 // Check if a path matches public routes

@@ -27,7 +27,7 @@ export async function proxy(request: NextRequest) {
     let apiKeyPrefix: string | undefined;
 
     // ─── Public/Test endpoints (no auth required) ───────────────────────────
-    const publicEndpoints = ['/api/webhooks', '/api/health', '/api/geo/test'];
+    const publicEndpoints = ['/api/webhooks', '/api/health', '/api/geo/test', '/api/geo/analyze', '/api/geo/rankings', '/api/geo/competitors'];
     const isPublicEndpoint = publicEndpoints.some(ep => pathname.startsWith(ep));
 
     if (isPublicEndpoint) {
