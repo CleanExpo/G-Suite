@@ -34,6 +34,7 @@ export interface SEOAnalysisResult {
     keywordAnalysis: KeywordAnalysis;
     recommendations: SEORecommendation[];
     issues: SEOIssue[];
+    searchConsoleData?: SearchConsoleData;
 }
 
 // ============================================================================

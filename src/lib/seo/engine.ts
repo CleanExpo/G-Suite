@@ -9,12 +9,18 @@ import { getOnPageAnalyzer } from './analyzers/on-page';
 import { getTechnicalAnalyzer } from './analyzers/technical';
 import { getContentAnalyzer } from './analyzers/content';
 import { getKeywordAnalyzer } from './analyzers/keyword';
-import {
+import { getSearchConsoleClient, SearchConsoleClient } from './search-console-client';
+import type {
     SEOAnalysisRequest,
     SEOAnalysisResult,
     SEORecommendation,
     SEOIssue,
-    SEOCategory
+    SEOCategory,
+    SearchConsoleData,
+    OnPageAnalysis,
+    TechnicalAnalysis,
+    ContentAnalysis,
+    KeywordAnalysis
 } from './types';
 
 export class SEOEngine {
@@ -39,14 +45,30 @@ export class SEOEngine {
         const technicalAnalyzer = getTechnicalAnalyzer();
         const contentAnalyzer = getContentAnalyzer();
         const keywordAnalyzer = getKeywordAnalyzer();
+        const searchConsoleClient = getSearchConsoleClient();
 
-        // Run all analyzers in parallel
-        const [onPageSEO, technicalSEO, contentAnalysis, keywordAnalysis] = await Promise.all([
+        // Run all analyzers in parallel, including Search Console data if configured
+        const promises: Promise<any>[] = [
             onPageAnalyzer.analyze(pageHtml, url, keywords),
             technicalAnalyzer.analyze(pageHtml, url, includePerformance),
             contentAnalyzer.analyze(pageHtml, keywords),
             keywordAnalyzer.analyze(url, keywords, keywords[0])
-        ]);
+        ];
+
+        // Add Search Console data fetch if configured
+        if (searchConsoleClient.isConfigured()) {
+            const { startDate, endDate } = SearchConsoleClient.getDefault28DayRange();
+            promises.push(searchConsoleClient.getSearchAnalytics(url, startDate, endDate));
+        } else {
+            promises.push(Promise.resolve(null));
+        }
+
+        const results = await Promise.all(promises);
+        const onPageSEO = results[0] as OnPageAnalysis;
+        const technicalSEO = results[1] as TechnicalAnalysis;
+        const contentAnalysis = results[2] as ContentAnalysis;
+        const keywordAnalysis = results[3] as KeywordAnalysis;
+        const searchConsoleData = results[4] as SearchConsoleData | null;
 
         // Calculate individual scores
         const scores = {
@@ -91,7 +113,8 @@ export class SEOEngine {
             contentAnalysis,
             keywordAnalysis,
             recommendations,
-            issues
+            issues,
+            searchConsoleData: searchConsoleData || undefined
         };
     }
 
