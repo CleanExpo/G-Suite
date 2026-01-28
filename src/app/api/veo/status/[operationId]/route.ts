@@ -13,9 +13,9 @@ import { getVeoClient } from '@/lib/google/veo-client';
 export const dynamic = 'force-dynamic';
 
 interface RouteParams {
-    params: {
+    params: Promise<{
         operationId: string;
-    };
+    }>;
 }
 
 export async function GET(
@@ -23,6 +23,9 @@ export async function GET(
     { params }: RouteParams
 ): Promise<Response> {
     try {
+        // Await params (Next.js 15+ requirement)
+        const { operationId } = await params;
+
         // Authenticate user
         const { userId } = await auth();
 
@@ -38,8 +41,6 @@ export async function GET(
                 { status: 401 }
             );
         }
-
-        const { operationId } = params;
 
         if (!operationId) {
             return NextResponse.json(
