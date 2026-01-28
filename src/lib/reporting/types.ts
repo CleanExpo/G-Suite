@@ -257,7 +257,7 @@ export interface DashboardFilter {
   search?: string;
 }
 
-export interface ReportFilter {
+export interface ReportListFilter {
   type?: ReportType;
   isScheduled?: boolean;
   search?: string;
