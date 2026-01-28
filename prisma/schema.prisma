@@ -602,3 +602,191 @@ model CRMTask {
   @@index([contactId])
   @@index([deletedAt])
 }
+
+// ─── UNI-172: Inventory & Stock Management ─────────────────────────
+
+// Product Model
+model Product {
+  id     String @id @default(uuid())
+  userId String
+
+  // Basic Info
+  sku         String
+  name        String
+  description String?
+  category    String?
+  brand       String?
+
+  // Pricing
+  unitCost     Int    @default(0) // In cents
+  sellingPrice Int    @default(0) // In cents
+  currency     String @default("USD")
+
+  // Inventory Tracking
+  trackInventory  Boolean @default(true)
+  stockLevel      Int     @default(0)
+  reorderPoint    Int     @default(0)
+  reorderQuantity Int     @default(0)
+
+  // Physical Attributes
+  weight     Float?
+  dimensions Json? // { length, width, height, unit }
+  barcode    String?
+
+  // Status
+  status String @default("active") // active, discontinued, out_of_stock
+
+  // Relationships
+  stockLocations        StockLocation[]
+  inventoryTransactions InventoryTransaction[]
+
+  // Custom Fields
+  customFields Json?
+
+  // Audit
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  createdBy String
+  updatedBy String
+  deletedAt DateTime?
+
+  @@unique([sku, userId])
+  @@index([userId, status])
+  @@index([category])
+  @@index([stockLevel])
+  @@index([deletedAt])
+}
+
+// Warehouse Model
+model Warehouse {
+  id     String @id @default(uuid())
+  userId String
+
+  // Basic Info
+  name String
+  code String
+  type String @default("standard") // standard, fulfillment, retail
+
+  // Address
+  addressLine1 String?
+  addressLine2 String?
+  city         String?
+  state        String?
+  postalCode   String?
+  country      String?
+
+  // Contact
+  phone       String?
+  email       String?
+  managerName String?
+
+  // Metadata
+  status    String  @default("active") // active, inactive
+  isDefault Boolean @default(false)
+
+  // Relationships
+  stockLocations        StockLocation[]
+  inventoryTransactions InventoryTransaction[]
+
+  // Custom Fields
+  customFields Json?
+
+  // Audit
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  createdBy String
+  updatedBy String
+  deletedAt DateTime?
+
+  @@unique([code, userId])
+  @@index([userId, status])
+  @@index([deletedAt])
+}
+
+// StockLocation Model
+model StockLocation {
+  id     String @id @default(uuid())
+  userId String
+
+  // Location Details
+  warehouseId String
+  warehouse   Warehouse @relation(fields: [warehouseId], references: [id])
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
+  // Physical Location
+  zone  String?
+  aisle String?
+  rack  String?
+  shelf String?
+  bin   String?
+
+  // Stock Info
+  quantity          Int @default(0)
+  reservedQuantity  Int @default(0)
+  availableQuantity Int @default(0) // quantity - reservedQuantity
+
+  // Metadata
+  isPrimary Boolean @default(false)
+
+  // Audit
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@unique([warehouseId, productId, zone, aisle, rack, shelf, bin])
+  @@index([userId])
+  @@index([warehouseId])
+  @@index([productId])
+  @@index([deletedAt])
+}
+
+// InventoryTransaction Model
+model InventoryTransaction {
+  id     String @id @default(uuid())
+  userId String
+
+  // Transaction Type
+  type    String // in, out, transfer, adjustment, return
+  subType String? // purchase, sale, damaged, lost, found
+
+  // Product & Location
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
+  warehouseId String
+  warehouse   Warehouse @relation(fields: [warehouseId], references: [id])
+
+  // Quantity & Cost
+  quantity  Int
+  unitCost  Int? // In cents
+  totalCost Int? // quantity * unitCost
+
+  // Transfer Details (if type = transfer)
+  fromWarehouseId String?
+  toWarehouseId   String?
+
+  // Reference
+  referenceType String? // order, return, adjustment
+  referenceId   String?
+
+  // Metadata
+  notes       String?
+  performedBy String
+
+  // Stock Levels (snapshot at time of transaction)
+  stockBefore Int
+  stockAfter  Int
+
+  // Audit
+  createdAt DateTime  @default(now())
+  deletedAt DateTime?
+
+  @@index([userId, type])
+  @@index([productId])
+  @@index([warehouseId])
+  @@index([createdAt])
+  @@index([referenceType, referenceId])
+  @@index([deletedAt])
+}
