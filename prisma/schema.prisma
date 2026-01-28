@@ -1088,3 +1088,158 @@ model Notification {
   @@index([createdAt])
   @@index([referenceType, referenceId])
 }
+
+// ─── UNI-175: Reporting & Analytics ─────────────────────────────────
+
+// Dashboard Model
+model Dashboard {
+  id     String @id @default(uuid())
+  userId String
+
+  // Dashboard Info
+  name        String
+  description String?
+  type        String  @default("custom") // custom, template, system
+
+  // Layout (JSONB)
+  layout Json // Grid layout configuration
+  /**
+   * Example:
+   * {
+   *   columns: 12,
+   *   widgets: [
+   *     { id: "widget-1", x: 0, y: 0, w: 6, h: 4, type: "sales_chart", config: {...} },
+   *     { id: "widget-2", x: 6, y: 0, w: 6, h: 4, type: "pipeline_status", config: {...} }
+   *   ]
+   * }
+   */
+
+  // Access
+  isPublic   Boolean  @default(false)
+  sharedWith String[] // User IDs who can access
+
+  // Metadata
+  isDefault Boolean @default(false)
+  sortOrder Int     @default(0)
+
+  // Audit
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  createdBy String
+  updatedBy String
+  deletedAt DateTime?
+
+  @@index([userId, type])
+  @@index([isDefault])
+  @@index([deletedAt])
+}
+
+// Report Model
+model Report {
+  id     String @id @default(uuid())
+  userId String
+
+  // Report Info
+  name        String
+  description String?
+  type        String // sales, inventory, financial, crm, custom
+
+  // Query Definition (JSONB)
+  query Json // Report query configuration
+  /**
+   * Example:
+   * {
+   *   dataSource: "invoices",
+   *   filters: [
+   *     { field: "status", operator: "eq", value: "paid" },
+   *     { field: "invoiceDate", operator: "gte", value: "2026-01-01" }
+   *   ],
+   *   groupBy: ["companyId"],
+   *   aggregations: [
+   *     { field: "total", function: "sum", alias: "totalRevenue" }
+   *   ],
+   *   orderBy: [{ field: "totalRevenue", direction: "desc" }],
+   *   limit: 100
+   * }
+   */
+
+  // Visualization
+  chartType   String? // line, bar, pie, table, area, scatter
+  chartConfig Json?   // Chart-specific settings
+
+  // Scheduling
+  isScheduled  Boolean   @default(false)
+  schedule     String?   // Cron expression
+  recipients   String[]  // Email addresses for scheduled delivery
+  lastRunAt    DateTime?
+  nextRunAt    DateTime?
+
+  // Cache
+  cachedResult Json?
+  cachedAt     DateTime?
+  cacheTTL     Int       @default(300) // Cache TTL in seconds
+
+  // Audit
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  createdBy String
+  updatedBy String
+  deletedAt DateTime?
+
+  @@index([userId, type])
+  @@index([isScheduled, nextRunAt])
+  @@index([deletedAt])
+}
+
+// KPI Model
+model KPI {
+  id     String @id @default(uuid())
+  userId String
+
+  // KPI Info
+  name        String
+  description String?
+  category    String // sales, inventory, financial, operations, crm
+
+  // Calculation
+  metric  String // revenue, conversion_rate, inventory_turnover, etc.
+  formula Json   // Calculation logic
+  /**
+   * Example:
+   * {
+   *   dataSource: "invoices",
+   *   aggregation: "sum",
+   *   field: "total",
+   *   filters: [{ field: "status", operator: "eq", value: "paid" }],
+   *   timeRange: "current_month"
+   * }
+   */
+
+  // Targets
+  targetValue  Float?
+  targetPeriod String? // daily, weekly, monthly, quarterly, yearly
+
+  // Current Value (cached)
+  currentValue     Float?
+  previousValue    Float?
+  changePercent    Float?
+  lastCalculatedAt DateTime?
+
+  // Display
+  unit       String?  // currency, percentage, count, ratio
+  format     String?  // Formatting rules (e.g., "$0,0.00", "0.00%")
+  isVisible  Boolean  @default(true)
+  sortOrder  Int      @default(0)
+
+  // Audit
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  createdBy String
+  updatedBy String
+  deletedAt DateTime?
+
+  @@index([userId, category])
+  @@index([isVisible])
+  @@index([sortOrder])
+  @@index([deletedAt])
+}
