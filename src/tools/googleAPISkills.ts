@@ -268,10 +268,12 @@ export async function deepResearch(
 interface Veo31Result {
     success: boolean;
     videoUrl?: string;
+    operationName?: string; // For async operations
     duration: number;
-    resolution: '1080p' | '4k';
+    resolution: '720p' | '1080p' | '4k';
     aspectRatio: '16:9' | '9:16' | '1:1';
     generationTime: number;
+    error?: string;
 }
 
 /**
@@ -282,37 +284,106 @@ export async function veo31Generate(
     prompt: string,
     options: {
         duration?: 4 | 6 | 8;
-        resolution?: '1080p' | '4k';
+        resolution?: '720p' | '1080p' | '4k';
         aspectRatio?: '16:9' | '9:16' | '1:1';
-        referenceImages?: string[];
-        extendExisting?: string;
+        referenceImage?: { base64: string; mimeType: 'image/jpeg' | 'image/png' | 'image/webp' };
+        referenceImages?: Array<{ base64: string; mimeType: 'image/jpeg' | 'image/png' | 'image/webp'; referenceType: 'asset' | 'style' }>;
+        negativePrompt?: string;
+        seed?: number;
+        personGeneration?: 'allow_adult' | 'dont_allow' | 'allow_all';
+        generateAudio?: boolean;
+        waitForCompletion?: boolean;
     } = {}
 ): Promise<Veo31Result> {
     console.log(`[veo31Generate] Creating video for user ${userId}`);
 
     const startTime = Date.now();
-    const duration = options.duration ?? 6;
-    const resolution = options.resolution ?? '1080p';
+    const duration = options.duration ?? 8;
+    const resolution = options.resolution ?? '720p';
     const aspectRatio = options.aspectRatio ?? '16:9';
 
-    // In production, this would call the Veo 3.1 API
-    // For now, simulate the API call
-    try {
-        // Simulate video generation time
-        await new Promise(resolve => setTimeout(resolve, 2000));
+    // Check if Google Cloud is configured
+    const hasGoogleCloud = process.env.GOOGLE_CLOUD_PROJECT &&
+                          process.env.GOOGLE_CLOUD_PROJECT !== 'your-project-id-here';
 
-        const videoId = `veo_${Date.now()}`;
-        // Realistic mock metadata for UI integration
-        const resolution = options.resolution ?? '1080p';
+    if (!hasGoogleCloud) {
+        console.warn('[veo31Generate] Google Cloud not configured, returning mock response');
 
+        // FALLBACK: Return mock data when Google Cloud not configured
+        const videoId = `veo_mock_${Date.now()}`;
         return {
             success: true,
             videoUrl: `https://storage.googleapis.com/gpilot-media/${videoId}.mp4`,
             duration,
             resolution,
             aspectRatio,
+            generationTime: 2000
+        };
+    }
+
+    try {
+        // Import VeoClient dynamically to avoid errors when not configured
+        const { getVeoClient } = await import('@/lib/google/veo-client');
+        const veoClient = getVeoClient();
+
+        // Determine if we should wait for completion or return operation name
+        const waitForCompletion = options.waitForCompletion !== undefined
+            ? options.waitForCompletion
+            : true; // Default: wait for completion
+
+        // Build generation options
+        const generationOptions = {
+            prompt,
+            durationSeconds: duration,
+            resolution,
+            aspectRatio,
+            referenceImage: options.referenceImage,
+            referenceImages: options.referenceImages,
+            negativePrompt: options.negativePrompt,
+            seed: options.seed,
+            personGeneration: options.personGeneration,
+            generateAudio: options.generateAudio !== undefined ? options.generateAudio : true,
+            storageUri: process.env.VEO_STORAGE_BUCKET || undefined
+        };
+
+        let result;
+
+        if (waitForCompletion) {
+            // Wait for video generation to complete
+            result = await veoClient.generateVideoAndWait(generationOptions, {
+                maxAttempts: 60, // 10 minutes max
+                pollIntervalMs: 10000, // Poll every 10 seconds
+                onProgress: (attempt, maxAttempts) => {
+                    if (attempt % 6 === 0) { // Log every minute
+                        console.log(`[veo31Generate] Polling... ${attempt}/${maxAttempts} (${Math.round((attempt / maxAttempts) * 100)}%)`);
+                    }
+                }
+            });
+        } else {
+            // Just start generation and return operation name
+            result = await veoClient.generateVideo(generationOptions);
+        }
+
+        if (!result.success) {
+            throw new Error(result.error || 'Video generation failed');
+        }
+
+        const videoUrl = result.videoUrls?.[0];
+
+        if (!videoUrl && waitForCompletion) {
+            throw new Error('No video URL returned from Veo API');
+        }
+
+        return {
+            success: true,
+            videoUrl: videoUrl || undefined,
+            operationName: result.operationName,
+            duration,
+            resolution,
+            aspectRatio,
             generationTime: Date.now() - startTime
         };
+
     } catch (error: any) {
         console.error('[veo31Generate] Error:', error.message);
         return {
@@ -320,7 +391,8 @@ export async function veo31Generate(
             duration,
             resolution,
             aspectRatio,
-            generationTime: Date.now() - startTime
+            generationTime: Date.now() - startTime,
+            error: error.message
         };
     }
 }
