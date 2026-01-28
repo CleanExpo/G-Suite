@@ -2,7 +2,6 @@ import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
 import prisma from '@/prisma';
-import { handlePaymentSuccess, handleRefund } from '@/lib/invoices/stripe-integration';
 
 export async function POST(req: Request) {
   const rawBody = await req.arrayBuffer();
@@ -74,43 +73,6 @@ export async function POST(req: Request) {
     } catch (dbError) {
       console.error('Ledger Update Error:', dbError);
       return new NextResponse('Database Error', { status: 500 });
-    }
-  }
-
-  // 4. Handle Invoice Payment Success
-  if (event.type === 'payment_intent.succeeded') {
-    const paymentIntent = event.data.object as any;
-
-    // Check if this is an invoice payment (has invoiceId in metadata)
-    if (paymentIntent.metadata?.invoiceId) {
-      console.log(`💰 Invoice payment received: ${paymentIntent.id}`);
-
-      try {
-        await handlePaymentSuccess(paymentIntent.id);
-        console.log('✅ Invoice payment processed successfully.');
-      } catch (error: any) {
-        console.error('Invoice Payment Error:', error);
-        return new NextResponse('Invoice Payment Error', { status: 500 });
-      }
-    }
-  }
-
-  // 5. Handle Invoice Payment Refund
-  if (event.type === 'charge.refunded') {
-    const charge = event.data.object as any;
-    const refund = charge.refunds?.data[0];
-
-    if (refund) {
-      console.log(`🔄 Refund processed: ${refund.id}`);
-
-      try {
-        await handleRefund(charge.id, refund.amount);
-        console.log('✅ Invoice refund processed successfully.');
-      } catch (error: any) {
-        console.error('Refund Error:', error);
-        // Don't fail the webhook for refund errors
-        console.warn('Continuing despite refund error');
-      }
     }
   }
 
