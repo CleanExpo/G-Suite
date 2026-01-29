@@ -67,10 +67,14 @@ def check_beads_tasks() -> tuple[bool, str]:
             text=True,
             timeout=10
         )
-        if result.stdout.strip():
-            lines = [l for l in result.stdout.strip().split("\n") if l.strip()]
-            if lines:
-                return False, f"Beads: {len(lines)} tasks still ready"
+        output = result.stdout.strip()
+        # "No open issues" or empty means all complete
+        if not output or "No open issues" in output or "✨" in output:
+            return True, "Beads: all tasks complete"
+        # Count actual task lines (exclude status messages)
+        lines = [l for l in output.split("\n") if l.strip() and not l.startswith("✨") and not "No open issues" in l]
+        if lines:
+            return False, f"Beads: {len(lines)} tasks still ready"
         return True, "Beads: all tasks complete"
     except Exception:
         return True, "Beads: check skipped"
