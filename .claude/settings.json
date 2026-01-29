@@ -12,7 +12,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "powershell -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/session-start-context.ps1\"",
+            "command": "powershell -ExecutionPolicy Bypass -File \".claude/hooks/scripts/session-start-context.ps1\"",
             "timeout": 30
           }
         ]
@@ -24,7 +24,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "powershell -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/post-edit-format.ps1\"",
+            "command": "powershell -ExecutionPolicy Bypass -File \".claude/hooks/scripts/post-edit-format.ps1\"",
             "timeout": 60
           }
         ]
@@ -36,7 +36,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/pre-bash-validate.py\"",
+            "command": "python \".claude/hooks/scripts/pre-bash-validate.py\"",
             "timeout": 10
           }
         ]
@@ -48,7 +48,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "powershell -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/notification-alert.ps1\"",
+            "command": "powershell -ExecutionPolicy Bypass -File \".claude/hooks/scripts/notification-alert.ps1\"",
             "timeout": 15
           }
         ]
@@ -59,7 +59,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/stop-verify-todos.py\"",
+            "command": "python \".claude/hooks/scripts/stop-verify-todos.py\"",
             "timeout": 15
           }
         ]
