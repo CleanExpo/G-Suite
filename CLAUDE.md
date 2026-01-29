@@ -130,17 +130,23 @@ NodeJS-Starter-V1/
 │       │   ├── db/             # Database models
 │       │   └── models/         # AI providers
 │       └── tests/              # Pytest tests
-├── scripts/                    # Setup scripts
-│   ├── setup.sh               # Unix/macOS setup
-│   ├── setup.ps1              # Windows setup
-│   ├── verify.sh              # Health checks
-│   └── init-db.sql            # Database schema
+├── .beads/                     # AI agent memory (Beads tasks)
+├── .bin/                       # Binary tools (bd.exe)
+├── .claude/                    # Claude Code configuration
+│   ├── hooks/scripts/          # Automation hook scripts
+│   ├── rules/                  # Agent rules and profiles
+│   └── settings.json           # Hook configuration
+├── .skills/                    # Agent skills (Vercel format)
 ├── docs/                       # Documentation
-│   ├── LOCAL_SETUP.md         # Setup guide
-│   ├── AI_PROVIDERS.md        # Ollama vs Claude
-│   └── OPTIONAL_SERVICES.md   # Deployment guides
-├── docker-compose.yml         # PostgreSQL + Redis
-└── .env.example               # Environment template
+│   ├── MULTI_AGENT_ARCHITECTURE.md  # Agent workflow spec
+│   ├── DESIGN_SYSTEM.md        # Scientific Luxury design
+│   ├── BEADS.md                # Agent memory system
+│   ├── LOCAL_SETUP.md          # Setup guide
+│   ├── AI_PROVIDERS.md         # Ollama vs Claude
+│   └── OPTIONAL_SERVICES.md    # Deployment guides
+├── scripts/                    # Setup scripts
+├── docker-compose.yml          # PostgreSQL + Redis
+└── .env.example                # Environment template
 ```
 
 ## 🔄 Development Workflow

@@ -233,6 +233,30 @@ pnpm run verify
 
 </td>
 </tr>
+<tr>
+<td width="50%" valign="top">
+
+### Agent Infrastructure
+
+- **Multi-Agent Architecture** hierarchical workflow
+- **Beads** git-backed task memory
+- **Claude Code Hooks** automation
+- **Linear Integration** project tracking
+- **Quality Gates** verification system
+
+</td>
+<td width="50%" valign="top">
+
+### Design System
+
+- **Scientific Luxury** tier UI
+- OLED black backgrounds
+- Spectral colour system
+- Physics-based animations
+- Design tokens configuration
+
+</td>
+</tr>
 </table>
 
 ---
@@ -252,13 +276,16 @@ NodeJS-Starter-V1/
 │           ├── api/            # REST endpoints
 │           ├── auth/           # JWT authentication
 │           └── models/         # AI providers
-├── docs/
-│   ├── guides/                 # Setup & usage guides
-│   ├── reference/              # API documentation
-│   ├── architecture/           # System design docs
-│   └── releases/               # Release notes
+├── .beads/                     # AI agent memory (Beads)
+├── .claude/                    # Claude Code config & hooks
+│   ├── hooks/scripts/          # Automation scripts
+│   └── rules/                  # Agent rules
+├── .skills/                    # Agent skills (Vercel format)
+├── docs/                       # Documentation
+│   ├── MULTI_AGENT_ARCHITECTURE.md
+│   ├── DESIGN_SYSTEM.md
+│   └── BEADS.md
 ├── scripts/                    # Setup & utility scripts
-├── .claude/                    # Claude Code config
 └── .github/workflows/          # CI/CD pipelines
 ```
 
@@ -369,14 +396,17 @@ ANTHROPIC_API_KEY=sk-ant-xxx
 
 ## Documentation
 
-| Guide                                                         | Description                 |
-| ------------------------------------------------------------- | --------------------------- |
-| [Quick Start](docs/guides/QUICK_START.md)                     | Get running in 10 minutes   |
-| [Local Setup](docs/LOCAL_SETUP.md)                            | Complete setup guide        |
-| [AI Providers](docs/AI_PROVIDERS.md)                          | Ollama vs Claude comparison |
-| [Testing Guide](docs/guides/TESTING_GUIDE.md)                 | Testing strategies          |
-| [CI/CD Guide](docs/guides/CI_CD_GUIDE.md)                     | Pipeline configuration      |
-| [Production Deployment](docs/guides/PRODUCTION-DEPLOYMENT.md) | Deployment options          |
+| Guide                                                         | Description                   |
+| ------------------------------------------------------------- | ----------------------------- |
+| [Quick Start](docs/guides/QUICK_START.md)                     | Get running in 10 minutes     |
+| [Local Setup](docs/LOCAL_SETUP.md)                            | Complete setup guide          |
+| [AI Providers](docs/AI_PROVIDERS.md)                          | Ollama vs Claude comparison   |
+| [Multi-Agent Architecture](docs/MULTI_AGENT_ARCHITECTURE.md)  | Agent workflow specification  |
+| [Design System](docs/DESIGN_SYSTEM.md)                        | Scientific Luxury UI system   |
+| [Beads](docs/BEADS.md)                                        | AI agent memory system        |
+| [Testing Guide](docs/guides/TESTING_GUIDE.md)                 | Testing strategies            |
+| [CI/CD Guide](docs/guides/CI_CD_GUIDE.md)                     | Pipeline configuration        |
+| [Production Deployment](docs/guides/PRODUCTION-DEPLOYMENT.md) | Deployment options            |
 
 ### Framework Documentation
 
@@ -458,6 +488,6 @@ MIT License - Use freely for any purpose.
 
 <sub>Built with care for developers who want to build AI apps without barriers</sub>
 
-<sub>Last Updated: 2026-01-23</sub>
+<sub>Last Updated: 30/01/2026</sub>
 
 </div>
