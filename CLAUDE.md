@@ -489,6 +489,54 @@ bash .skills/install.sh
 
 See `.skills/AGENTS.md` for the full skills registry and creation guide.
 
+## 🤝 Multi-Agent Architecture
+
+This project implements a **hierarchical multi-agent workflow** for AI-assisted development. All AI agents must follow these protocols.
+
+**Full Documentation**: [`docs/MULTI_AGENT_ARCHITECTURE.md`](docs/MULTI_AGENT_ARCHITECTURE.md)
+
+### Hierarchy
+
+```
+Developer (Human) → Senior PM → Orchestrator → Specialists (A/B/C/D)
+```
+
+### Agent Roles
+
+| Agent | Domain | Context Focus |
+|-------|--------|---------------|
+| **Orchestrator** | Task decomposition, work distribution, synthesis | All coordination |
+| **Specialist A** | Architecture, design, ADRs, API contracts | Design docs only |
+| **Specialist B** | Implementation, coding, refactoring | Code only |
+| **Specialist C** | Testing, validation, coverage | Tests only |
+| **Specialist D** | Documentation, review, knowledge | Docs only |
+
+### Core Protocols
+
+1. **Linear Integration**: Every task tracked in Linear with full audit trail
+2. **Context Isolation**: Each specialist operates in isolated context
+3. **Quality Gates**: No phase advances without verification
+4. **Escalation Path**: Specialist → Orchestrator → PM → Developer
+
+### Quick Triggers
+
+```
+@orchestrator decompose: [task]
+@specialist-a design: [component]
+@specialist-b implement: [feature]
+@specialist-c test: [component]
+@specialist-d document: [feature]
+```
+
+### Integration Points
+
+| System | Connection |
+|--------|------------|
+| Genesis Hive Mind | Orchestrator = GENESIS_DEV |
+| Council of Logic | Quality gates invoke council validation |
+| Beads | Tasks sync to `.beads/` |
+| Linear | Primary task tracking |
+
 ## 🧵 Beads - AI Agent Memory System
 
 This project uses **Beads** (`bd`) for persistent, git-backed task tracking across AI coding sessions.
@@ -629,16 +677,17 @@ Hooks are configured in `.claude/settings.json` under the `"hooks"` key. Each ho
 
 ## 📚 Documentation
 
-| Document                                                         | Purpose                         |
-| ---------------------------------------------------------------- | ------------------------------- |
-| [`README.md`](README.md)                                         | Overview and quick start        |
-| [`docs/LOCAL_SETUP.md`](docs/LOCAL_SETUP.md)                     | Complete setup guide            |
-| [`docs/AI_PROVIDERS.md`](docs/AI_PROVIDERS.md)                   | Ollama vs Claude                |
-| [`docs/OPTIONAL_SERVICES.md`](docs/OPTIONAL_SERVICES.md)         | Deployment guides               |
-| [`docs/DESIGN_SYSTEM.md`](docs/DESIGN_SYSTEM.md)                 | Scientific Luxury design system |
-| [`docs/BEADS.md`](docs/BEADS.md)                                 | AI agent memory system          |
-| [Claude Code Hooks](https://code.claude.com/docs/en/hooks)       | Automated workflow hooks        |
-| [`docs/new-project-checklist.md`](docs/new-project-checklist.md) | 3-step setup                    |
+| Document                                                                       | Purpose                           |
+| ------------------------------------------------------------------------------ | --------------------------------- |
+| [`README.md`](README.md)                                                       | Overview and quick start          |
+| [`docs/LOCAL_SETUP.md`](docs/LOCAL_SETUP.md)                                   | Complete setup guide              |
+| [`docs/AI_PROVIDERS.md`](docs/AI_PROVIDERS.md)                                 | Ollama vs Claude                  |
+| [`docs/OPTIONAL_SERVICES.md`](docs/OPTIONAL_SERVICES.md)                       | Deployment guides                 |
+| [`docs/DESIGN_SYSTEM.md`](docs/DESIGN_SYSTEM.md)                               | Scientific Luxury design system   |
+| [`docs/MULTI_AGENT_ARCHITECTURE.md`](docs/MULTI_AGENT_ARCHITECTURE.md)         | Multi-agent workflow specification|
+| [`docs/BEADS.md`](docs/BEADS.md)                                               | AI agent memory system            |
+| [Claude Code Hooks](https://code.claude.com/docs/en/hooks)                     | Automated workflow hooks          |
+| [`docs/new-project-checklist.md`](docs/new-project-checklist.md)               | 3-step setup                      |
 
 ## 🔧 Troubleshooting
 
