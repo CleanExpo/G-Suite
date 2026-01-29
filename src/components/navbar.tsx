@@ -1,9 +1,10 @@
 'use client';
 
 import * as React from 'react';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import Image from 'next/image';
 import { ThemeToggle } from './theme-toggle';
+import { LocaleSwitcher } from './locale-switcher';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useAuth } from '@/components/auth/auth-provider';
 
@@ -98,6 +99,7 @@ export function Navbar() {
 
         {/* Operations Hub */}
         <div className="flex items-center gap-6">
+          <LocaleSwitcher />
           <ThemeToggle />
 
           {isLoading ? (

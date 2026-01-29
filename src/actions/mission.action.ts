@@ -4,6 +4,8 @@ import { getAuthUserIdOrDev } from '@/lib/supabase/auth';
 import { app as workflow } from '@/graph/workflow';
 import { revalidatePath } from 'next/cache';
 
+import { getLocale } from 'next-intl/server';
+
 /**
  * runMission
  * The secure server-side bridge to trigger the LangGraph orchestrator.
@@ -11,8 +13,9 @@ import { revalidatePath } from 'next/cache';
 export async function runMission(query: string) {
   // 1. Security Check
   const userId = await getAuthUserIdOrDev();
+  const locale = await getLocale();
 
-  console.log(`🚀 Mission Initiated by ${userId}: ${query}`);
+  console.log(`🚀 Mission Initiated by ${userId} [${locale}]: ${query}`);
 
   try {
     // 2. Invoke the Agents
@@ -20,6 +23,7 @@ export async function runMission(query: string) {
     const finalState = await workflow.invoke({
       userRequest: query,
       userId: userId,
+      locale: locale,
       status: 'starting',
     });
 

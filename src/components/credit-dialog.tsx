@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { Rocket, Zap, Shield, Loader2, Check, X, CreditCard } from 'lucide-react';
+import { Rocket, Zap, Shield, Loader2, Check, X, CreditCard, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createCheckoutSession } from '@/actions/stripe.actions';
+import { useTranslations } from 'next-intl';
 
 export default function CreditDialog({
   isOpen,
@@ -12,41 +13,42 @@ export default function CreditDialog({
   isOpen: boolean;
   onClose: () => void;
 }) {
+  const t = useTranslations('CreditDialog');
   const [loading, setLoading] = useState<string | null>(null);
 
   const packages = [
     {
       id: 'STARTER',
-      name: 'Founder',
+      name: t('founder'),
       price: '$22',
       credits: '500',
       icon: <Zap className="w-6 h-6 text-blue-600" />,
       color: 'border-gray-100 dark:border-white/5 bg-white dark:bg-[#1c222b]',
       btnColor:
         'bg-gray-100 dark:bg-white/10 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-white/20',
-      features: ['Essential Orchestration', 'Standard Node Support'],
+      features: [t('features.essential'), t('features.standard')],
     },
     {
       id: 'PRO',
-      name: 'Director',
+      name: t('director'),
       price: '$33',
       credits: '1,500',
       icon: <Rocket className="w-6 h-6 text-white" />,
       color: 'border-blue-600/30 bg-blue-600 text-white',
       btnColor: 'bg-white text-blue-600 hover:bg-blue-50',
       popular: true,
-      features: ['Deep Research Access', 'Priority Command', 'Vault Encryption'],
+      features: [t('features.deep'), t('features.priority'), t('features.vault')],
     },
     {
       id: 'GROWTH',
-      name: 'Vanguard',
+      name: t('vanguard'),
       price: '$49.95',
       credits: '5,000',
       icon: <Shield className="w-6 h-6 text-emerald-600" />,
       color: 'border-gray-100 dark:border-white/5 bg-white dark:bg-[#1c222b]',
       btnColor:
         'bg-gray-100 dark:bg-white/10 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-white/20',
-      features: ['Custom SPEC Nodes', 'Global Hub Support', '24/7 Intel Access'],
+      features: [t('features.custom'), t('features.global'), t('features.intel')],
     },
   ];
 
@@ -87,14 +89,14 @@ export default function CreditDialog({
                   <div className="flex items-center gap-3">
                     <CreditCard className="w-6 h-6 text-blue-600" />
                     <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">
-                      Ledger Replenishment
+                      {t('ledgerReplenishment')}
                     </span>
                   </div>
                   <h2 className="text-4xl lg:text-6xl font-black italic uppercase tracking-tighter text-gray-900 dark:text-white leading-none">
-                    Fuel Your <span className="text-blue-600">Enterprise.</span>
+                    {t('title').split(' ')[0]} {t('title').split(' ')[1]} <span className="text-blue-600">{t('title').split(' ').slice(2).join(' ')}</span>
                   </h2>
                   <p className="text-gray-600 dark:text-gray-400 font-medium text-lg">
-                    Select a mission-driven fuel package for your autonomous fleet.
+                    {t('description')}
                   </p>
                 </div>
                 <button
@@ -113,7 +115,7 @@ export default function CreditDialog({
                   >
                     {pkg.popular && (
                       <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gray-900 dark:bg-white dark:text-black text-white text-[10px] font-black uppercase px-6 py-2 rounded-full tracking-widest shadow-xl">
-                        Propulsion Choice
+                        {t('propulsionChoice')}
                       </div>
                     )}
 
@@ -133,7 +135,7 @@ export default function CreditDialog({
                       <div
                         className={`text-[10px] font-black uppercase tracking-widest mt-2 ${pkg.popular ? 'text-white/60' : 'text-gray-400'}`}
                       >
-                        {pkg.credits} Mission Pts
+                        {pkg.credits} {t('missionPts')}
                       </div>
                     </div>
 
@@ -168,7 +170,7 @@ export default function CreditDialog({
                         <Loader2 className="w-5 h-5 animate-spin" />
                       ) : (
                         <>
-                          Replenish Ledger <ArrowRight className="w-4 h-4 ml-1" />
+                          {t('replenish')} <ArrowRight className="w-4 h-4 ml-1" />
                         </>
                       )}
                     </button>
@@ -178,10 +180,10 @@ export default function CreditDialog({
 
               <div className="mt-16 flex items-center justify-center gap-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">
                 <div className="flex items-center gap-2">
-                  <Shield className="w-4 h-4 text-emerald-500" /> Stripe Secure
+                  <Shield className="w-4 h-4 text-emerald-500" /> {t('stripeSecure')}
                 </div>
                 <div className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-blue-600" /> Identity Verified
+                  <Check className="w-4 h-4 text-blue-600" /> {t('identityVerified')}
                 </div>
               </div>
             </div>
@@ -191,4 +193,3 @@ export default function CreditDialog({
     </AnimatePresence>
   );
 }
-import { ArrowRight } from 'lucide-react';

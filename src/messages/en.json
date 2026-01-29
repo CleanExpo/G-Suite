@@ -1,0 +1,116 @@
+{
+    "Mission": {
+        "title": "Initialize Mission",
+        "description": "Objective Description",
+        "placeholder": "e.g., 'Scan the market for G-Pilot mentions and draft a response blueprint...'",
+        "launching": "EXECUTING PROTOCOL",
+        "deploy": "Deploy Mission",
+        "cancel": "Cancel",
+        "encrypted": "Input Encrypted",
+        "version": "Orchestrator v4.2 · Secure Linkage"
+    },
+    "CreditDialog": {
+        "title": "Fuel Your Enterprise.",
+        "description": "Select a mission-driven fuel package for your autonomous fleet.",
+        "ledgerReplenishment": "Ledger Replenishment",
+        "propulsionChoice": "Propulsion Choice",
+        "missionPts": "Mission Pts",
+        "replenish": "Replenish Ledger",
+        "stripeSecure": "Stripe Secure",
+        "identityVerified": "Identity Verified",
+        "founder": "Founder",
+        "director": "Director",
+        "vanguard": "Vanguard",
+        "features": {
+            "essential": "Essential Orchestration",
+            "standard": "Standard Node Support",
+            "deep": "Deep Research Access",
+            "priority": "Priority Command",
+            "vault": "Vault Encryption",
+            "custom": "Custom SPEC Nodes",
+            "global": "Global Hub Support",
+            "intel": "24/7 Intel Access"
+        }
+    },
+    "FleetStatus": {
+        "title": "Fleet Operational Status",
+        "subtitle": "System Readiness",
+        "totalMissions": "Total Missions",
+        "successRate": "Success Rate",
+        "fuelConsumed": "Fuel Consumed",
+        "version": "Orchestrator Version: v9.42",
+        "meshStable": "Global Mesh Stable",
+        "systems": {
+            "architect": "Architect",
+            "executor": "Executor",
+            "vault": "The Vault",
+            "mirror": "The Mirror",
+            "commerce": "Commerce",
+            "social": "Social Swarm"
+        },
+        "statuses": {
+            "ready": "READY",
+            "standby": "STANDBY",
+            "encrypted": "ENCRYPTED",
+            "synced": "SYNCED",
+            "active": "ACTIVE",
+            "linked": "LINKED"
+        }
+    },
+    "IntelligenceDossier": {
+        "title": "Latest Mission Synthesized.",
+        "highProbability": "High Probability Result",
+        "dossierId": "Intelligence Dossier",
+        "qualityScore": "Quality Score",
+        "artifacts": "Artifacts",
+        "sectorOrigin": "Sector Origin",
+        "openDossier": "Open Dossier",
+        "verifiedBy": "Verified by Independent-Verifier"
+    },
+    "TelemetryPanel": {
+        "live": "Live",
+        "metrics": {
+            "search": "Search Dominance",
+            "webVitals": "Core Web Vitals",
+            "vault": "Vault Integrity",
+            "conversion": "Conversion Lift"
+        }
+    },
+    "Dashboard": {
+        "title": "Tactical Dashboard",
+        "description": "Initialize high-fidelity reasoning swarms.",
+        "fuelReserve": "Mission Fuel Reserve",
+        "commandLaunchpad": "Command Launchpad",
+        "deployMission": "Deploy New Mission",
+        "ignite": "IGNITE",
+        "fleetStatus": "Fleet Readiness Node",
+        "archive": "Mission Archive Ledger",
+        "statusSyncing": "Syncing Mission Ledger",
+        "coreActive": "G-PILOT CORE v7.2 ACTIVE",
+        "uplinkInvalid": "Uplink Invalid.",
+        "noLedger": "No active billing ledger detected in the current sector. Initialize your secure credit tunnel to begin deployment.",
+        "initializeVault": "Initialize Vault",
+        "estimatedValue": "Estimated Sector Value",
+        "vaultActive": "AES-256 Vault Active",
+        "globalTelemetrySync": "Global Telemetry Sync: Stable",
+        "deploymentProfile": "Deployment Profile",
+        "fuelDelta": "Fuel Delta",
+        "timestamp": "Timestamp",
+        "sectorSilence": "Sector Silence Detected.",
+        "establishFlow": "Establish Initial Mission Flow",
+        "verified": "VERIFIED"
+    },
+    "Landing": {
+        "badge": "The Ultimate Bridge for AI Mastery",
+        "title1": "Architect Your",
+        "title2": "Future with G-Pilot.",
+        "description": "The only platform that seamlessly integrates 20+ Google AI Studio tools into one unified workflow. Master innovation without the learning curve.",
+        "cta": "Unleash G-Pilot Now",
+        "secondaryCta": "Explore Ecosystem"
+    },
+    "Common": {
+        "loading": "Syncing G-Pilot Core...",
+        "verified": "VERIFIED",
+        "system": "SYSTEM"
+    }
+}

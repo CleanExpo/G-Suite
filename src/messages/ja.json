@@ -1,0 +1,49 @@
+{
+    "Mission": {
+        "title": "ミッションの初期化",
+        "description": "目的の記述",
+        "placeholder": "例：'市場でG-Pilotへの言及をスキャンし、返信のブループリントをドラフトして...'",
+        "launching": "プロトコル実行中",
+        "deploy": "ミッションを展開",
+        "cancel": "キャンセル",
+        "encrypted": "入力は暗号化されています",
+        "version": "オーケストレーター v4.2 · セキュア連携"
+    },
+    "Dashboard": {
+        "title": "タクティカル・ダッシュボード",
+        "description": "高精度な推論スウォームを初期化します。",
+        "fuelReserve": "ミッション燃料リザーブ",
+        "commandLaunchpad": "コマンド・ローンチパッド",
+        "deployMission": "新規ミッションを展開",
+        "ignite": "点火",
+        "fleetStatus": "フリート準備完了ノード",
+        "archive": "ミッション・アーカイブ・レジャー",
+        "statusSyncing": "ミッション・レジャーを同期中",
+        "coreActive": "G-PILOTコア v7.2 アクティブ",
+        "uplinkInvalid": "アップリンクが無効です。",
+        "noLedger": "現在のセクターでアクティブな請求レジャーが検出されませんでした。展開を開始するには、セキュアなクレジット・トンネルを初期化してください。",
+        "initializeVault": "保管庫を初期化",
+        "estimatedValue": "推定セクター価値",
+        "vaultActive": "AES-256 保管庫アクティブ",
+        "globalTelemetrySync": "グローバル・テレメトリ同期：安定",
+        "deploymentProfile": "展開プロファイル",
+        "fuelDelta": "燃料デルタ",
+        "timestamp": "タイムスタンプ",
+        "sectorSilence": "セクターの沈黙が検出されました。",
+        "establishFlow": "初期ミッションフローを確立",
+        "verified": "検証済み"
+    },
+    "Landing": {
+        "badge": "AIマスタリーへの究極の架け橋",
+        "title1": "G-Pilotで",
+        "title2": "未来を設計する。",
+        "description": "20以上のGoogle AI Studioツールを1つの統合ワークフローにシームレスに統合する唯一のプラットフォーム。学習曲線なしでイノベーションをマスターしましょう。",
+        "cta": "今すぐG-Pilotを解放する",
+        "secondaryCta": "エコシステムを探索"
+    },
+    "Common": {
+        "loading": "G-Pilotコアを同期中...",
+        "verified": "検証済み",
+        "system": "システム"
+    }
+}

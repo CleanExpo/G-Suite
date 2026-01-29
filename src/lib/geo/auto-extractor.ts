@@ -81,10 +81,10 @@ export async function extractBusinessInfo(url: string): Promise<ExtractedBusines
  */
 function extractFromSchema(document: any): ExtractedBusinessInfo {
   try {
-    const scripts = Array.from(document.querySelectorAll('script[type="application/ld+json"]'));
+    const scripts = document.querySelectorAll('script[type="application/ld+json"]');
 
-    for (const script of scripts) {
-      const jsonText = script.textContent || '';
+    for (const script of Array.from(scripts) as Element[]) {
+      const jsonText = (script as Element).textContent || '';
       try {
         const json = JSON.parse(jsonText);
 
@@ -198,7 +198,7 @@ async function extractFromContactPage(url: string, document: any): Promise<Extra
         const href = a.getAttribute('href') || '';
         const text = (a.textContent || '').toLowerCase();
         return href.includes('contact') || text.includes('contact') ||
-               href.includes('about') || text.includes('about');
+          href.includes('about') || text.includes('about');
       });
 
     if (contactLinks.length === 0) {

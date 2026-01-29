@@ -1,0 +1,116 @@
+{
+    "Mission": {
+        "title": "Inicializar Misión",
+        "description": "Descripción del Objetivo",
+        "placeholder": "ej., 'Escanea el mercado en busca de menciones de G-Pilot y redacta un plan de respuesta...'",
+        "launching": "EJECUTANDO PROTOCOLO",
+        "deploy": "Desplegar Misión",
+        "cancel": "Cancelar",
+        "encrypted": "Entrada Encriptada",
+        "version": "Orquestador v4.2 · Vínculo Seguro"
+    },
+    "CreditDialog": {
+        "title": "Abastece tu Empresa.",
+        "description": "Selecciona un paquete de combustible orientado a misiones para tu flota autónoma.",
+        "ledgerReplenishment": "Reposición de Registro",
+        "propulsionChoice": "Opción de Propulsión",
+        "missionPts": "Pts de Misión",
+        "replenish": "Reponer Registro",
+        "stripeSecure": "Pago Seguro Stripe",
+        "identityVerified": "Identidad Verificada",
+        "founder": "Fundador",
+        "director": "Director",
+        "vanguard": "Vanguardia",
+        "features": {
+            "essential": "Orquestación Esencial",
+            "standard": "Soporte de Nodo Estándar",
+            "deep": "Acceso a Investigación Profunda",
+            "priority": "Mando Prioritario",
+            "vault": "Encriptación de Bóveda",
+            "custom": "Nodos SPEC Personalizados",
+            "global": "Soporte de Hub Global",
+            "intel": "Acceso a Inteligencia 24/7"
+        }
+    },
+    "FleetStatus": {
+        "title": "Estado Operativo de la Flota",
+        "subtitle": "Disponibilidad del Sistema",
+        "totalMissions": "Misiones Totales",
+        "successRate": "Tasa de Éxito",
+        "fuelConsumed": "Combustible Consumido",
+        "version": "Versión del Orquestador: v9.42",
+        "meshStable": "Malla Global Estable",
+        "systems": {
+            "architect": "Arquitecto",
+            "executor": "Ejecutor",
+            "vault": "La Bóveda",
+            "mirror": "El Espejo",
+            "commerce": "Comercio",
+            "social": "Enjambre Social"
+        },
+        "statuses": {
+            "ready": "LISTO",
+            "standby": "EN ESPERA",
+            "encrypted": "ENCRIPTADO",
+            "synced": "SINCRONIZADO",
+            "active": "ACTIVO",
+            "linked": "VINCULADO"
+        }
+    },
+    "IntelligenceDossier": {
+        "title": "Última Misión Sintetizada.",
+        "highProbability": "Resultado de Alta Probabilidad",
+        "dossierId": "Expediente de Inteligencia",
+        "qualityScore": "Puntuación de Calidad",
+        "artifacts": "Artefactos",
+        "sectorOrigin": "Origen del Sector",
+        "openDossier": "Abrir Expediente",
+        "verifiedBy": "Verificado por Independent-Verifier"
+    },
+    "TelemetryPanel": {
+        "live": "En Vivo",
+        "metrics": {
+            "search": "Dominio de Búsqueda",
+            "webVitals": "Core Web Vitals",
+            "vault": "Integridad de Bóveda",
+            "conversion": "Aumento de Conversión"
+        }
+    },
+    "Dashboard": {
+        "title": "Panel Táctico",
+        "description": "Inicializa enjambres de razonamiento de alta fidelidad.",
+        "fuelReserve": "Reserva de Combustible de Misión",
+        "commandLaunchpad": "Plataforma de Mando",
+        "deployMission": "Desplegar Nueva Misión",
+        "ignite": "IGNICIÓN",
+        "fleetStatus": "Nodo de Disponibilidad de la Flota",
+        "archive": "Registro de Archivo de Misión",
+        "statusSyncing": "Sincronizando el Registro de Misión",
+        "coreActive": "NÚCLEO G-PILOT v7.2 ACTIVO",
+        "uplinkInvalid": "Enlace no válido.",
+        "noLedger": "No se detectó ningún registro de facturación activo en el sector actual. Inicialice su túnel de crédito seguro para comenzar el despliegue.",
+        "initializeVault": "Inicializar Bóveda",
+        "estimatedValue": "Valor Estimado del Sector",
+        "vaultActive": "Bóveda AES-256 Activa",
+        "globalTelemetrySync": "Sincronización de Telemetría Global: Estable",
+        "deploymentProfile": "Perfil de Despliegue",
+        "fuelDelta": "Delta de Combustible",
+        "timestamp": "Marca de Tiempo",
+        "sectorSilence": "Silencio de Sector Detectado.",
+        "establishFlow": "Establecer Flujo de Misión Inicial",
+        "verified": "VERIFICADO"
+    },
+    "Landing": {
+        "badge": "El Puente Definitivo para la Maestría en IA",
+        "title1": "Arquitecta tu",
+        "title2": "Futuro con G-Pilot.",
+        "description": "La única plataforma que integra fluidamente más de 20 herramientas de Google AI Studio en un flujo de trabajo unificado. Domina la innovación sin la curva de aprendizaje.",
+        "cta": "Libera a G-Pilot Ahora",
+        "secondaryCta": "Explorar el Ecosistema"
+    },
+    "Common": {
+        "loading": "Sincronizando el Núcleo G-Pilot...",
+        "verified": "VERIFICADO",
+        "system": "SISTEMA"
+    }
+}

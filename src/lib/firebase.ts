@@ -1,6 +1,6 @@
-import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
+import { getAuth, Auth } from 'firebase/auth';
+import { getFirestore, Firestore } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -12,9 +12,44 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-// Initialize Firebase (Singleton pattern)
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-const auth = getAuth(app);
-const firestore = getFirestore(app);
+// Lazy initialization to prevent build-time errors
+let app: FirebaseApp | null = null;
+let auth: Auth | null = null;
+let firestore: Firestore | null = null;
 
-export { app, auth, firestore };
+/**
+ * Get Firebase App instance (lazy initialization)
+ */
+export function getFirebaseApp(): FirebaseApp {
+  if (!app) {
+    // Only initialize if we have a valid API key
+    if (!firebaseConfig.apiKey) {
+      throw new Error('Firebase API key not configured');
+    }
+    app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+  }
+  return app;
+}
+
+/**
+ * Get Firebase Auth instance (lazy initialization)
+ */
+export function getFirebaseAuth(): Auth {
+  if (!auth) {
+    auth = getAuth(getFirebaseApp());
+  }
+  return auth;
+}
+
+/**
+ * Get Firestore instance (lazy initialization)
+ */
+export function getFirebaseFirestore(): Firestore {
+  if (!firestore) {
+    firestore = getFirestore(getFirebaseApp());
+  }
+  return firestore;
+}
+
+// Legacy exports for backward compatibility (lazy getters)
+export { getFirebaseApp as app, getFirebaseAuth as auth, getFirebaseFirestore as firestore };

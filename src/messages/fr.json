@@ -1,0 +1,105 @@
+{
+    "CreditDialog": {
+        "title": "Alimentez votre Entreprise.",
+        "description": "Sélectionnez un pack de carburant orienté mission pour votre flotte autonome.",
+        "ledgerReplenishment": "Réapprovisionnement du Registre",
+        "propulsionChoice": "Choix de Propulsion",
+        "missionPts": "Pts de Mission",
+        "replenish": "Réapprovisionner le Registre",
+        "stripeSecure": "Paiement Sécurisé Stripe",
+        "identityVerified": "Identité Vérifiée",
+        "founder": "Fondateur",
+        "director": "Directeur",
+        "vanguard": "Avant-garde",
+        "features": {
+            "essential": "Orchestration Essentielle",
+            "standard": "Support de Nœud Standard",
+            "deep": "Accès Recherche Profonde",
+            "priority": "Commande Prioritaire",
+            "vault": "Chiffrement du Coffre",
+            "custom": "Nœuds SPEC Personnalisés",
+            "global": "Support Hub Global",
+            "intel": "Accès Intel 24/7"
+        }
+    },
+    "FleetStatus": {
+        "title": "État Opérationnel de la Flotte",
+        "subtitle": "Disponibilité du Système",
+        "totalMissions": "Missions Totales",
+        "successRate": "Taux de Réussite",
+        "fuelConsumed": "Carburant Consommé",
+        "version": "Version de l'Orchestrateur : v9.42",
+        "meshStable": "Maillage Global Stable",
+        "systems": {
+            "architect": "Architecte",
+            "executor": "Exécuteur",
+            "vault": "Le Coffre",
+            "mirror": "Le Miroir",
+            "commerce": "Commerce",
+            "social": "Essaim Social"
+        },
+        "statuses": {
+            "ready": "PRÊT",
+            "standby": "EN ATTENTE",
+            "encrypted": "CHIFFRÉ",
+            "synced": "SYNCHRONISÉ",
+            "active": "ACTIF",
+            "linked": "LIÉ"
+        }
+    },
+    "IntelligenceDossier": {
+        "title": "Dernière Mission Synthétisée.",
+        "highProbability": "Résultat Haute Probabilité",
+        "dossierId": "Dossier d'Intelligence",
+        "qualityScore": "Score de Qualité",
+        "artifacts": "Artéfacts",
+        "sectorOrigin": "Origine du Secteur",
+        "openDossier": "Ouvrir le Dossier",
+        "verifiedBy": "Vérifié par Independent-Verifier"
+    },
+    "TelemetryPanel": {
+        "live": "En Direct",
+        "metrics": {
+            "search": "Dominance de Recherche",
+            "webVitals": "Core Web Vitals",
+            "vault": "Intégrité du Coffre",
+            "conversion": "Hausse de Conversion"
+        }
+    },
+    "Dashboard": {
+        "title": "Tableau de Bord Tactique",
+        "description": "Initialisez des essaims de raisonnement haute fidélité.",
+        "fuelReserve": "Réserve de Carburant de Mission",
+        "commandLaunchpad": "Rampe de Lancement de Commande",
+        "deployMission": "Déployer une Nouvelle Mission",
+        "ignite": "ALLUMER",
+        "fleetStatus": "Nœud de Disponibilité de la Flotte",
+        "archive": "Registre d'Archive de Mission",
+        "statusSyncing": "Synchronisation du Registre de Mission",
+        "coreActive": "CŒUR G-PILOT v7.2 ACTIF",
+        "uplinkInvalid": "Liaison montante invalide.",
+        "noLedger": "Aucun registre de facturation actif détecté. Initialisez votre tunnel de crédit sécurisé pour commencer le déploiement.",
+        "initializeVault": "Initialiser le Coffre",
+        "estimatedValue": "Valeur Estimée du Secteur",
+        "vaultActive": "Coffre AES-256 Actif",
+        "globalTelemetrySync": "Sync. Télémétrie Globale : Stable",
+        "deploymentProfile": "Profil de Déploiement",
+        "fuelDelta": "Delta de Carburant",
+        "timestamp": "Horodatage",
+        "sectorSilence": "Silence de Secteur Détecté.",
+        "establishFlow": "Établir le Flux de Mission Initial"
+    },
+    "Landing": {
+        "badge": "Le Pont Ultime pour la Maîtrise de l'IA",
+        "title1": "Architectez votre",
+        "title2": "Futur avec G-Pilot.",
+        "description": "La seule plateforme qui intègre parfaitement plus de 20 outils Google AI Studio. Maîtrisez l'innovation sans courbe d'apprentissage.",
+        "cta": "Libérez G-Pilot Maintenant",
+        "secondaryCta": "Explorer l'Écosystème"
+    },
+    "Common": {
+        "loading": "Sincronisation du Cœur G-Pilot...",
+        "verified": "VÉRIFIÉ",
+        "system": "SYSTÈME"
+    }
+}

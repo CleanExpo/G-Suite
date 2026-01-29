@@ -5,6 +5,9 @@ import { createSlidesStoryboard } from '../tools/googleSlides';
 import { runNotebookLMAgent } from '../agents/notebookLM';
 import { generateImage, generateVideo, webIntel } from '../tools/mediaEngine';
 import { searchConsoleAudit } from '../tools/searchConsole';
+import { localSEOAnalyzer } from '../lib/geo/local-seo-analyzer';
+import { getJinaClient } from '../lib/jina/client';
+import { getDocumentProcessor } from '../lib/document-processor/engine';
 import { z } from 'zod';
 
 const SpecSchema = z.object({
@@ -36,6 +39,9 @@ const SpecSchema = z.object({
     'veo_31_upsample',
     'document_ai_extract',
     'gemini_3_flash',
+    'geo_marketing_audit',
+    'brand_dna_extraction',
+    'deep_research_synthesis',
     // Web Intelligence Skills
     'web_unlocker',
     'serp_collector',
@@ -60,7 +66,10 @@ const model = genAI.getGenerativeModel({
     - If they ask for research, use "web_intel" with search-grounding logic.
     - If they mention sales or products, use "shopify_sync".
     - If they mention posting or growth, use "social_blast".
-    - If they mention SEO, performance, or "how do I look?", use "web_mastery_audit".
+    - If they mention local SEO, proximity, or "where do I rank locally?", use "geo_marketing_audit".
+    - If they ask for brand analysis, style guides, or "who am I visually?", use "brand_dna_extraction".
+    - If they provide documents, invoices, or contracts, use "document_ai_extract".
+    - If they ask for deep, comprehensive research or market reports, use "deep_research_synthesis".
     - ALWAYS provide a 'reasoning' block explaining your architectural decisions.
     `,
 });
@@ -74,6 +83,7 @@ export async function architectNode(state: ProjectStateType) {
 
   const prompt = `
     Mission Request: "${state.userRequest}"
+    Target Locale: "${state.locale || 'en'}"
     
     Convert this into a MISSION SPEC.
     Tools Available:
@@ -86,6 +96,10 @@ export async function architectNode(state: ProjectStateType) {
     - shopify_sync: { action: "sync_products" | "audit_sales" }
     - social_blast: { platform: "x" | "linkedin" | "reddit", content }
     - web_mastery_audit: { url }
+    - geo_marketing_audit: { businessName, address, phone }
+    - brand_dna_extraction: { url }
+    - document_ai_extract: { documentUrl }
+    - deep_research_synthesis: { topic, focusAreas: [] }
     
     Return ONLY valid JSON following the SpecSchema.
   `;
@@ -195,6 +209,7 @@ export async function executorNode(state: ProjectStateType) {
         const context = {
           userId: state.userId,
           mission: state.userRequest,
+          locale: state.locale,
           config: {
             ...state.spec.payload,
             explicitAgents: [targetAgentName] // <--- Force Overseer to use this agent
@@ -231,12 +246,33 @@ export async function executorNode(state: ProjectStateType) {
       results.push(await veo31Upsample(state.userId, state.spec.payload.videoUrl, state.spec.payload.resolution));
     }
     else if (state.spec.tool === 'document_ai_extract') {
-      const { documentAIExtract } = await import('../tools/googleAPISkills');
-      results.push(await documentAIExtract(state.userId, state.spec.payload.documentUrl, state.spec.payload.options));
+      // For standalone tool call, we assume file is already uploaded or URL provided
+      const { getDocumentProcessor } = await import('../lib/document-processor/engine');
+      const processor = getDocumentProcessor();
+      results.push(await processor.process({
+        fileName: 'document.pdf',
+        documentUrl: state.spec.payload.documentUrl
+      } as any));
     }
     else if (state.spec.tool === 'gemini_3_flash') {
       const { gemini3Flash } = await import('../tools/googleAPISkills');
       results.push(await gemini3Flash(state.userId, state.spec.payload.prompt, state.spec.payload.options));
+    }
+    else if (state.spec.tool === 'geo_marketing_audit') {
+      const { businessName, address, phone } = state.spec.payload;
+      results.push(await localSEOAnalyzer.auditNAP(businessName, address, phone));
+    }
+    else if (state.spec.tool === 'brand_dna_extraction') {
+      const jina = getJinaClient();
+      const { url } = state.spec.payload;
+      const { content } = await jina.read(url);
+      const { BrandExtractor } = await import('../lib/brand/extractor');
+      const extractor = new BrandExtractor();
+      results.push(await extractor.extract(content, url));
+    }
+    else if (state.spec.tool === 'deep_research_synthesis') {
+      const { deepResearch } = await import('../tools/googleAPISkills');
+      results.push(await deepResearch(state.userId, state.spec.payload.topic, { depth: 'deep', focusAreas: state.spec.payload.focusAreas }));
     }
     // Web Intelligence Skills
     else if (state.spec.tool === 'web_unlocker') {

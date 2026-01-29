@@ -11,30 +11,12 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
-import { getRankingPredictor } from '@/lib/geo/ranking-predictor';
-import type { RankingPredictorInput } from '@/lib/geo/ranking-predictor';
+import { getRankingPredictor, type RankingFactors } from '@/lib/geo/ranking-predictor';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest): Promise<Response> {
     try {
-        // Authenticate user
-        const { userId } = await auth();
-
-        if (!userId) {
-            return NextResponse.json(
-                {
-                    success: false,
-                    error: {
-                        code: 'UNAUTHORIZED',
-                        message: 'Authentication required'
-                    }
-                },
-                { status: 401 }
-            );
-        }
-
         // Parse request body
         const body = await req.json();
 
@@ -53,34 +35,28 @@ export async function POST(req: NextRequest): Promise<Response> {
             );
         }
 
-        const input: RankingPredictorInput = {
-            keyword: body.keyword,
-            location: body.location,
-            businessName: body.businessName,
-            address: body.address,
-            phone: body.phone,
-            website: body.website,
-            categories: body.categories || [],
-            gbpProfile: body.gbpProfile,
-            napAnalysis: body.napAnalysis,
-            citationAnalysis: body.citationAnalysis,
-            localSchemaAnalysis: body.localSchemaAnalysis,
-            competitors: body.competitors,
-            lat: body.lat,
-            lng: body.lng,
-            searcherLat: body.searcherLat,
-            searcherLng: body.searcherLng
+        // Build ranking factors from request
+        const factors: RankingFactors = {
+            distanceKm: body.distanceKm || 2,
+            authorityScore: body.authorityScore || 60,
+            reviewScore: body.reviewScore || 70,
+            categoryRelevance: body.categoryRelevance || 0.9
         };
 
-        console.log(`[POST /api/geo/rankings] Predicting ranking for "${input.keyword}" in ${input.location} for user ${userId}`);
+        console.log(`[POST /api/geo/rankings] Predicting ranking for "${body.keyword}" in ${body.location}`);
 
         // Predict ranking
         const predictor = getRankingPredictor();
-        const prediction = await predictor.predictRanking(input);
+        const prediction = predictor.predictRank(factors);
 
         return NextResponse.json({
             success: true,
-            data: prediction,
+            data: {
+                ...prediction,
+                keyword: body.keyword,
+                location: body.location,
+                businessName: body.businessName
+            },
             meta: {
                 version: 'v1',
                 timestamp: new Date().toISOString()
@@ -124,21 +100,13 @@ function validateRankingRequest(body: any): { valid: boolean; error?: string } {
         return { valid: false, error: 'Missing required field: businessName' };
     }
 
-    if (!body.address) {
-        return { valid: false, error: 'Missing required field: address' };
-    }
-
-    if (!body.phone) {
-        return { valid: false, error: 'Missing required field: phone' };
-    }
-
     return { valid: true };
 }
 
 /**
  * Get ranking prediction info
  */
-export async function GET(req: NextRequest): Promise<Response> {
+export async function GET(): Promise<Response> {
     return NextResponse.json({
         success: true,
         data: {
@@ -154,22 +122,13 @@ export async function GET(req: NextRequest): Promise<Response> {
             requiredFields: [
                 'keyword',
                 'location',
-                'businessName',
-                'address',
-                'phone'
+                'businessName'
             ],
             optionalFields: [
-                'website',
-                'categories',
-                'gbpProfile',
-                'napAnalysis',
-                'citationAnalysis',
-                'localSchemaAnalysis',
-                'competitors',
-                'lat',
-                'lng',
-                'searcherLat',
-                'searcherLng'
+                'distanceKm',
+                'authorityScore',
+                'reviewScore',
+                'categoryRelevance'
             ]
         }
     });

@@ -28,6 +28,9 @@ import { Navbar } from '@/components/navbar';
 
 import { TelemetryPanel } from '@/components/telemetry-panel';
 import { FleetStatus } from '@/components/fleet-status';
+import { IntelligenceDossier } from '@/components/intelligence-dossier';
+import { getLatestReport } from '@/actions/mission-history';
+import { useTranslations } from 'next-intl';
 
 function AuthenticatedDashboard({
   onOpenModal,
@@ -36,18 +39,22 @@ function AuthenticatedDashboard({
   onOpenModal: () => void;
   onOpenCreditDialog: () => void;
 }) {
+  const t = useTranslations('Dashboard');
   const [wallet, setWallet] = useState<any>(null);
   const [missions, setMissions] = useState<any[]>([]); // New state for missions
+  const [latestReport, setLatestReport] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   async function fetchData() {
     try {
-      const [walletData, missionData] = await Promise.all([
+      const [walletData, missionData, reportData] = await Promise.all([
         getWalletData(),
-        import('@/actions/mission-history').then(mod => mod.getMissionHistory())
+        import('@/actions/mission-history').then(mod => mod.getMissionHistory()),
+        getLatestReport()
       ]);
       setWallet(walletData);
       setMissions(missionData);
+      setLatestReport(reportData);
     } catch (err) {
       console.error('Dashboard error:', err);
     } finally {
@@ -69,10 +76,10 @@ function AuthenticatedDashboard({
         />
         <div className="space-y-2 text-center">
           <p className="text-gray-400 font-black text-xs uppercase tracking-[0.4em] animate-pulse">
-            Syncing Mission Ledger
+            {t('statusSyncing')}
           </p>
           <p className="text-[10px] text-gray-500 font-mono tracking-widest opacity-50">
-            G-PILOT CORE v7.2 ACTIVE
+            {t('coreActive')}
           </p>
         </div>
       </div>
@@ -91,18 +98,17 @@ function AuthenticatedDashboard({
         </div>
         <div>
           <h2 className="text-2xl md:text-4xl font-black italic tracking-tighter uppercase dark:text-white mb-4 leading-none">
-            Uplink Invalid.
+            {t('uplinkInvalid')}
           </h2>
           <p className="text-gray-600 dark:text-gray-400 text-base md:text-lg font-medium leading-relaxed">
-            No active billing ledger detected in the current sector. Initialize your secure credit
-            tunnel to begin deployment.
+            {t('noLedger')}
           </p>
         </div>
         <button
           onClick={onOpenCreditDialog}
           className="w-full h-20 bg-blue-600 hover:bg-blue-700 text-white rounded-[1.5rem] font-black text-2xl transition-all shadow-2xl shadow-blue-600/30 active:scale-95 flex items-center justify-center gap-4"
         >
-          Initialize Vault <ArrowRight className="w-6 h-6" />
+          {t('initializeVault')} <ArrowRight className="w-6 h-6" />
         </button>
       </motion.div>
     );
@@ -115,6 +121,9 @@ function AuthenticatedDashboard({
 
       {/* Tactical Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 items-stretch">
+        {/* Intelligence Dossier - High Impact */}
+        {latestReport && <IntelligenceDossier report={latestReport} />}
+
         {/* Ledger Card: Multi-Layer Spatial */}
         <motion.div
           initial={{ y: 30, opacity: 0 }}
@@ -148,7 +157,7 @@ function AuthenticatedDashboard({
           <div className="space-y-8 md:space-y-12">
             <div>
               <h3 className="text-gray-400 dark:text-gray-500 text-[10px] font-black uppercase tracking-[0.3em] mb-4">
-                Mission Fuel Reserve
+                {t('fuelReserve')}
               </h3>
               <div className="text-5xl md:text-8xl font-black text-gray-900 dark:text-white tracking-tighter flex items-baseline gap-2 leading-none">
                 {wallet.balance.toLocaleString()}
@@ -160,7 +169,7 @@ function AuthenticatedDashboard({
 
             <div className="pt-6 md:pt-8 border-t border-gray-100 dark:border-white/5 space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[10px] md:text-xs font-black uppercase tracking-widest text-gray-400">
-                <span>Estimated Sector Value</span>
+                <span>{t('estimatedValue')}</span>
                 <span className="text-gray-900 dark:text-white text-base md:text-lg font-black">
                   ${(wallet.balance / 100).toFixed(2)} USD
                 </span>
@@ -194,21 +203,21 @@ function AuthenticatedDashboard({
               </span>
             </div>
             <h2 className="text-4xl md:text-6xl lg:text-[7rem] font-black italic uppercase text-white tracking-tighter leading-[0.8]">
-              Deploy <br className="hidden md:block" />
-              <span className="text-blue-200">New Mission.</span>
+              {t('deployMission').split(' ')[0]} <br className="hidden md:block" />
+              <span className="text-blue-200">{t('deployMission').split(' ').slice(1).join(' ')}.</span>
             </h2>
             <p className="text-blue-100/70 text-lg md:text-2xl font-medium max-w-xl leading-relaxed italic">
-              "Initialize high-fidelity reasoning swarms for complex agentic orchestration."
+              "{t('description')}"
             </p>
           </div>
 
           <div className="mt-8 md:mt-12 flex flex-col sm:flex-row sm:items-center gap-4 md:gap-6 group relative z-10">
             <div className="h-16 md:h-24 px-8 md:px-12 bg-white text-blue-600 rounded-xl md:rounded-[2rem] font-black flex items-center justify-center gap-4 group-hover:bg-gray-50 shadow-2xl text-xl md:text-2xl transition-all w-full sm:w-auto">
-              IGNITE{' '}
+              {t('ignite')}{' '}
               <ArrowRight className="w-6 h-6 md:w-8 md:h-8 group-hover:translate-x-3 transition-transform" />
             </div>
             <div className="flex items-center gap-2 px-4 md:px-6 py-2 rounded-full border border-white/20 text-white text-[8px] md:text-[10px] font-black uppercase tracking-widest backdrop-blur-md w-fit">
-              <Shield className="w-3 h-3 md:w-4 md:h-4" /> AES-256 Vault Active
+              <Shield className="w-3 h-3 md:w-4 md:h-4" /> {t('vaultActive')}
             </div>
           </div>
         </motion.div>
@@ -230,13 +239,13 @@ function AuthenticatedDashboard({
               <History className="w-5 h-5 md:w-6 md:h-6 text-white" />
             </div>
             <h3 className="font-black italic uppercase tracking-tighter text-2xl md:text-4xl text-gray-900 dark:text-white leading-none">
-              Mission Archive Ledger
+              {t('archive')}
             </h3>
           </div>
           <div className="flex items-center gap-3">
             <div className="w-2 h-2 md:w-3 md:h-3 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
             <span className="text-[8px] md:text-[10px] font-black text-emerald-500 uppercase tracking-widest">
-              Global Telemetry Sync: Stable
+              {t('globalTelemetrySync')}
             </span>
           </div>
         </div>
@@ -246,13 +255,13 @@ function AuthenticatedDashboard({
             <thead>
               <tr className="border-b border-gray-100 dark:border-white/5">
                 <th className="px-6 md:px-12 py-6 md:py-10 text-[10px] md:text-[12px] font-black text-gray-400 uppercase tracking-[0.3em]">
-                  Deployment Profile
+                  {t('deploymentProfile')}
                 </th>
                 <th className="px-6 md:px-12 py-6 md:py-10 text-[10px] md:text-[12px] font-black text-gray-400 uppercase tracking-[0.3em] text-center">
-                  Fuel Delta
+                  {t('fuelDelta')}
                 </th>
                 <th className="px-6 md:px-12 py-6 md:py-10 text-[10px] md:text-[12px] font-black text-gray-400 uppercase tracking-[0.3em] text-right">
-                  Timestamp
+                  {t('timestamp')}
                 </th>
               </tr>
             </thead>
@@ -304,7 +313,7 @@ function AuthenticatedDashboard({
                       {format(new Date(mission.createdAt), 'dd MMM · HH:mm')}
                     </div>
                     <div className="text-[8px] md:text-[10px] text-gray-400 uppercase font-black tracking-widest mt-1 md:mt-2 flex items-center justify-end gap-1 md:gap-2">
-                      <Shield className="w-2 md:w-3 h-2 md:h-3 text-emerald-500" /> VERIFIED
+                      <Shield className="w-2 md:w-3 h-2 md:h-3 text-emerald-500" /> {t('verified')}
                     </div>
                   </td>
                 </motion.tr>
@@ -316,10 +325,10 @@ function AuthenticatedDashboard({
                       <Target className="w-24 h-24 group-hover:scale-110 transition-transform duration-1000" />
                       <div className="space-y-2">
                         <p className="text-3xl font-black uppercase italic tracking-tighter">
-                          Sector Silence Detected.
+                          {t('sectorSilence')}
                         </p>
                         <p className="text-xs font-black uppercase tracking-[0.4em]">
-                          Establish Initial Mission Flow
+                          {t('establishFlow')}
                         </p>
                       </div>
                     </div>

@@ -1,0 +1,53 @@
+﻿[96msrc/lib/geo/geo-engine.ts[0m:[93m145[0m:[93m13[0m - [91merror[0m[90m TS2739: [0mType '{ score: number; issues: never[]; nameConsistency: boolean; addressConsistency: boolean; phoneConsistency: boolean; }' is missing the following properties from type 'NAPAnalysis': consistency, recommendations
+
+[7m145[0m             napAnalysis,
+[7m   [0m [91m            ~~~~~~~~~~~[0m
+
+  [96msrc/lib/geo/types.ts[0m:[93m24[0m:[93m5[0m
+    [7m24[0m     napAnalysis: NAPAnalysis;
+    [7m  [0m [96m    ~~~~~~~~~~~[0m
+    The expected type comes from property 'napAnalysis' which is declared here on type 'GEOAnalysisResult'
+
+[96msrc/lib/geo/geo-engine.ts[0m:[93m146[0m:[93m13[0m - [91merror[0m[90m TS2739: [0mType '{ score: number; total: number; verified: number; missing: number; inconsistent: number; missingDirectories: string[]; }' is missing the following properties from type 'CitationAnalysis': consistent, citations
+
+[7m146[0m             citationAnalysis,
+[7m   [0m [91m            ~~~~~~~~~~~~~~~~[0m
+
+  [96msrc/lib/geo/types.ts[0m:[93m25[0m:[93m5[0m
+    [7m25[0m     citationAnalysis: CitationAnalysis;
+    [7m  [0m [96m    ~~~~~~~~~~~~~~~~[0m
+    The expected type comes from property 'citationAnalysis' which is declared here on type 'GEOAnalysisResult'
+
+[96msrc/lib/geo/geo-engine.ts[0m:[93m147[0m:[93m13[0m - [91merror[0m[90m TS2739: [0mType '{ hasLocalBusiness: boolean; score: number; completeness: { completenessPercentage: number; missingFields: string[]; }; }' is missing the following properties from type 'LocalSchemaAnalysis': schemaTypes, issues, recommendations
+
+[7m147[0m             localSchema,
+[7m   [0m [91m            ~~~~~~~~~~~[0m
+
+  [96msrc/lib/geo/types.ts[0m:[93m26[0m:[93m5[0m
+    [7m26[0m     localSchema: LocalSchemaAnalysis;
+    [7m  [0m [96m    ~~~~~~~~~~~[0m
+    The expected type comes from property 'localSchema' which is declared here on type 'GEOAnalysisResult'
+
+[96msrc/lib/geo/geo-engine.ts[0m:[93m148[0m:[93m13[0m - [91merror[0m[90m TS2739: [0mType '{ hasEmbeddedMap: boolean; hasDirectionsLink: boolean; score: number; }' is missing the following properties from type 'MapsIntegrationAnalysis': hasStoreLocator, issues, recommendations
+
+[7m148[0m             mapsIntegration,
+[7m   [0m [91m            ~~~~~~~~~~~~~~~[0m
+
+  [96msrc/lib/geo/types.ts[0m:[93m27[0m:[93m5[0m
+    [7m27[0m     mapsIntegration: MapsIntegrationAnalysis;
+    [7m  [0m [96m    ~~~~~~~~~~~~~~~[0m
+    The expected type comes from property 'mapsIntegration' which is declared here on type 'GEOAnalysisResult'
+
+[96msrc/lib/geo/geo-engine.ts[0m:[93m149[0m:[93m74[0m - [91merror[0m[90m TS2739: [0mType '{ overall: number; }' is missing the following properties from type 'RankingFactors': distance, relevance, prominence, optimization
+
+[7m149[0m             rankingPrediction: { ...rankingPrediction, improvements: [], factors: { overall: 70 } },
+[7m   [0m [91m                                                                         ~~~~~~~[0m
+
+  [96msrc/lib/geo/types.ts[0m:[93m278[0m:[93m5[0m
+    [7m278[0m     factors: RankingFactors;
+    [7m   [0m [96m    ~~~~~~~[0m
+    The expected type comes from property 'factors' which is declared here on type 'RankingPrediction'
+
+
+Found 5 errors in the same file, starting at: src/lib/geo/geo-engine.ts[90m:145[0m
+

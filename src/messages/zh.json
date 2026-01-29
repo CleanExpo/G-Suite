@@ -1,0 +1,49 @@
+{
+    "Mission": {
+        "title": "初始化任务",
+        "description": "目标描述",
+        "placeholder": "例如：'扫描市场中关于 G-Pilot 的提法，并起草一份回复蓝图...'",
+        "launching": "正在执行协议",
+        "deploy": "部署任务",
+        "cancel": "取消",
+        "encrypted": "输入已加密",
+        "version": "编排器 v4.2 · 安全联动"
+    },
+    "Dashboard": {
+        "title": "战术仪表板",
+        "description": "初始化高保真推理群。",
+        "fuelReserve": "任务燃料储备",
+        "commandLaunchpad": "指挥发射台",
+        "deployMission": "部署新任务",
+        "ignite": "点火",
+        "fleetStatus": "舰队就绪节点",
+        "archive": "任务归档分类账",
+        "statusSyncing": "正在同步任务分类账",
+        "coreActive": "G-PILOT 核心 v7.2 活跃",
+        "uplinkInvalid": "上行链路无效。",
+        "noLedger": "在当前扇区未检测到活跃的计费分类账。请初始化安全信用通道以开始部署。",
+        "initializeVault": "初始化保管库",
+        "estimatedValue": "预估扇区价值",
+        "vaultActive": "AES-256 保管库活跃",
+        "globalTelemetrySync": "全局遥测同步：稳定",
+        "deploymentProfile": "部署配置",
+        "fuelDelta": "燃料增量",
+        "timestamp": "时间戳",
+        "sectorSilence": "检测到扇区静默。",
+        "establishFlow": "建立初始任务流",
+        "verified": "已验证"
+    },
+    "Landing": {
+        "badge": "通往 AI 精通的终极桥梁",
+        "title1": "使用 G-Pilot",
+        "title2": "架构您的未来。",
+        "description": "唯一一个将 20 多个 Google AI Studio 工具无缝集成到统一工作流中的平台。无需学习曲线，即可掌握创新。",
+        "cta": "立即释放 G-Pilot",
+        "secondaryCta": "探索生态系统"
+    },
+    "Common": {
+        "loading": "正在同步 G-Pilot 核心...",
+        "verified": "已验证",
+        "system": "系统"
+    }
+}

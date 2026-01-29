@@ -10,6 +10,7 @@ export type AgentMode = 'PLANNING' | 'EXECUTION' | 'VERIFICATION';
 export interface AgentContext {
     userId: string;
     mission: string;
+    locale?: string; // Phase 11: Multi-language support
     previousResults?: AgentResult[];
     config?: Record<string, unknown>;
     onStream?: (chunk: string) => void; // Support for streaming logs

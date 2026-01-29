@@ -1,6 +1,7 @@
 'use server';
 
 import prisma from '@/prisma';
+import { Prisma } from '@prisma/client';
 import { getAuthUserIdOrDev } from '@/lib/supabase/auth';
 
 export interface MissionHistoryItem {
@@ -64,5 +65,40 @@ export async function getFleetStats() {
             totalFuelConsumed: 0,
             activeAgents: 5
         };
+    }
+}
+/**
+ * Fetch the most recent high-fidelity mission dossier.
+ */
+export async function getLatestReport() {
+    const userId = await getAuthUserIdOrDev();
+
+    try {
+        const latest = await prisma.mission.findFirst({
+            where: {
+                userId,
+                status: 'COMPLETED',
+                result: { not: Prisma.JsonNull }
+            },
+            orderBy: { createdAt: 'desc' }
+        });
+
+        if (!latest || !latest.result) return null;
+
+        // Extract metadata for the dashboard
+        const data = (latest.result as any).data || {};
+        const artifacts = (latest.result as any).artifacts || [];
+
+        return {
+            id: latest.id,
+            mission: latest.id, // Using ID as name
+            summary: data.message || 'Mission Objective Neutralized.',
+            score: 94, // Mock score for design consistency, real score from ReportGenerator in future
+            timestamp: latest.createdAt,
+            artifactCount: artifacts.length,
+            previewUrl: artifacts[0]?.value || null
+        };
+    } catch (error) {
+        return null;
     }
 }

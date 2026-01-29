@@ -5,6 +5,7 @@ import { X, Send, Loader2, Rocket, Target, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useChat } from '@ai-sdk/react';
 import { DefaultChatTransport } from 'ai';
+import { useTranslations } from 'next-intl';
 
 interface MissionModalProps {
   isOpen: boolean;
@@ -19,6 +20,7 @@ export default function MissionModal({
   onSuccess,
   initialInput,
 }: MissionModalProps) {
+  const t = useTranslations('Mission');
   const [input, setInput] = useState('');
 
   const transport = useMemo(() => new DefaultChatTransport({
@@ -95,10 +97,10 @@ export default function MissionModal({
                 </div>
                 <div>
                   <h2 className="text-2xl font-black italic uppercase tracking-tighter dark:text-white">
-                    Initialize <span className="text-blue-600">Mission</span>
+                    {t('title').split(' ')[0]} <span className="text-blue-600">{t('title').split(' ').slice(1).join(' ')}</span>
                   </h2>
                   <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest mt-1">
-                    Orchestrator v4.2 · Secure Linkage
+                    {t('version')}
                   </p>
                 </div>
               </div>
@@ -116,16 +118,16 @@ export default function MissionModal({
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] flex items-center gap-2">
-                      <Target className="w-3 h-3 text-blue-600" /> Objective Description
+                      <Target className="w-3 h-3 text-blue-600" /> {t('description')}
                     </label>
                     <span className="text-[10px] font-black text-emerald-500 uppercase">
-                      Input Encrypted
+                      {t('encrypted')}
                     </span>
                   </div>
                   <textarea
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
-                    placeholder="e.g., 'Scan the market for G-Pilot mentions and draft a response blueprint...'"
+                    placeholder={t('placeholder')}
                     className="w-full h-48 bg-gray-50 dark:bg-white/[0.02] border border-gray-100 dark:border-white/10 rounded-3xl p-8 text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-blue-600/50 transition-all leading-relaxed text-lg resize-none"
                   />
                 </div>
@@ -168,7 +170,7 @@ export default function MissionModal({
                   disabled={isLaunching}
                   className={`flex-1 h-16 rounded-2xl font-black text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all uppercase tracking-widest text-xs ${isLaunching ? 'opacity-0 pointer-events-none' : ''}`}
                 >
-                  Cancel
+                  {t('cancel')}
                 </button>
                 <button
                   onClick={handleLaunch}
@@ -177,11 +179,11 @@ export default function MissionModal({
                 >
                   {isLaunching ? (
                     <span className="flex items-center gap-2">
-                      EXECUTING PROTOCOL <span className="animate-pulse">...</span>
+                      {t('launching')} <span className="animate-pulse">...</span>
                     </span>
                   ) : (
                     <>
-                      Deploy Mission{' '}
+                      {t('deploy')}{' '}
                       <Send className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                     </>
                   )}

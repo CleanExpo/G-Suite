@@ -4,6 +4,7 @@ import { Rocket, Shield, Globe, Zap, Cpu, ShoppingCart, Share2, Activity } from 
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { getFleetStats } from '@/actions/mission-history';
+import { useTranslations } from 'next-intl';
 
 export function FleetStatus() {
   const [stats, setStats] = useState({
@@ -12,18 +13,19 @@ export function FleetStatus() {
     totalFuelConsumed: 0,
     activeAgents: 5
   });
+  const t = useTranslations('FleetStatus');
 
   useEffect(() => {
     getFleetStats().then(setStats);
   }, []);
 
   const systems = [
-    { name: 'Architect', status: 'READY', icon: Cpu, color: 'text-blue-600' },
-    { name: 'Executor', status: 'STANDBY', icon: Rocket, color: 'text-amber-500' },
-    { name: 'The Vault', status: 'ENCRYPTED', icon: Shield, color: 'text-emerald-500' },
-    { name: 'The Mirror', status: 'SYNCED', icon: Globe, color: 'text-indigo-500' },
-    { name: 'Commerce', status: 'ACTIVE', icon: ShoppingCart, color: 'text-rose-500' },
-    { name: 'Social Swarm', status: 'LINKED', icon: Share2, color: 'text-sky-500' },
+    { name: t('systems.architect'), status: t('statuses.ready'), icon: Cpu, color: 'text-blue-600' },
+    { name: t('systems.executor'), status: t('statuses.standby'), icon: Rocket, color: 'text-amber-500' },
+    { name: t('systems.vault'), status: t('statuses.encrypted'), icon: Shield, color: 'text-emerald-500' },
+    { name: t('systems.mirror'), status: t('statuses.synced'), icon: Globe, color: 'text-indigo-500' },
+    { name: t('systems.commerce'), status: t('statuses.active'), icon: ShoppingCart, color: 'text-rose-500' },
+    { name: t('systems.social'), status: t('statuses.linked'), icon: Share2, color: 'text-sky-500' },
   ];
 
   return (
@@ -31,25 +33,25 @@ export function FleetStatus() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
         <div>
           <h3 className="text-gray-400 dark:text-gray-500 text-[10px] font-black uppercase tracking-[0.3em] mb-4">
-            Fleet Operational Status
+            {t('title')}
           </h3>
           <h2 className="text-4xl font-black italic uppercase tracking-tighter text-gray-900 dark:text-white leading-none">
-            System Readiness
+            {t('subtitle')}
           </h2>
         </div>
 
         {/* Real Metrics */}
         <div className="flex gap-8">
           <div className="space-y-1">
-            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Total Missions</p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">{t('totalMissions')}</p>
             <p className="text-2xl font-black text-gray-900 dark:text-white leading-none">{stats.totalMissions}</p>
           </div>
           <div className="space-y-1">
-            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Success Rate</p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">{t('successRate')}</p>
             <p className="text-2xl font-black text-emerald-500 leading-none">{stats.successRate.toFixed(1)}%</p>
           </div>
           <div className="space-y-1">
-            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Fuel Consumed</p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">{t('fuelConsumed')}</p>
             <p className="text-2xl font-black text-blue-600 leading-none">{stats.totalFuelConsumed} PTS</p>
           </div>
         </div>
@@ -79,8 +81,8 @@ export function FleetStatus() {
       </div>
 
       <div className="pt-8 border-t border-gray-100 dark:border-white/5 flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-gray-400">
-        <span>Orchestrator Version: v9.42</span>
-        <span className="text-blue-600 italic">Global Mesh Stable</span>
+        <span>{t('version')}</span>
+        <span className="text-blue-600 italic">{t('meshStable')}</span>
       </div>
     </div>
   );

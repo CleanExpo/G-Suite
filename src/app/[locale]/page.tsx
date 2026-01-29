@@ -6,6 +6,7 @@ import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import { Navbar } from '@/components/navbar';
 import { useRef, Suspense } from 'react';
+import { useTranslations } from 'next-intl';
 
 // Dynamic imports for below-the-fold heavy components - significantly improves initial load
 const MissionShowcase = dynamic(() => import('@/components/mission-showcase').then(mod => ({ default: mod.MissionShowcase })), {
@@ -37,7 +38,8 @@ const MissionSimulator = dynamic(() => import('@/components/ui/mission-simulator
 });
 
 
-export default function LandingPage() {
+export default function LandingPage({ params }: { params: Promise<{ locale: string }> }) {
+  const t = useTranslations('Landing');
   const targetRef = useRef(null);
   const { scrollYProgress } = useScroll({
     target: targetRef,
@@ -75,31 +77,30 @@ export default function LandingPage() {
           >
             <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-blue-50/50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 text-sm font-black uppercase tracking-[0.3em] border border-blue-100/50 dark:border-blue-800 shadow-[0_0_20px_rgba(37,99,235,0.1)] backdrop-blur-md">
               <div className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
-              The Ultimate Bridge for AI Mastery
+              {t('badge')}
             </div>
 
             <h1 className="text-4xl md:text-7xl lg:text-[9rem] font-black tracking-tighter text-gray-900 dark:text-white leading-[0.8] uppercase group font-tactical italic">
-              Architect Your <br className="hidden md:block" />
+              {t('title1')} <br className="hidden md:block" />
               <span className="text-blue-600 transition-colors font-serif-emphasis normal-case drop-shadow-2xl">
-                Future with G-Pilot.
+                {t('title2')}
               </span>
             </h1>
 
             <p className="text-lg md:text-xl lg:text-3xl text-gray-600 dark:text-gray-400 leading-relaxed font-medium max-w-xl">
-              The only platform that seamlessly integrates 20+ Google AI Studio tools into one unified workflow.{' '}
-              <span className="text-blue-600 font-bold underline decoration-blue-600/20 underline-offset-8">Master innovation</span> without the learning curve.
+              {t('description')}
             </p>
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-8 pt-6">
               <Link href="/sign-in">
                 <button className="h-16 md:h-24 px-8 md:px-14 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl md:rounded-[2.5rem] font-black text-lg md:text-2xl shadow-[0_20px_60px_rgba(37,99,235,0.4)] flex items-center justify-center gap-4 transition-all hover:scale-105 active:scale-95 group relative overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                  Unleash G-Pilot Now
+                  {t('cta')}
                 </button>
               </Link>
               <Link href="/abilities" className="w-full sm:w-auto">
                 <button className="h-16 md:h-24 w-full px-8 md:px-12 rounded-2xl md:rounded-[2.5rem] font-black text-lg md:text-xl text-gray-500 hover:text-gray-900 dark:hover:text-white transition-all flex items-center justify-center gap-3 border-4 border-transparent hover:border-blue-600/10">
-                  Explore Ecosystem
+                  {t('secondaryCta')}
                 </button>
               </Link>
             </div>

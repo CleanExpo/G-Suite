@@ -9,7 +9,7 @@
 
 import { adminFirestore, adminMessaging } from '@/lib/firebase-admin';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { app } from '@/lib/firebase';
+import { getFirebaseApp } from '@/lib/firebase';
 import { Timestamp, FieldValue } from 'firebase-admin/firestore';
 
 // =============================================================================
@@ -114,7 +114,7 @@ export async function uploadToStorage(
     contentType: string
 ): Promise<{ success: boolean; url?: string; error?: string }> {
     try {
-        const storage = getStorage(app);
+        const storage = getStorage(getFirebaseApp());
         const storageRef = ref(storage, `users/${userId}/outputs/${fileName}`);
 
         await uploadBytes(storageRef, fileBuffer, {

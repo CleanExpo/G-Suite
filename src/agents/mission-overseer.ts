@@ -118,6 +118,12 @@ export class MissionOverseerAgent extends BaseAgent {
         } else if (mission.includes('seo')) {
             missionType = 'seo';
             suggestedAgents = ['seo-analyst'];
+        } else if (mission.includes('local') || mission.includes('rank') || mission.includes('geo')) {
+            missionType = 'geo';
+            suggestedAgents = ['geo-marketing-agent'];
+        } else if (mission.includes('invoice') || mission.includes('receipt') || mission.includes('contract') || mission.includes('document')) {
+            missionType = 'document';
+            suggestedAgents = ['document-processor'];
         }
 
         // Query historical patterns (Phase 4)
@@ -161,6 +167,8 @@ export class MissionOverseerAgent extends BaseAgent {
         if (lower.includes('research')) return 'research';
         if (lower.includes('presentation')) return 'presentation';
         if (lower.includes('video')) return 'video';
+        if (lower.includes('geo') || lower.includes('local')) return 'geo';
+        if (lower.includes('document') || lower.includes('invoice')) return 'document';
 
         return 'general';
     }

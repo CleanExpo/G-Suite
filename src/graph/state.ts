@@ -8,6 +8,8 @@ export const ProjectState = Annotation.Root({
   userRequest: Annotation<string>(),
   // The clerk user ID (internal)
   userId: Annotation<string>(),
+  // The user locale preference
+  locale: Annotation<string>(),
   // The generated JSON specification for the task
   spec: Annotation<any>(),
   // Status of the workflow

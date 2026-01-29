@@ -1,0 +1,49 @@
+{
+    "Mission": {
+        "title": "Mission initialisieren",
+        "description": "Objektive Beschreibung",
+        "placeholder": "z.B. 'Scanne den Markt nach G-Pilot-Erwähnungen und entwirfe einen Antwortplan...'",
+        "launching": "PROTOKOLL WIRD AUSGEFÜHRT",
+        "deploy": "Mission starten",
+        "cancel": "Abbrechen",
+        "encrypted": "Eingabe verschlüsselt",
+        "version": "Orchestrator v4.2 · Sichere Verbindung"
+    },
+    "Dashboard": {
+        "title": "Taktisches Dashboard",
+        "description": "Initialisiere hochpräzise Reasoning-Swarms.",
+        "fuelReserve": "Missions-Kraftstoffreserve",
+        "commandLaunchpad": "Kommando-Startrampe",
+        "deployMission": "Neue Mission starten",
+        "ignite": "ZÜNDUNG",
+        "fleetStatus": "Flottenbereitschafts-Knoten",
+        "archive": "Missionsarchiv-Ledger",
+        "statusSyncing": "Synchronisiere Missions-Ledger",
+        "coreActive": "G-PILOT CORE v7.2 AKTIV",
+        "uplinkInvalid": "Uplink ungültig.",
+        "noLedger": "Kein aktives Abrechnungs-Ledger im aktuellen Sektor erkannt. Initialisieren Sie Ihren sicheren Kredit-Tunnel, um mit dem Einsatz zu beginnen.",
+        "initializeVault": "Tresor initialisieren",
+        "estimatedValue": "Geschätzter Sektorwert",
+        "vaultActive": "AES-256 Tresor aktiv",
+        "globalTelemetrySync": "Globale Telemetrie-Synchronisation: Stabil",
+        "deploymentProfile": "Einsatzprofil",
+        "fuelDelta": "Kraftstoff-Delta",
+        "timestamp": "Zeitstempel",
+        "sectorSilence": "Sektorstille erkannt.",
+        "establishFlow": "Initialen Missionsfluss etablieren",
+        "verified": "VERIFIZIERT"
+    },
+    "Landing": {
+        "badge": "Die ultimative Brücke zur KI-Meisterschaft",
+        "title1": "Architektieren Sie Ihre",
+        "title2": "Zukunft mit G-Pilot.",
+        "description": "Die einzige Plattform, die über 20 Google AI Studio-Tools nahtlos in einen einheitlichen Workflow integriert. Meistern Sie Innovationen ohne Lernkurve.",
+        "cta": "G-Pilot jetzt entfesseln",
+        "secondaryCta": "Ökosystem erkunden"
+    },
+    "Common": {
+        "loading": "G-Pilot Core synchronisieren...",
+        "verified": "VERIFIZIERT",
+        "system": "SYSTEM"
+    }
+}

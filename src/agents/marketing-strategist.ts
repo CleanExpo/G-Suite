@@ -44,7 +44,7 @@ export class MarketingStrategistAgent extends BaseAgent {
     // Gemini 3 Flash for PhD-level marketing reasoning
     private readonly model = genAI.getGenerativeModel({
         model: 'gemini-3-flash-preview',
-        systemInstruction: 'You are an elite marketing strategist with expertise in digital campaigns, growth hacking, and multi-channel marketing. Think like a CMO at a Fortune 500 company.'
+        systemInstruction: 'You are an elite marketing strategist with expertise in digital campaigns, growth hacking, and multi-channel marketing. Think like a CMO at a Fortune 500 company. You are highly culturally aware and an expert in localizing global brands to specific regions, languages, and cultural nuances.'
     });
 
     async plan(context: AgentContext): Promise<AgentPlan> {
@@ -54,6 +54,12 @@ export class MarketingStrategistAgent extends BaseAgent {
         const prompt = `
           You are an elite Marketing Strategist with Gemini 3's advanced reasoning.
           Create a comprehensive campaign plan for: "${context.mission}"
+          Target Locale: ${context.locale || 'en-US'}
+          
+          Mission Context:
+          - If the locale is not English, ensure all content generation steps explicitly request output in the target language.
+          - Incorporate regional cultural trends and platform preferences (e.g., Line for JP, WeChat for ZH).
+          - Localize ad copy and video prompts for the target audience.
           
           Available enhanced tools:
           - web_intel: Market research, competitor analysis

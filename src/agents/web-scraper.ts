@@ -3,7 +3,7 @@
  * 
  * Enterprise web scraping agent with anti-block handling,
  * intelligent extraction, and structured data output.
- * Implements Bright Data-style web access capabilities.
+ * Implements Jina AI Reader for AI-friendly content extraction.
  */
 
 import {
@@ -15,9 +15,11 @@ import {
     PlanStep
 } from './base';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { getJinaClient, JinaReaderResult } from '../lib/jina/client';
+import { brandExtractor } from '../lib/brand/extractor';
 
 // Scraping mode configuration
-type ScrapingMode = 'gentle' | 'standard' | 'aggressive' | 'burst';
+type ScrapingMode = 'gentle' | 'standard' | 'aggressive' | 'burst' | 'jina_reader';
 
 // Scraping target
 interface ScrapeTarget {
@@ -27,6 +29,7 @@ interface ScrapeTarget {
         type: 'next' | 'infinite' | 'numbered';
         maxPages: number;
     };
+    extractBrand?: boolean; // New flag for brand extraction
 }
 
 // Extracted data item
@@ -37,6 +40,7 @@ interface ExtractedItem {
         scrapedAt: number;
         responseTime: number;
         statusCode: number;
+        engine: 'native' | 'jina';
     };
 }
 
@@ -59,15 +63,15 @@ const genAI = new GoogleGenerativeAI(
 
 export class WebScraperAgent extends BaseAgent {
     readonly name = 'web-scraper';
-    readonly description = 'Enterprise web scraping with anti-block handling and intelligent extraction';
+    readonly description = 'Enterprise web scraping with Jina AI integration for brand extraction';
     readonly capabilities = [
         'url_crawling',
         'content_extraction',
         'structured_data',
         'anti_block_handling',
         'pagination_support',
-        'rate_limiting',
-        'data_transformation'
+        'jina_reader',      // New capability
+        'brand_analysis'    // New capability
     ];
     readonly requiredSkills = [
         'web_unlocker',
@@ -82,23 +86,19 @@ export class WebScraperAgent extends BaseAgent {
             gentle: { requestsPerSecond: 0.2, concurrent: 2 },
             standard: { requestsPerSecond: 1, concurrent: 5 },
             aggressive: { requestsPerSecond: 10, concurrent: 20 },
-            burst: { requestsPerSecond: 50, concurrent: 50 }
+            burst: { requestsPerSecond: 50, concurrent: 50 },
+            jina_reader: { requestsPerSecond: 5, concurrent: 10 } // Jina is fast
         },
-        defaultMode: 'standard' as ScrapingMode,
-        userAgents: [
-            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
-            'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36'
-        ],
+        defaultMode: 'jina_reader' as ScrapingMode, // Default to Jina for better quality
         retryAttempts: 3,
         timeout: 30000
     };
 
     // Gemini 3 for intelligent extraction
-    private readonly model = genAI.getGenerativeModel({
-        model: 'gemini-3-flash-preview',
-        systemInstruction: 'You are a data extraction specialist. Analyze web pages and extract structured data.'
-    });
+    private readonly model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+
+    // Jina Client
+    private readonly jina = getJinaClient();
 
     // Current job state
     private currentJob?: ScrapeJobResult;
@@ -109,10 +109,16 @@ export class WebScraperAgent extends BaseAgent {
     private parseTargets(context: AgentContext): ScrapeTarget[] {
         const urlMatches = context.mission.match(/https?:\/\/[^\s]+/g) || [];
 
+        // Detect if brand extraction is requested
+        const extractBrand = context.mission.toLowerCase().includes('brand') ||
+            context.mission.toLowerCase().includes('style') ||
+            context.mission.toLowerCase().includes('color');
+
         return urlMatches.map(url => ({
             url,
             selectors: context.config?.selectors as Record<string, string> | undefined,
-            pagination: context.config?.pagination as ScrapeTarget['pagination']
+            pagination: context.config?.pagination as ScrapeTarget['pagination'],
+            extractBrand
         }));
     }
 
@@ -133,60 +139,19 @@ export class WebScraperAgent extends BaseAgent {
             const text = result.response.text().replace(/```json|```/gi, '').trim();
             return JSON.parse(text);
         } catch {
-            // Fallback to common selectors
             return {
                 title: 'h1, .title, [data-title]',
-                description: 'meta[name="description"], .description',
-                price: '.price, [data-price]',
-                image: 'img[src], meta[property="og:image"]'
+                description: 'meta[name="description"], .description'
             };
         }
     }
 
     /**
-     * Simulate fetching a page with anti-block measures
+     * Fetch page using Jina Reader
      */
-    private async fetchPage(url: string, mode: ScrapingMode): Promise<{
-        success: boolean;
-        html?: string;
-        statusCode: number;
-        responseTime: number;
-    }> {
-        const startTime = Date.now();
-
-        this.log(`Fetching: ${url} (mode: ${mode})`);
-
-        // Simulate network request with mode-based delay
-        const delay = 1000 / this.config.modes[mode].requestsPerSecond;
-        await new Promise(resolve => setTimeout(resolve, Math.min(delay, 2000)));
-
-        // In production, this would use actual HTTP client with:
-        // - Proxy rotation
-        // - User-agent cycling
-        // - Cookie handling
-        // - CAPTCHA solving integration
-
-        return {
-            success: true,
-            html: `<html><body><h1>Scraped Content</h1><p>Data from ${url}</p></body></html>`,
-            statusCode: 200,
-            responseTime: Date.now() - startTime
-        };
-    }
-
-    /**
-     * Extract data from HTML using selectors
-     */
-    private extractData(html: string, selectors: Record<string, string>): Record<string, unknown> {
-        // In production, this would use cheerio or jsdom
-        const extracted: Record<string, unknown> = {};
-
-        for (const [field, selector] of Object.entries(selectors)) {
-            // Simulate extraction
-            extracted[field] = `[Extracted ${field} using ${selector}]`;
-        }
-
-        return extracted;
+    private async fetchWithJina(url: string): Promise<JinaReaderResult> {
+        this.log(`🚀 Jina Reader: Processing ${url}...`);
+        return await this.jina.read(url, { withImagesSummary: true });
     }
 
     /**
@@ -198,16 +163,14 @@ export class WebScraperAgent extends BaseAgent {
 
         const targets = this.parseTargets(context);
         const mode = (context.config?.mode as ScrapingMode) || this.config.defaultMode;
-        const dataFields = (context.config?.fields as string[]) || ['title', 'description', 'price'];
 
         if (targets.length === 0) {
-            // No URLs provided, generate discovery plan
             return {
                 steps: [{
                     id: 'discover',
                     action: 'Discover URLs from mission description',
                     tool: 'web_crawler',
-                    payload: { query: context.mission, maxUrls: 10 }
+                    payload: { query: context.mission, maxUrls: 5 }
                 }],
                 estimatedCost: 25,
                 requiredSkills: this.requiredSkills,
@@ -217,53 +180,47 @@ export class WebScraperAgent extends BaseAgent {
 
         const steps: PlanStep[] = [];
 
-        // Step 1: Generate selectors if not provided
-        if (!targets[0].selectors) {
-            steps.push({
-                id: 'generate_selectors',
-                action: 'AI-generate extraction selectors',
-                tool: 'gemini_3_flash',
-                payload: { url: targets[0].url, fields: dataFields }
-            });
-        }
-
-        // Step 2: Scrape each target
         for (let i = 0; i < targets.length; i++) {
+            // Step 1: Fetch Content (Jina or Native)
             steps.push({
-                id: `scrape_${i}`,
-                action: `Scrape: ${targets[i].url.substring(0, 50)}...`,
-                tool: 'web_unlocker',
-                payload: { url: targets[i].url, mode },
-                dependencies: targets[i].selectors ? [] : ['generate_selectors']
+                id: `fetch_${i}`,
+                action: `Fetch content: ${targets[i].url.substring(0, 40)}...`,
+                tool: mode === 'jina_reader' ? 'jina_reader' : 'web_unlocker',
+                payload: { url: targets[i].url }
             });
 
-            steps.push({
-                id: `extract_${i}`,
-                action: `Extract structured data from page ${i + 1}`,
-                tool: 'structured_scraper',
-                payload: { pageIndex: i },
-                dependencies: [`scrape_${i}`]
-            });
+            // Step 2: Extract Brand DNA (if requested)
+            if (targets[i].extractBrand) {
+                steps.push({
+                    id: `analyze_brand_${i}`,
+                    action: 'Extract Brand DNA (Colors, Fonts, Vibe)',
+                    tool: 'brand_extractor',
+                    payload: { url: targets[i].url },
+                    dependencies: [`fetch_${i}`]
+                });
+            }
+
+            // Step 3: Extract Specific Data (if selectors provided or inferred)
+            if (targets[i].selectors || !targets[i].extractBrand) {
+                steps.push({
+                    id: `extract_data_${i}`,
+                    action: 'Extract structured data',
+                    tool: 'structured_scraper',
+                    payload: { pageIndex: i },
+                    dependencies: [`fetch_${i}`]
+                });
+            }
         }
 
-        // Step 3: Archive results
-        steps.push({
-            id: 'archive',
-            action: 'Archive scraped data',
-            tool: 'data_archive',
-            payload: { format: 'json' },
-            dependencies: targets.map((_, i) => `extract_${i}`)
-        });
-
-        // Calculate cost based on targets and mode
+        // Calculate Cost (Jina is premium)
         const baseCost = 10;
-        const perUrlCost = mode === 'burst' ? 5 : mode === 'aggressive' ? 3 : 2;
+        const perUrlCost = mode === 'jina_reader' ? 5 : 2;
 
         return {
             steps,
             estimatedCost: baseCost + (targets.length * perUrlCost),
             requiredSkills: this.requiredSkills,
-            reasoning: `Scraping ${targets.length} URL(s) in ${mode} mode with ${dataFields.length} fields`
+            reasoning: `Processing ${targets.length} URLs using ${mode} engine.${targets[0]?.extractBrand ? ' Brand analysis enabled.' : ''}`
         };
     }
 
@@ -283,83 +240,79 @@ export class WebScraperAgent extends BaseAgent {
             jobId: `scrape_${Date.now()}`,
             status: 'completed',
             items: [],
-            stats: {
-                urlsProcessed: 0,
-                successCount: 0,
-                failCount: 0,
-                totalTime: 0
-            }
+            stats: { urlsProcessed: 0, successCount: 0, failCount: 0, totalTime: 0 }
         };
 
         const artifacts: AgentResult['artifacts'] = [];
-        let selectors: Record<string, string> = {};
+
+        // Storage for fetched content to pass between steps
+        const contentCache: Record<string, string> = {};
 
         try {
-            // Execute each step
             for (const step of plan.steps) {
                 this.log(`Executing: ${step.action}`);
+                const stepStartTime = Date.now();
 
-                if (step.tool === 'gemini_3_flash' || step.id === 'generate_selectors') {
-                    // Generate selectors with AI
-                    const fields = step.payload.fields as string[] || ['title', 'description'];
-                    selectors = await this.generateSelectors(step.payload.url as string, fields);
-                    artifacts.push({
-                        type: 'data',
-                        name: 'selectors',
-                        value: selectors
-                    });
-                }
-                else if (step.tool === 'web_unlocker') {
-                    // Fetch page
+                // --- TOOL: JINA READER ---
+                if (step.tool === 'jina_reader') {
                     const url = step.payload.url as string;
-                    const result = await this.fetchPage(url, mode);
+                    try {
+                        const result = await this.fetchWithJina(url);
+                        contentCache[url] = result.content; // Store markdown for analysis
 
-                    this.currentJob.stats.urlsProcessed++;
-
-                    if (result.success) {
+                        this.currentJob.stats.urlsProcessed++;
                         this.currentJob.stats.successCount++;
-                    } else {
+
+                        // Store raw Jina result as artifact
+                        artifacts.push({
+                            type: 'data',
+                            name: `jina_raw_${step.id}`,
+                            value: result as any
+                        });
+
+                    } catch (err) {
+                        this.log(`❌ Jina Failed: ${err}`);
                         this.currentJob.stats.failCount++;
                     }
                 }
-                else if (step.tool === 'structured_scraper') {
-                    // Extract data
-                    const pageIndex = step.payload.pageIndex as number;
-                    const target = targets[pageIndex];
 
-                    if (target) {
-                        const extractedData = this.extractData('', target.selectors || selectors);
+                // --- TOOL: BRAND EXTRACTOR ---
+                else if (step.tool === 'brand_extractor') {
+                    const url = step.payload.url as string;
+                    const content = contentCache[url];
 
-                        const item: ExtractedItem = {
-                            url: target.url,
-                            data: extractedData,
-                            metadata: {
-                                scrapedAt: Date.now(),
-                                responseTime: 100,
-                                statusCode: 200
-                            }
-                        };
-
-                        this.currentJob.items.push(item);
+                    if (content) {
+                        const brandProfile = await brandExtractor.extract(content, url);
 
                         artifacts.push({
                             type: 'data',
-                            name: `extracted_${pageIndex}`,
-                            value: item as unknown as Record<string, unknown>
+                            name: 'brand_profile',
+                            value: brandProfile as any
+                        });
+
+                        this.log(`🎨 Brand extracted: ${brandProfile.name} (${brandProfile.tone.voice})`);
+
+                        // Add to job items
+                        this.currentJob.items.push({
+                            url,
+                            data: { brandProfile },
+                            metadata: {
+                                scrapedAt: Date.now(),
+                                responseTime: Date.now() - stepStartTime,
+                                statusCode: 200,
+                                engine: 'jina'
+                            }
                         });
                     }
                 }
-                else if (step.tool === 'data_archive') {
-                    // Archive all results
-                    artifacts.push({
-                        type: 'data',
-                        name: 'archive',
-                        value: {
-                            jobId: this.currentJob.jobId,
-                            itemCount: this.currentJob.items.length,
-                            format: step.payload.format
-                        }
-                    });
+
+                // --- TOOL: WEB UNLOCKER (Legacy/Fallback) ---
+                else if (step.tool === 'web_unlocker') {
+                    // ... legacy fetch logic (simplified for this replacement)
+                    this.log('Using legacy fetch (mocked for now)');
+                    contentCache[step.payload.url as string] = "Legacy HTML Content";
+                    this.currentJob.stats.urlsProcessed++;
+                    this.currentJob.stats.successCount++;
                 }
             }
 
@@ -368,7 +321,7 @@ export class WebScraperAgent extends BaseAgent {
             return {
                 success: this.currentJob.stats.failCount === 0,
                 data: {
-                    message: `Scraped ${this.currentJob.stats.successCount} URLs successfully`,
+                    message: `Processed ${this.currentJob.stats.successCount} URLs using ${mode}`,
                     jobId: this.currentJob.jobId,
                     stats: this.currentJob.stats,
                     items: this.currentJob.items
@@ -391,50 +344,27 @@ export class WebScraperAgent extends BaseAgent {
     }
 
     /**
-     * VERIFICATION: Validate scraped data
+     * VERIFICATION: Validate scraper results
      */
     async verify(result: AgentResult, context: AgentContext): Promise<VerificationReport> {
         this.mode = 'VERIFICATION';
-        this.log('✅ Web Scraper: Validating results...');
-
-        const data = result.data as Record<string, unknown> | undefined;
-        const stats = data?.stats as ScrapeJobResult['stats'] | undefined;
-        const items = data?.items as ExtractedItem[] | undefined;
+        const items = (result.data as any)?.items as ExtractedItem[] || [];
 
         return {
-            passed: result.success && (items?.length ?? 0) > 0,
+            passed: result.success && items.length > 0,
             checks: [
                 {
-                    name: 'URLs Processed',
-                    passed: (stats?.urlsProcessed ?? 0) > 0,
-                    message: `${stats?.urlsProcessed ?? 0} URLs processed`
+                    name: 'Content Fetched',
+                    passed: items.length > 0,
+                    message: `${items.length} pages processed`
                 },
                 {
-                    name: 'Success Rate',
-                    passed: (stats?.failCount ?? 0) === 0,
-                    message: `${stats?.successCount ?? 0}/${stats?.urlsProcessed ?? 0} successful`
-                },
-                {
-                    name: 'Data Extracted',
-                    passed: (items?.length ?? 0) > 0,
-                    message: `${items?.length ?? 0} items extracted`
-                },
-                {
-                    name: 'Data Quality',
-                    passed: items?.every(i => Object.keys(i.data).length > 0) ?? false,
-                    message: 'All items have data fields'
+                    name: 'Brand Data (if requested)',
+                    passed: items.every(i => !context.mission.includes('brand') || i.data.brandProfile),
+                    message: 'Brand DNA present in results'
                 }
             ],
-            recommendations: result.success
-                ? ['Review extracted data for accuracy', 'Set up recurring scrape if needed']
-                : ['Check URL accessibility', 'Review selector accuracy', 'Try different scraping mode']
+            recommendations: []
         };
-    }
-
-    /**
-     * Get current job status
-     */
-    getJob(): ScrapeJobResult | undefined {
-        return this.currentJob;
     }
 }

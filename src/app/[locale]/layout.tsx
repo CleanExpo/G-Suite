@@ -1,9 +1,14 @@
 import type { Metadata } from 'next';
 import { Inter, Outfit, DM_Serif_Display } from 'next/font/google';
-import './globals.css';
+import '../globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { AuthProvider } from '@/components/auth/auth-provider';
 import { Footer } from '@/components/footer';
+import { NextIntlClientProvider } from 'next-intl';
+import { getMessages } from 'next-intl/server';
+import { notFound } from 'next/navigation';
+import { routing } from '@/i18n/routing';
+import { setUserLocale } from '@/lib/locale';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const outfit = Outfit({ subsets: ['latin'], variable: '--font-outfit' });
@@ -123,11 +128,28 @@ function DevModeBanner() {
   );
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({
+  children,
+  params
+}: {
+  children: React.ReactNode;
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+
+  // Ensure that the incoming `locale` is valid
+  if (!routing.locales.includes(locale as any)) {
+    notFound();
+  }
+
+  // Update locale cookie for consistency if needed
+  await setUserLocale(locale);
+
+  const messages = await getMessages();
   const showDevBanner = !isSupabaseConfigured;
 
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning>
       <head>
         <script
           type="application/ld+json"
@@ -143,11 +165,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             disableTransitionOnChange
           >
             {showDevBanner && <DevModeBanner />}
-            <div className={showDevBanner ? 'pt-10' : ''}>
-              <SystemBanner />
-              {children}
-              <Footer />
-            </div>
+            <NextIntlClientProvider messages={messages} locale={locale}>
+              <div className={showDevBanner ? 'pt-10' : ''}>
+                <SystemBanner />
+                {children}
+                <Footer />
+              </div>
+            </NextIntlClientProvider>
           </ThemeProvider>
         </AuthProvider>
       </body>

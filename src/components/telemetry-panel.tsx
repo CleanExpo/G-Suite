@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Activity, Globe, Zap, ShieldCheck, BarChart3, Search } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 
 export function TelemetryPanel() {
   const [status, setStatus] = useState('SYNCING');
@@ -12,11 +13,13 @@ export function TelemetryPanel() {
     return () => clearTimeout(timer);
   }, []);
 
+  const t = useTranslations('TelemetryPanel');
+
   const metrics = [
-    { label: 'Search Dominance', value: '84%', icon: Globe, color: 'text-blue-600' },
-    { label: 'Core Web Vitals', value: '98/100', icon: Zap, color: 'text-amber-500' },
-    { label: 'Vault Integrity', value: 'AES-256', icon: ShieldCheck, color: 'text-emerald-500' },
-    { label: 'Conversion Lift', value: '+12.4%', icon: BarChart3, color: 'text-purple-500' },
+    { label: t('metrics.search'), value: '84%', icon: Globe, color: 'text-blue-600' },
+    { label: t('metrics.webVitals'), value: '98/100', icon: Zap, color: 'text-amber-500' },
+    { label: t('metrics.vault'), value: 'AES-256', icon: ShieldCheck, color: 'text-emerald-500' },
+    { label: t('metrics.conversion'), value: '+12.4%', icon: BarChart3, color: 'text-purple-500' },
   ];
 
   return (
@@ -37,7 +40,7 @@ export function TelemetryPanel() {
             </div>
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-[10px] font-black uppercase text-emerald-500">Live</span>
+              <span className="text-[10px] font-black uppercase text-emerald-500">{t('live')}</span>
             </div>
           </div>
           <div className="space-y-1">

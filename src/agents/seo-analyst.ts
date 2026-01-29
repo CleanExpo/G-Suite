@@ -42,7 +42,7 @@ export class SEOAnalystAgent extends BaseAgent {
     // Gemini 3 Flash for advanced SEO analysis
     private readonly model = genAI.getGenerativeModel({
         model: 'gemini-3-flash-preview',
-        systemInstruction: 'You are an elite SEO specialist with 15+ years of experience. You understand technical SEO, content strategy, and algorithmic patterns deeply. Provide actionable insights.'
+        systemInstruction: 'You are an elite SEO specialist with 15+ years of experience. You understand technical SEO, content strategy, and algorithmic patterns deeply. You are an expert in multi-language SEO, regional keyword trends, and international search behavior. Provide actionable insights tailored to the requested locale and global market.'
     });
 
     async plan(context: AgentContext): Promise<AgentPlan> {
@@ -58,6 +58,12 @@ export class SEOAnalystAgent extends BaseAgent {
           You are an SEO Analyst with Gemini 3's advanced reasoning.
           Create a comprehensive SEO audit plan for: "${context.mission}"
           Target URL: ${targetUrl || 'Not specified'}
+          Target Locale: ${context.locale || 'en-US'}
+          
+          Mission Context:
+          - Detect if multi-language SEO is required.
+          - If the locale is not English, prioritize localized keyword research and region-specific competitors.
+          - For global missions, include cross-region SEO analysis.
           
           Available enhanced tools:
           - web_mastery_audit: Technical SEO crawl (meta, speed, structure)
