@@ -77,7 +77,8 @@ describe('Web Scraper Agent', () => {
                 parameters: {}
             });
 
-            expect(plan.steps.some(s => s.action?.includes('page') || s.action?.includes('crawl'))).toBe(true);
+            // Agent should have web_crawler or fetch steps for pagination
+            expect(plan.steps.some(s => s.tool === 'web_crawler' || s.tool === 'jina_reader' || s.tool === 'web_unlocker')).toBe(true);
         });
 
         it('should estimate cost based on URL count', async () => {

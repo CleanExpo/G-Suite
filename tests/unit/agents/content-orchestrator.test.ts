@@ -82,7 +82,8 @@ describe('Content Orchestrator Agent', () => {
                 parameters: {}
             });
 
-            expect(plan.steps.some(s => s.tool === 'deep_research')).toBe(true);
+            // Research missions use notebook_lm_research_with_serp tool
+            expect(plan.steps.some(s => s.tool === 'notebook_lm_research_with_serp')).toBe(true);
         });
 
         it('should always include content strategy step', async () => {

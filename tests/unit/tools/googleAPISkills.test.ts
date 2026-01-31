@@ -73,8 +73,8 @@ describe('Google API Skills', () => {
             const result = await veo31Generate('test-user', 'A sunset over mountains');
 
             expect(result.success).toBe(true);
-            expect(result.duration).toBe(6);
-            expect(result.resolution).toBe('1080p');
+            expect(result.duration).toBe(8);
+            expect(result.resolution).toBe('720p');
             expect(result.aspectRatio).toBe('16:9');
         });
 

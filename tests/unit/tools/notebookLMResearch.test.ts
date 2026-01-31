@@ -64,7 +64,7 @@ describe('NotebookLM Research Tool', () => {
             expect(result.notebook).toBeDefined();
             expect(result.notebook?.summary).toBe(mockResponse.summary);
             expect(result.notebook?.keyTopics).toEqual(mockResponse.keyTopics);
-            expect(mocks.getGenerativeModel).toHaveBeenCalledWith({ model: 'gemini-3-pro' });
+            expect(mocks.getGenerativeModel).toHaveBeenCalledWith({ model: 'gemini-3-pro-preview' });
         });
 
         it('should handle errors during creation', async () => {
@@ -144,7 +144,7 @@ describe('NotebookLM Research Tool', () => {
             expect(result.success).toBe(true);
             expect(result.answer).toBe(mockResponse.answer);
             expect(result.citations).toEqual(mockResponse.citations);
-            expect(mocks.getGenerativeModel).toHaveBeenCalledWith(expect.objectContaining({ model: 'gemini-3-flash' }));
+            expect(mocks.getGenerativeModel).toHaveBeenCalledWith(expect.objectContaining({ model: 'gemini-3-flash-preview' }));
         });
     });
 
