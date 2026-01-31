@@ -28,6 +28,9 @@ yarn-error.log*
 .env.prod
 env.yaml
 
+# Firebase service account (NEVER commit this!)
+firebase-service-account.json
+
 # vercel
 .vercel
 
@@ -42,3 +45,5 @@ next-env.d.ts
 
 # Beads task tracking
 .beads/
+nul
+dev-server.log

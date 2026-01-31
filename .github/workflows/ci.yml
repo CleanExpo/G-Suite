@@ -75,10 +75,11 @@ jobs:
         run: npm ci
       
       - name: Build Next.js
-        run: npm run build
+        run: npm run build:vercel
         env:
           NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
           GOOGLE_API_KEY: placeholder
+          NODE_OPTIONS: '--max-old-space-size=8192'
 
   e2e:
     name: E2E Tests
