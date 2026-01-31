@@ -40,9 +40,15 @@ export class CostCollector {
         const endTime = new Date().toISOString();
         const duration = result.duration || (Date.now() - startMs);
 
-        // Extract token count from result.data if available
-        const data = result.data as Record<string, any> | undefined;
-        const tokens = data?.tokensUsed ?? data?.tokens ?? 0;
+        // Phase 9.2: Extract token count from result.tokensUsed (preferred)
+        // Fall back to result.data.tokensUsed or result.data.tokens for backward compat
+        let tokens = 0;
+        if (result.tokensUsed) {
+          tokens = result.tokensUsed.totalTokens ?? 0;
+        } else {
+          const data = result.data as Record<string, any> | undefined;
+          tokens = data?.tokensUsed?.totalTokens ?? data?.tokensUsed ?? data?.tokens ?? 0;
+        }
 
         this.entries.push({
           agentName,

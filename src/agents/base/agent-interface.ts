@@ -38,8 +38,17 @@ export interface AgentResult {
     cost: number;
     duration: number;
     artifacts?: AgentArtifact[];
-    confidence?: number;        // NEW: 0-1 score indicating agent's confidence in result
-    uncertainties?: string[];   // NEW: What agent is unsure about
+    confidence?: number;        // 0-1 score indicating agent's confidence in result
+    uncertainties?: string[];   // What agent is unsure about
+    tokensUsed?: TokenUsage;    // Phase 9.2: Per-agent token telemetry
+}
+
+/** Phase 9.2: Token usage tracking for cost telemetry */
+export interface TokenUsage {
+    promptTokens: number;       // Input tokens consumed
+    completionTokens: number;   // Output tokens generated
+    totalTokens: number;        // Total tokens (prompt + completion)
+    model?: string;             // Model used for this call
 }
 
 export interface AgentArtifact {

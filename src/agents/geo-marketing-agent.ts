@@ -19,6 +19,7 @@ import {
     VerificationReport
 } from './base';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { TokenTracker } from '@/lib/telemetry/token-tracker';
 
 const genAI = new GoogleGenerativeAI(
     process.env.GOOGLE_AI_STUDIO_API_KEY || process.env.GOOGLE_API_KEY || ''
@@ -214,6 +215,9 @@ Prioritize factual precision and citation-worthiness over traditional marketing 
         const artifacts: AgentResult['artifacts'] = [];
         const geoFindings: Record<string, unknown> = {};
 
+        // Phase 9.2: Track token usage across all LLM calls
+        const tokenTracker = new TokenTracker();
+
         try {
             for (const step of plan.steps) {
                 this.log(`📊 ${step.action}`);
@@ -224,8 +228,8 @@ Prioritize factual precision and citation-worthiness over traditional marketing 
                 if (this.boundSkills.has(step.tool)) {
                     result = await this.invokeSkill(step.tool, context.userId, step.payload);
                 } else {
-                    // Fall back to GEO-enhanced skills
-                    result = await this.executeGeoSkill(step.tool, context.userId, step.payload);
+                    // Fall back to GEO-enhanced skills (with token tracking)
+                    result = await this.executeGeoSkill(step.tool, context.userId, step.payload, tokenTracker);
                 }
 
                 if (result) {
@@ -239,7 +243,10 @@ Prioritize factual precision and citation-worthiness over traditional marketing 
             }
 
             // Generate comprehensive GEO report
-            const geoReport = await this.generateGeoReport(geoFindings);
+            const geoReport = await this.generateGeoReport(geoFindings, tokenTracker);
+
+            // Phase 9.2: Include token usage in result
+            const tokensUsed = tokenTracker.getUsage();
 
             return {
                 success: true,
@@ -250,9 +257,10 @@ Prioritize factual precision and citation-worthiness over traditional marketing 
                     report: geoReport,
                     citationReady: this.calculateCitationReadiness(geoFindings)
                 },
-                cost: plan.estimatedCost,
+                cost: tokenTracker.estimateCost() || plan.estimatedCost,
                 duration: Date.now() - startTime,
-                artifacts
+                artifacts,
+                tokensUsed
             };
         } catch (error: any) {
             return {
@@ -268,7 +276,8 @@ Prioritize factual precision and citation-worthiness over traditional marketing 
     private async executeGeoSkill(
         tool: string,
         userId: string,
-        payload: Record<string, unknown>
+        payload: Record<string, unknown>,
+        tokenTracker: TokenTracker
     ): Promise<unknown> {
         try {
             const skills = await import('../tools/googleAPISkills');
@@ -284,16 +293,16 @@ Prioritize factual precision and citation-worthiness over traditional marketing 
                     });
 
                 case 'geo_citation_analyzer':
-                    return this.analyzeCitationVectors(payload);
+                    return this.analyzeCitationVectors(payload, tokenTracker);
 
                 case 'authority_scorer':
-                    return this.calculateAuthorityScore(payload);
+                    return this.calculateAuthorityScore(payload, tokenTracker);
 
                 case 'content_humanizer':
-                    return this.applyForensicLayer(payload);
+                    return this.applyForensicLayer(payload, tokenTracker);
 
                 case 'llm_visibility_audit':
-                    return this.auditLlmVisibility(payload);
+                    return this.auditLlmVisibility(payload, tokenTracker);
 
                 default:
                     return null;
@@ -311,19 +320,20 @@ Prioritize factual precision and citation-worthiness over traditional marketing 
      * Analyze Citation Vector signals for LLM citation-worthiness
      */
     private async analyzeCitationVectors(
-        payload: Record<string, unknown>
+        payload: Record<string, unknown>,
+        tokenTracker: TokenTracker
     ): Promise<CitationVectorScore> {
         const prompt = `
             Analyze the following content/URL for Citation Vector signals.
             Target: ${payload.url || payload.mission}
-            
+
             Score each dimension 0-100:
             1. TOPICAL AUTHORITY: How deep is the domain expertise?
             2. SEMANTIC RICHNESS: Clarity, structure, natural language quality
             3. STRUCTURED DATA: Schema markup, proper HTML semantics, metadata
             4. FACTUAL ACCURACY: Verifiable claims with authoritative sources
             5. E-E-A-T SIGNALS: Experience, Expertise, Authoritativeness, Trustworthiness
-            
+
             Return JSON:
             {
                 "topicalAuthority": 0-100,
@@ -338,6 +348,7 @@ Prioritize factual precision and citation-worthiness over traditional marketing 
 
         try {
             const result = await this.model.generateContent(prompt);
+            tokenTracker.recordGemini(result.response, 'gemini-3-flash-preview');
             const text = result.response.text().replace(/```json|```/gi, '').trim();
             return JSON.parse(text);
         } catch {
@@ -357,29 +368,31 @@ Prioritize factual precision and citation-worthiness over traditional marketing 
      * Calculate Primary Authority Score across LLM platforms
      */
     private async calculateAuthorityScore(
-        payload: Record<string, unknown>
+        payload: Record<string, unknown>,
+        tokenTracker: TokenTracker
     ): Promise<AuthorityScore[]> {
         const prompt = `
             Analyze brand authority for: ${payload.url || payload.mission}
-            
+
             Estimate visibility and authority position in these LLM platforms:
             - Gemini (Google AI)
             - ChatGPT (OpenAI)
             - Perplexity
             - Claude (Anthropic)
-            
+
             For each platform, estimate:
             - mentions: Approximate brand mention frequency
             - citations: How often cited as authoritative source
             - sentiment: Overall sentiment when mentioned
             - authorityRank: 1-10 where 10 is primary authority
             - competitors: Top 3 competing authorities in this space
-            
+
             Return JSON array of platform scores.
         `;
 
         try {
             const result = await this.model.generateContent(prompt);
+            tokenTracker.recordGemini(result.response, 'gemini-3-flash-preview');
             const text = result.response.text().replace(/```json|```/gi, '').trim();
             return JSON.parse(text);
         } catch {
@@ -396,18 +409,19 @@ Prioritize factual precision and citation-worthiness over traditional marketing 
      * Forensic Stylistic Layer - Ensure content passes human authenticity checks
      */
     private async applyForensicLayer(
-        payload: Record<string, unknown>
+        payload: Record<string, unknown>,
+        tokenTracker: TokenTracker
     ): Promise<{ passed: boolean; score: number; recommendations: string[] }> {
         const prompt = `
             Evaluate content authenticity for: ${payload.mission}
-            
+
             Apply Forensic Stylistic Layer analysis:
             1. Does the content mirror natural human speech patterns?
             2. Are there AI-detectable patterns (repetition, formulaic structures)?
             3. Does it have authentic voice and personality?
             4. Are there genuine expertise indicators (anecdotes, specific examples)?
             5. Would this content be flagged as automated spam?
-            
+
             Return JSON:
             {
                 "passed": true/false,
@@ -419,6 +433,7 @@ Prioritize factual precision and citation-worthiness over traditional marketing 
 
         try {
             const result = await this.model.generateContent(prompt);
+            tokenTracker.recordGemini(result.response, 'gemini-3-flash-preview');
             const text = result.response.text().replace(/```json|```/gi, '').trim();
             return JSON.parse(text);
         } catch {
@@ -430,20 +445,21 @@ Prioritize factual precision and citation-worthiness over traditional marketing 
      * Comprehensive LLM Visibility Audit
      */
     private async auditLlmVisibility(
-        payload: Record<string, unknown>
+        payload: Record<string, unknown>,
+        tokenTracker: TokenTracker
     ): Promise<{ visibility: number; platformBreakdown: Record<string, number>; gaps: string[] }> {
         const platforms = (payload.platforms as string[]) || ['gemini', 'chatgpt', 'perplexity'];
 
         const prompt = `
             Conduct LLM Visibility Audit for: ${payload.brand}
             Platforms to check: ${platforms.join(', ')}
-            
+
             For each platform, assess:
             - How visible is this brand in AI search results?
             - Is it cited as an authority?
             - What queries would surface this brand?
             - What gaps exist in visibility?
-            
+
             Return JSON:
             {
                 "visibility": overall score 0-100,
@@ -456,6 +472,7 @@ Prioritize factual precision and citation-worthiness over traditional marketing 
 
         try {
             const result = await this.model.generateContent(prompt);
+            tokenTracker.recordGemini(result.response, 'gemini-3-flash-preview');
             const text = result.response.text().replace(/```json|```/gi, '').trim();
             return JSON.parse(text);
         } catch {
@@ -494,21 +511,25 @@ Prioritize factual precision and citation-worthiness over traditional marketing 
     /**
      * Generate comprehensive GEO report with Gemini 3
      */
-    private async generateGeoReport(findings: Record<string, unknown>): Promise<string> {
+    private async generateGeoReport(
+        findings: Record<string, unknown>,
+        tokenTracker: TokenTracker
+    ): Promise<string> {
         try {
             const result = await this.model.generateContent(`
                 Synthesize these GEO audit findings into an executive summary:
                 ${JSON.stringify(findings, null, 2)}
-                
+
                 Include:
                 1. CITATION READINESS: Overall score and key factors
                 2. PRIMARY AUTHORITY STATUS: Current position and gaps
                 3. FORENSIC COMPLIANCE: Content authenticity assessment
                 4. PRIORITY ACTIONS: Top 5 recommendations for GEO improvement
                 5. ZERO-CLICK READINESS: Preparedness for AI transactional search
-                
+
                 Format as a professional GEO audit report.
             `);
+            tokenTracker.recordGemini(result.response, 'gemini-3-flash-preview');
             return result.response.text();
         } catch {
             return 'Report generation failed. Review individual findings.';

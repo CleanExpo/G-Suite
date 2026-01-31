@@ -144,6 +144,19 @@ export async function initializeAgents(): Promise<void> {
         const { AgentScoutAgent } = await import('./agent-scout');
         const { IndependentVerifierAgent } = await import('./independent-verifier');
 
+        // Phase 9.4: Specialist agents
+        const { FrontendSpecialistAgent } = await import('./frontend-specialist');
+        const { BackendSpecialistAgent } = await import('./backend-specialist');
+        const { DatabaseSpecialistAgent } = await import('./database-specialist');
+        const { TestEngineerAgent } = await import('./test-engineer');
+        const { SecurityAuditorAgent } = await import('./security-auditor');
+        const { PerformanceOptimizerAgent } = await import('./performance-optimizer');
+        const { DeployGuardianAgent } = await import('./deploy-guardian');
+        const { DocsWriterAgent } = await import('./docs-writer');
+        const { CodeReviewerAgent } = await import('./code-reviewer');
+        const { RefactorSpecialistAgent } = await import('./refactor-specialist');
+        const { BugHunterAgent } = await import('./bug-hunter');
+
         AgentRegistry.registerClass('independent-verifier', IndependentVerifierAgent);
         AgentRegistry.registerClass('marketing-strategist', MarketingStrategistAgent);
         AgentRegistry.registerClass('seo-analyst', SEOAnalystAgent);
@@ -158,6 +171,19 @@ export async function initializeAgents(): Promise<void> {
         AgentRegistry.registerClass('geo-marketing-agent', GeoMarketingAgent);
         AgentRegistry.registerClass('geo-marketing', GeoMarketingAgent); // Alias
         AgentRegistry.registerClass('agent-scout', AgentScoutAgent);
+
+        // Phase 9.4: Register specialist agents
+        AgentRegistry.registerClass('frontend-specialist', FrontendSpecialistAgent);
+        AgentRegistry.registerClass('backend-specialist', BackendSpecialistAgent);
+        AgentRegistry.registerClass('database-specialist', DatabaseSpecialistAgent);
+        AgentRegistry.registerClass('test-engineer', TestEngineerAgent);
+        AgentRegistry.registerClass('security-auditor', SecurityAuditorAgent);
+        AgentRegistry.registerClass('performance-optimizer', PerformanceOptimizerAgent);
+        AgentRegistry.registerClass('deploy-guardian', DeployGuardianAgent);
+        AgentRegistry.registerClass('docs-writer', DocsWriterAgent);
+        AgentRegistry.registerClass('code-reviewer', CodeReviewerAgent);
+        AgentRegistry.registerClass('refactor-specialist', RefactorSpecialistAgent);
+        AgentRegistry.registerClass('bug-hunter', BugHunterAgent);
 
         console.log(`✅ ${AgentRegistry.getAvailableAgents().length} agents initialized`);
     } catch (error) {
