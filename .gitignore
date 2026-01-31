@@ -47,3 +47,4 @@ next-env.d.ts
 .beads/
 nul
 dev-server.log
+.claude/settings.local.json
