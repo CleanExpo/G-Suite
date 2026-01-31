@@ -26,3 +26,14 @@ export { CodeReviewerAgent } from './code-reviewer';
 export { RefactorSpecialistAgent } from './refactor-specialist';
 export { BugHunterAgent } from './bug-hunter';
 export { AgentScoutAgent } from './agent-scout';
+
+// Phase 10: Advanced agents
+export { CompetitiveIntelligenceAgent } from './competitive-intelligence';
+export { ContentCalendarAgent } from './content-calendar';
+export { CRMHubAgent } from './crm-hub';
+
+// Phase 11: Advanced platform agents
+export { VisualBuilderAgent } from './visual-builder';
+export { VoiceControlAgent } from './voice-control';
+export { MobileBridgeAgent } from './mobile-bridge';
+export { WhiteLabelAgent } from './white-label';

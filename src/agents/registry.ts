@@ -157,6 +157,17 @@ export async function initializeAgents(): Promise<void> {
         const { RefactorSpecialistAgent } = await import('./refactor-specialist');
         const { BugHunterAgent } = await import('./bug-hunter');
 
+        // Phase 10: Advanced agents
+        const { CompetitiveIntelligenceAgent } = await import('./competitive-intelligence');
+        const { ContentCalendarAgent } = await import('./content-calendar');
+        const { CRMHubAgent } = await import('./crm-hub');
+
+        // Phase 11: Advanced platform agents
+        const { VisualBuilderAgent } = await import('./visual-builder');
+        const { VoiceControlAgent } = await import('./voice-control');
+        const { MobileBridgeAgent } = await import('./mobile-bridge');
+        const { WhiteLabelAgent } = await import('./white-label');
+
         AgentRegistry.registerClass('independent-verifier', IndependentVerifierAgent);
         AgentRegistry.registerClass('marketing-strategist', MarketingStrategistAgent);
         AgentRegistry.registerClass('seo-analyst', SEOAnalystAgent);
@@ -184,6 +195,17 @@ export async function initializeAgents(): Promise<void> {
         AgentRegistry.registerClass('code-reviewer', CodeReviewerAgent);
         AgentRegistry.registerClass('refactor-specialist', RefactorSpecialistAgent);
         AgentRegistry.registerClass('bug-hunter', BugHunterAgent);
+
+        // Phase 10: Advanced agents
+        AgentRegistry.registerClass('competitive-intelligence', CompetitiveIntelligenceAgent);
+        AgentRegistry.registerClass('content-calendar', ContentCalendarAgent);
+        AgentRegistry.registerClass('crm-hub', CRMHubAgent);
+
+        // Phase 11: Advanced platform agents
+        AgentRegistry.registerClass('visual-builder', VisualBuilderAgent);
+        AgentRegistry.registerClass('voice-control', VoiceControlAgent);
+        AgentRegistry.registerClass('mobile-bridge', MobileBridgeAgent);
+        AgentRegistry.registerClass('white-label', WhiteLabelAgent);
 
         console.log(`✅ ${AgentRegistry.getAvailableAgents().length} agents initialized`);
     } catch (error) {
