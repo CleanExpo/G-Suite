@@ -23,6 +23,47 @@
     font-size: 1.1em;
     letter-spacing: -0.02em;
   }
+
+  /* Orientation-specific utilities */
+  @media (orientation: portrait) {
+    .portrait\:hidden { display: none; }
+    .portrait\:block { display: block; }
+    .portrait\:flex { display: flex; }
+    .portrait\:grid { display: grid; }
+    .portrait\:flex-col { flex-direction: column; }
+    .portrait\:text-center { text-align: center; }
+    .portrait\:w-full { width: 100%; }
+    .portrait\:px-4 { padding-left: 1rem; padding-right: 1rem; }
+    .portrait\:py-8 { padding-top: 2rem; padding-bottom: 2rem; }
+    .portrait\:gap-4 { gap: 1rem; }
+  }
+
+  @media (orientation: landscape) {
+    .landscape\:hidden { display: none; }
+    .landscape\:block { display: block; }
+    .landscape\:flex { display: flex; }
+    .landscape\:grid { display: grid; }
+    .landscape\:flex-row { flex-direction: row; }
+    .landscape\:text-left { text-align: left; }
+    .landscape\:w-auto { width: auto; }
+    .landscape\:px-8 { padding-left: 2rem; padding-right: 2rem; }
+    .landscape\:py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+    .landscape\:gap-8 { gap: 2rem; }
+  }
+
+  /* Safe area utilities for notched devices */
+  .safe-top { padding-top: env(safe-area-inset-top); }
+  .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+  .safe-left { padding-left: env(safe-area-inset-left); }
+  .safe-right { padding-right: env(safe-area-inset-right); }
+  .safe-x { padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
+  .safe-y { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
+  .safe-all {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
 }
 
 @keyframes blob {
