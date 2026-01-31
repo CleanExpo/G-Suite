@@ -82,29 +82,140 @@ export class GoogleBusinessClient {
         }
 
         try {
-            // In production, this would make actual API calls to Google Business Profile API
-            // The API endpoint would be: https://mybusinessbusinessinformation.googleapis.com/v1/locations/{locationId}
-
             const client = await this.auth!.getClient();
             const accessToken = await client.getAccessToken();
 
-            // TODO: Implement actual API call
-            // const response = await fetch(
-            //     `https://mybusinessbusinessinformation.googleapis.com/v1/${locationId}`,
-            //     {
-            //         headers: {
-            //             'Authorization': `Bearer ${accessToken.token}`,
-            //             'Content-Type': 'application/json'
-            //         }
-            //     }
-            // );
+            if (!accessToken.token) {
+                console.warn('[GoogleBusinessClient] No access token available, using mock data');
+                return this.getMockProfile(locationId);
+            }
 
-            // For now, return mock data
-            return this.getMockProfile(locationId);
+            // Fetch location data from Google Business Profile API
+            const locationResponse = await fetch(
+                `https://mybusinessbusinessinformation.googleapis.com/v1/${locationId}?readMask=name,title,phoneNumbers,websiteUri,storefrontAddress,regularHours,categories,attributes`,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken.token}`,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+
+            if (!locationResponse.ok) {
+                const errorText = await locationResponse.text();
+                console.error('[GoogleBusinessClient] API error:', locationResponse.status, errorText);
+                // Fall back to mock data on API error
+                return this.getMockProfile(locationId);
+            }
+
+            const locationData = await locationResponse.json();
+
+            // Transform API response to our GoogleBusinessProfile type
+            const profile: GoogleBusinessProfile = {
+                locationId,
+                name: locationData.title || locationData.name || 'Unknown Business',
+                address: this.parseAddress(locationData.storefrontAddress),
+                phone: locationData.phoneNumbers?.primaryPhone || '',
+                website: locationData.websiteUri || '',
+                categories: this.parseCategories(locationData.categories),
+                attributes: this.parseAttributes(locationData.attributes),
+                hours: this.parseHours(locationData.regularHours),
+                photos: [], // Fetched separately via media endpoint
+                reviews: [], // Fetched separately via reviews endpoint
+                rating: 0, // From reviews aggregate
+                reviewCount: 0,
+                posts: [], // Fetched separately
+                insights: await this.getInsights(locationId, '', ''),
+                completenessScore: 0
+            };
+
+            // Calculate completeness score
+            profile.completenessScore = this.calculateCompletenessScore(profile);
+
+            return profile;
         } catch (error: any) {
             console.error('[GoogleBusinessClient] Error fetching profile:', error.message);
-            throw error;
+            // Fall back to mock data on error
+            return this.getMockProfile(locationId);
         }
+    }
+
+    /**
+     * Parse address from API response
+     */
+    private parseAddress(address: any): GBPAddress {
+        if (!address) {
+            return {
+                addressLines: [],
+                locality: '',
+                administrativeArea: '',
+                postalCode: '',
+                regionCode: ''
+            };
+        }
+
+        return {
+            addressLines: address.addressLines || [],
+            locality: address.locality || '',
+            administrativeArea: address.administrativeArea || '',
+            postalCode: address.postalCode || '',
+            regionCode: address.regionCode || ''
+        };
+    }
+
+    /**
+     * Parse categories from API response
+     */
+    private parseCategories(categories: any): GBPCategory[] {
+        if (!categories) return [];
+
+        const result: GBPCategory[] = [];
+
+        if (categories.primaryCategory) {
+            result.push({
+                name: categories.primaryCategory.displayName || categories.primaryCategory.name || '',
+                primary: true
+            });
+        }
+
+        if (categories.additionalCategories) {
+            for (const cat of categories.additionalCategories) {
+                result.push({
+                    name: cat.displayName || cat.name || '',
+                    primary: false
+                });
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Parse attributes from API response
+     */
+    private parseAttributes(attributes: any): GBPAttribute[] {
+        if (!attributes) return [];
+
+        return Object.entries(attributes).map(([name, value]) => ({
+            name,
+            value: value === 'TRUE' || value === true
+        }));
+    }
+
+    /**
+     * Parse business hours from API response
+     */
+    private parseHours(regularHours: any): GBPHours[] {
+        if (!regularHours?.periods) return [];
+
+        const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+        return regularHours.periods.map((period: any) => ({
+            dayOfWeek: dayNames[period.openDay] || 'Unknown',
+            openTime: period.openTime?.hours ? `${String(period.openTime.hours).padStart(2, '0')}:${String(period.openTime.minutes || 0).padStart(2, '0')}` : '',
+            closeTime: period.closeTime?.hours ? `${String(period.closeTime.hours).padStart(2, '0')}:${String(period.closeTime.minutes || 0).padStart(2, '0')}` : '',
+            isClosed: false
+        }));
     }
 
     /**

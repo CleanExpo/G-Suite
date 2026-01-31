@@ -391,7 +391,11 @@ export class MetricsCollector {
     // Round to nearest minute
     timestamp.setSeconds(0, 0);
 
-    const metrics = await this.collectCurrentMetrics(userId);
+    const [metrics, completedJobs, costPerHour] = await Promise.all([
+      this.collectCurrentMetrics(userId),
+      this.getCompletedJobsInWindow(userId, 1), // Last 1 minute
+      this.calculateCostPerHour(userId),
+    ]);
 
     await prisma.metricSnapshot.upsert({
       where: {
@@ -404,11 +408,11 @@ export class MetricsCollector {
         queueDepth: metrics.queue.depth,
         activeJobs: metrics.queue.active,
         failedJobs: metrics.queue.failed,
-        completedJobs: 0, // TODO: Track completed in window
+        completedJobs,
         activeAgents: metrics.agents.active,
         idleAgents: metrics.agents.idle,
         jobsPerMinute: metrics.queue.throughput,
-        costPerHour: 0, // TODO: Calculate from cost telemetry
+        costPerHour,
         tokensPerMinute: metrics.resources.tokensPerMinute,
         errorRate: metrics.errors.rate,
       },
@@ -418,15 +422,52 @@ export class MetricsCollector {
         queueDepth: metrics.queue.depth,
         activeJobs: metrics.queue.active,
         failedJobs: metrics.queue.failed,
-        completedJobs: 0,
+        completedJobs,
         activeAgents: metrics.agents.active,
         idleAgents: metrics.agents.idle,
         jobsPerMinute: metrics.queue.throughput,
-        costPerHour: 0,
+        costPerHour,
         tokensPerMinute: metrics.resources.tokensPerMinute,
         errorRate: metrics.errors.rate,
       },
     });
+  }
+
+  /**
+   * Get count of completed jobs in the specified time window
+   */
+  private async getCompletedJobsInWindow(userId: string, windowMinutes: number): Promise<number> {
+    const since = new Date(Date.now() - windowMinutes * 60 * 1000);
+
+    return prisma.queueJob.count({
+      where: {
+        userId,
+        completedAt: { gte: since },
+        status: 'completed',
+      },
+    });
+  }
+
+  /**
+   * Calculate cost per hour from recent mission costs
+   */
+  private async calculateCostPerHour(userId: string): Promise<number> {
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+
+    const missions = await prisma.mission.findMany({
+      where: {
+        userId,
+        updatedAt: { gte: oneHourAgo },
+        status: 'COMPLETED',
+        cost: { not: null },
+      },
+      select: { cost: true },
+    });
+
+    // Sum up all mission costs from the last hour
+    const totalCost = missions.reduce((sum, m) => sum + (m.cost || 0), 0);
+
+    return totalCost;
   }
 
   /**
