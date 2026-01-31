@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, lazy } from 'react';
+import dynamic from 'next/dynamic';
 import { getWalletData } from '@/actions/wallet-actions';
 import { useAuth } from '@/components/auth/auth-provider';
 import {
@@ -19,18 +20,37 @@ import {
   BarChart3,
 } from 'lucide-react';
 import { format } from 'date-fns';
-import MissionModal from '@/components/MissionModal';
-import CreditDialog from '@/components/credit-dialog';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Navbar } from '@/components/navbar';
-
-import { TelemetryPanel } from '@/components/telemetry-panel';
-import { FleetStatus } from '@/components/fleet-status';
-import { IntelligenceDossier } from '@/components/intelligence-dossier';
 import { getLatestReport } from '@/actions/mission-history';
 import { useTranslations } from 'next-intl';
+
+// Dynamic imports for code splitting - heavy components loaded on demand
+const MissionModal = dynamic(() => import('@/components/MissionModal'), {
+  loading: () => <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+  </div>,
+  ssr: false,
+});
+
+const CreditDialog = dynamic(() => import('@/components/credit-dialog').then(mod => ({ default: mod.default || mod.CreditDialog })), {
+  loading: () => null,
+  ssr: false,
+});
+
+const TelemetryPanel = dynamic(() => import('@/components/telemetry-panel').then(mod => ({ default: mod.TelemetryPanel })), {
+  loading: () => <div className="h-64 bg-gray-100 dark:bg-gray-800 rounded-3xl animate-pulse" />,
+});
+
+const FleetStatus = dynamic(() => import('@/components/fleet-status').then(mod => ({ default: mod.FleetStatus })), {
+  loading: () => <div className="h-48 bg-gray-100 dark:bg-gray-800 rounded-3xl animate-pulse" />,
+});
+
+const IntelligenceDossier = dynamic(() => import('@/components/intelligence-dossier').then(mod => ({ default: mod.IntelligenceDossier })), {
+  loading: () => <div className="h-64 bg-gray-100 dark:bg-gray-800 rounded-3xl animate-pulse" />,
+});
 
 function AuthenticatedDashboard({
   onOpenModal,

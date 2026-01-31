@@ -58,6 +58,12 @@ export const metadata: Metadata = {
     shortcut: '/favicon.ico',
     apple: '/apple-touch-icon.png',
   },
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'G-Pilot',
+  },
   openGraph: {
     title: 'G-Pilot - Enterprise AI Orchestration',
     description:
@@ -118,6 +124,7 @@ const jsonLd = {
 };
 
 import { SystemBanner } from '@/components/ui/system-banner';
+import { PWAInstallPrompt } from '@/components/pwa-install-prompt';
 
 // Development mode banner component
 function DevModeBanner() {
@@ -170,6 +177,7 @@ export default async function RootLayout({
                 <SystemBanner />
                 {children}
                 <Footer />
+                <PWAInstallPrompt />
               </div>
             </NextIntlClientProvider>
           </ThemeProvider>
