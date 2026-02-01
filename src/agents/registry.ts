@@ -167,6 +167,8 @@ export async function initializeAgents(): Promise<void> {
         const { VoiceControlAgent } = await import('./voice-control');
         const { MobileBridgeAgent } = await import('./mobile-bridge');
         const { WhiteLabelAgent } = await import('./white-label');
+        const { EmailMarketingAgent } = await import('./email-marketing');
+        const { ModelTunerAgent } = await import('./model-tuner');
 
         AgentRegistry.registerClass('independent-verifier', IndependentVerifierAgent);
         AgentRegistry.registerClass('marketing-strategist', MarketingStrategistAgent);
@@ -206,6 +208,8 @@ export async function initializeAgents(): Promise<void> {
         AgentRegistry.registerClass('voice-control', VoiceControlAgent);
         AgentRegistry.registerClass('mobile-bridge', MobileBridgeAgent);
         AgentRegistry.registerClass('white-label', WhiteLabelAgent);
+        AgentRegistry.registerClass('email-marketing', EmailMarketingAgent);
+        AgentRegistry.registerClass('model-tuner', ModelTunerAgent);
 
         console.log(`✅ ${AgentRegistry.getAvailableAgents().length} agents initialized`);
     } catch (error) {

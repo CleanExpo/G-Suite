@@ -37,3 +37,5 @@ export { VisualBuilderAgent } from './visual-builder';
 export { VoiceControlAgent } from './voice-control';
 export { MobileBridgeAgent } from './mobile-bridge';
 export { WhiteLabelAgent } from './white-label';
+export { EmailMarketingAgent } from './email-marketing';
+export { ModelTunerAgent } from './model-tuner';
