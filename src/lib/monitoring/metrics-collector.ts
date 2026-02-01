@@ -55,9 +55,9 @@ export class MetricsCollector {
       health,
       agents: {
         total: agentStatuses.length,
-        active: agentStatuses.filter(a => a.status === 'active').length,
-        idle: agentStatuses.filter(a => a.status === 'idle').length,
-        failed: agentStatuses.filter(a => a.status === 'failed').length,
+        active: agentStatuses.filter((a) => a.status === 'active').length,
+        idle: agentStatuses.filter((a) => a.status === 'idle').length,
+        failed: agentStatuses.filter((a) => a.status === 'failed').length,
         breakdown: agentStatuses,
       },
       queue: {
@@ -88,9 +88,7 @@ export class MetricsCollector {
   private async getQueueMetrics(userId: string): Promise<QueueDepthSnapshot> {
     // Get metrics from all queues (missions, agents, webhooks, system)
     const queues = ['missions', 'agents', 'webhooks', 'system'];
-    const allMetrics = await Promise.all(
-      queues.map(queue => taskQueue.getQueueMetrics(queue))
-    );
+    const allMetrics = await Promise.all(queues.map((queue) => taskQueue.getQueueMetrics(queue)));
 
     // Aggregate metrics across all queues
     return allMetrics.reduce(
@@ -101,7 +99,7 @@ export class MetricsCollector {
         failed: acc.failed + metrics.failed,
         delayed: acc.delayed + metrics.delayed,
       }),
-      { waiting: 0, active: 0, completed: 0, failed: 0, delayed: 0 }
+      { waiting: 0, active: 0, completed: 0, failed: 0, delayed: 0 },
     );
   }
 
@@ -120,7 +118,7 @@ export class MetricsCollector {
       },
     });
 
-    return statuses.map(s => ({
+    return statuses.map((s) => ({
       agentName: s.agentName,
       status: s.status as 'idle' | 'active' | 'failed' | 'unknown',
       lastActiveAt: s.lastActiveAt.toISOString(),
@@ -265,11 +263,14 @@ export class MetricsCollector {
     return {
       firing: firingCount,
       resolved: resolvedCount,
-      recent: recentFirings.map(f => ({
+      recent: recentFirings.map((f) => ({
         id: f.id,
         name: f.rule.name,
         triggeredAt: f.triggeredAt.toISOString(),
-        severity: (f.metricValue > 0.5 ? 'critical' : f.metricValue > 0.2 ? 'warning' : 'info') as 'info' | 'warning' | 'critical',
+        severity: (f.metricValue > 0.5 ? 'critical' : f.metricValue > 0.2 ? 'warning' : 'info') as
+          | 'info'
+          | 'warning'
+          | 'critical',
         message: f.message,
       })),
     };
@@ -281,7 +282,7 @@ export class MetricsCollector {
   private calculateHealthScore(
     queueMetrics: QueueDepthSnapshot,
     errorRate: number,
-    agentCount: number
+    agentCount: number,
   ): { status: 'healthy' | 'degraded' | 'unhealthy'; score: number; uptime: number } {
     let score = 100;
 
@@ -374,10 +375,10 @@ export class MetricsCollector {
                 startedAt: job.startedAt?.toISOString() || '',
                 completedAt: job.completedAt?.toISOString(),
                 error: job.error || undefined,
-              } as RecentJob)
+              }) as RecentJob,
           ),
         };
-      })
+      }),
     );
 
     return agentDetails;
@@ -477,7 +478,7 @@ export class MetricsCollector {
     userId: string,
     metric: MetricType,
     timeRange: TimeRange,
-    resolution: Resolution
+    resolution: Resolution,
   ): Promise<{ dataPoints: DataPoint[]; aggregates: any }> {
     // Calculate time window
     const now = new Date();

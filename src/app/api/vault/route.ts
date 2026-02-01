@@ -21,7 +21,7 @@ export async function GET() {
     if (!profile) {
       return NextResponse.json(
         { success: false, error: 'No vault found. Complete onboarding first.' },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -76,9 +76,6 @@ export async function GET() {
     });
   } catch (error: any) {
     console.error('[Vault GET] Error:', error.message);
-    return NextResponse.json(
-      { success: false, error: error.message },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }

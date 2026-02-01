@@ -6,10 +6,10 @@
  */
 
 import prisma from '@/prisma';
-import {taskQueue} from '@/lib/queue';
-import {decrypt} from '@/lib/encryption';
-import {generateSignatureHeader} from './signature';
-import type {WebhookEvent, WebhookDispatchOptions} from './types';
+import { taskQueue } from '@/lib/queue';
+import { decrypt } from '@/lib/encryption';
+import { generateSignatureHeader } from './signature';
+import type { WebhookEvent, WebhookDispatchOptions } from './types';
 
 // ─── Event Dispatcher ───────────────────────────────────────────────────────
 
@@ -23,9 +23,9 @@ import type {WebhookEvent, WebhookDispatchOptions} from './types';
  */
 export async function dispatchWebhook(
   event: WebhookEvent,
-  options?: WebhookDispatchOptions
+  options?: WebhookDispatchOptions,
 ): Promise<void> {
-  const {type, data, userId} = event;
+  const { type, data, userId } = event;
 
   try {
     // Find all active endpoints subscribed to this event type
@@ -33,7 +33,7 @@ export async function dispatchWebhook(
       where: {
         userId,
         isActive: true,
-        events: {has: type},
+        events: { has: type },
       },
     });
 
@@ -71,12 +71,10 @@ export async function dispatchWebhook(
           userId,
           priority: 5,
           attempts: options?.maxAttempts || 3,
-        }
+        },
       );
 
-      console.log(
-        `[Webhook] Queued delivery ${delivery.id} for ${type} to ${endpoint.url}`
-      );
+      console.log(`[Webhook] Queued delivery ${delivery.id} for ${type} to ${endpoint.url}`);
     }
   } catch (error) {
     console.error('[Webhook] Error dispatching webhook:', error);
@@ -94,17 +92,17 @@ export async function dispatchWebhook(
  * @returns Delivery result
  */
 export async function processWebhookDelivery(job: any): Promise<any> {
-  const {deliveryId, url, secret, payload, eventType} = job.data;
+  const { deliveryId, url, secret, payload, eventType } = job.data;
 
   console.log(`[Webhook] Processing delivery ${deliveryId} to ${url}`);
 
   try {
     // Update delivery status to 'retrying'
     await prisma.webhookDelivery.update({
-      where: {id: deliveryId},
+      where: { id: deliveryId },
       data: {
         status: 'retrying',
-        attempts: {increment: 1},
+        attempts: { increment: 1 },
       },
     });
 
@@ -134,7 +132,7 @@ export async function processWebhookDelivery(job: any): Promise<any> {
 
     // Update delivery status to 'sent'
     await prisma.webhookDelivery.update({
-      where: {id: deliveryId},
+      where: { id: deliveryId },
       data: {
         status: 'sent',
         responseCode: response.status,
@@ -143,17 +141,15 @@ export async function processWebhookDelivery(job: any): Promise<any> {
       },
     });
 
-    console.log(
-      `[Webhook] Delivery ${deliveryId} sent successfully (${response.status})`
-    );
+    console.log(`[Webhook] Delivery ${deliveryId} sent successfully (${response.status})`);
 
-    return {success: true, status: response.status};
+    return { success: true, status: response.status };
   } catch (error: any) {
     console.error(`[Webhook] Delivery ${deliveryId} failed:`, error);
 
     // Update delivery status to 'failed'
     await prisma.webhookDelivery.update({
-      where: {id: deliveryId},
+      where: { id: deliveryId },
       data: {
         status: 'failed',
         error: error.message,

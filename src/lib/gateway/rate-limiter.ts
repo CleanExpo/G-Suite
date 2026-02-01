@@ -5,13 +5,8 @@
  * Uses Redis sorted sets to track request timestamps within a time window.
  */
 
-import {getRedisConnection} from '@/lib/queue/redis';
-import type {
-  RateLimitConfig,
-  RateLimitResult,
-  RateLimitTier,
-  RateLimitTierConfig,
-} from './types';
+import { getRedisConnection } from '@/lib/queue/redis';
+import type { RateLimitConfig, RateLimitResult, RateLimitTier, RateLimitTierConfig } from './types';
 
 // ─── Rate Limit Tiers ───────────────────────────────────────────────────────
 
@@ -44,9 +39,7 @@ export const RATE_LIMIT_TIERS: Record<RateLimitTier, RateLimitTierConfig> = {
  * @param config - Rate limit configuration
  * @returns Rate limit result with allowed status and metadata
  */
-export async function checkRateLimit(
-  config: RateLimitConfig
-): Promise<RateLimitResult> {
+export async function checkRateLimit(config: RateLimitConfig): Promise<RateLimitResult> {
   const redis = getRedisConnection();
 
   // Graceful degradation: if Redis is unavailable, allow request
@@ -114,7 +107,7 @@ export async function checkRateLimit(
 export function getRateLimitConfig(
   tier: RateLimitTier,
   identifier: string,
-  endpoint?: string
+  endpoint?: string,
 ): RateLimitConfig {
   const tierConfig = RATE_LIMIT_TIERS[tier];
   return {
@@ -127,10 +120,7 @@ export function getRateLimitConfig(
 /**
  * Get rate limit headers for HTTP response.
  */
-export function getRateLimitHeaders(result: RateLimitResult): Record<
-  string,
-  string
-> {
+export function getRateLimitHeaders(result: RateLimitResult): Record<string, string> {
   return {
     'X-RateLimit-Limit': String(result.limit),
     'X-RateLimit-Remaining': String(result.remaining),

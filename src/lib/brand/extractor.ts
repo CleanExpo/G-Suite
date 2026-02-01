@@ -1,6 +1,6 @@
 /**
  * Brand DNA Extractor
- * 
+ *
  * Uses Gemini to analyze raw website content (from Jina) and extract the "Brand DNA":
  * - Color Palette (Hex codes)
  * - Typography (Font families)
@@ -15,36 +15,35 @@ const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || '');
 const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
 export interface BrandProfile {
-    name: string;
-    palette: {
-        primary: string;
-        secondary: string;
-        accent: string;
-        background: string;
-        text: string;
-    };
-    typography: {
-        headings: string;
-        body: string;
-    };
-    tone: {
-        voice: string; // e.g., "Professional", "Playful"
-        keywords: string[];
-    };
-    imagery: {
-        style: string; // Description for Imagen 3
-        preferredSubjects: string[];
-    };
+  name: string;
+  palette: {
+    primary: string;
+    secondary: string;
+    accent: string;
+    background: string;
+    text: string;
+  };
+  typography: {
+    headings: string;
+    body: string;
+  };
+  tone: {
+    voice: string; // e.g., "Professional", "Playful"
+    keywords: string[];
+  };
+  imagery: {
+    style: string; // Description for Imagen 3
+    preferredSubjects: string[];
+  };
 }
 
 export class BrandExtractor {
-
-    /**
-     * Extract Brand DNA from markdown content
-     */
-    async extract(content: string, url: string): Promise<BrandProfile> {
-        try {
-            const prompt = `
+  /**
+   * Extract Brand DNA from markdown content
+   */
+  async extract(content: string, url: string): Promise<BrandProfile> {
+    try {
+      const prompt = `
         You are a Chief Marketing Officer. Analyze the following website content (scraped from ${url}) and extract the "Brand DNA".
         
         Input Content:
@@ -85,33 +84,32 @@ export class BrandExtractor {
         3. Be precise with the "imagery.style" - this will be used to generate assets.
       `;
 
-            const result = await model.generateContent(prompt);
-            const outputText = result.response.text();
+      const result = await model.generateContent(prompt);
+      const outputText = result.response.text();
 
-            // Clean JSON (markdown code block removal)
-            const cleanJson = outputText.replace(/```json|```/gi, '').trim();
+      // Clean JSON (markdown code block removal)
+      const cleanJson = outputText.replace(/```json|```/gi, '').trim();
 
-            return JSON.parse(cleanJson) as BrandProfile;
+      return JSON.parse(cleanJson) as BrandProfile;
+    } catch (error: any) {
+      console.error('[BrandExtractor] Extraction failed:', error.message);
 
-        } catch (error: any) {
-            console.error('[BrandExtractor] Extraction failed:', error.message);
-
-            // Fallback Profile
-            return {
-                name: 'Unknown Brand',
-                palette: {
-                    primary: '#000000',
-                    secondary: '#ffffff',
-                    accent: '#0066cc',
-                    background: '#ffffff',
-                    text: '#333333'
-                },
-                typography: { headings: 'Inter', body: 'Roboto' },
-                tone: { voice: 'Neutral', keywords: [] },
-                imagery: { style: 'Generic corporate style', preferredSubjects: [] }
-            };
-        }
+      // Fallback Profile
+      return {
+        name: 'Unknown Brand',
+        palette: {
+          primary: '#000000',
+          secondary: '#ffffff',
+          accent: '#0066cc',
+          background: '#ffffff',
+          text: '#333333',
+        },
+        typography: { headings: 'Inter', body: 'Roboto' },
+        tone: { voice: 'Neutral', keywords: [] },
+        imagery: { style: 'Generic corporate style', preferredSubjects: [] },
+      };
     }
+  }
 }
 
 // Singleton

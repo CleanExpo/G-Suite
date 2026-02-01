@@ -40,17 +40,19 @@ export async function GET() {
     const totalSpent = missions.reduce((sum, m) => sum + m.cost, 0);
     const missionCount = missions.length;
     const avgCostPerMission = missionCount > 0 ? Math.round(totalSpent / missionCount) : 0;
-    const budgetUsage = walletBalance > 0
-      ? Math.round((totalSpent / (totalSpent + walletBalance)) * 100)
-      : 0;
+    const budgetUsage =
+      walletBalance > 0 ? Math.round((totalSpent / (totalSpent + walletBalance)) * 100) : 0;
 
     // ── Per-agent breakdown ────────────────────────────────────────────
-    const agentTotals = new Map<string, {
-      totalCost: number;
-      totalTokens: number;
-      totalDuration: number;
-      executionCount: number;
-    }>();
+    const agentTotals = new Map<
+      string,
+      {
+        totalCost: number;
+        totalTokens: number;
+        totalDuration: number;
+        executionCount: number;
+      }
+    >();
 
     for (const mission of missions) {
       if (!mission.agentCosts || typeof mission.agentCosts !== 'object') continue;
@@ -76,9 +78,8 @@ export async function GET() {
         agentName,
         totalCost: stats.totalCost,
         totalTokens: stats.totalTokens,
-        avgDuration: stats.executionCount > 0
-          ? Math.round(stats.totalDuration / stats.executionCount)
-          : 0,
+        avgDuration:
+          stats.executionCount > 0 ? Math.round(stats.totalDuration / stats.executionCount) : 0,
         executionCount: stats.executionCount,
       }))
       .sort((a, b) => b.totalCost - a.totalCost);
@@ -131,9 +132,6 @@ export async function GET() {
     });
   } catch (error: any) {
     console.error('[Telemetry Costs GET] Error:', error.message);
-    return NextResponse.json(
-      { success: false, error: error.message },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }

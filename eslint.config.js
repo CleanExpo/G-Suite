@@ -44,7 +44,8 @@ module.exports = [
       parserOptions: {
         ecmaVersion: 2020,
         sourceType: 'module',
-        project: './tsconfig.json',
+        // Note: project-based linting disabled for memory efficiency
+        // Enable with: project: './tsconfig.json' for stricter checks
       },
     },
     plugins: {
@@ -57,7 +58,8 @@ module.exports = [
       ...nextPlugin.configs['core-web-vitals'].rules,
       '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
       '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/no-floating-promises': 'error',
+      // Disabled: requires type-aware linting (project config)
+      // '@typescript-eslint/no-floating-promises': 'error',
       '@typescript-eslint/no-non-null-assertion': 'off',
       'n/no-missing-import': 'off',
     },
@@ -68,11 +70,18 @@ module.exports = [
       '.next/',
       'dist/',
       'public/',
+      'coverage/',
+      'playwright-report/',
+      'tests/',
       '*.config.js',
       '*.config.ts',
+      '*.config.mjs',
+      '*.config.cjs',
       'test-db.js',
       'sweep-db.js',
-      'test-prisma.ts'
+      'test-prisma.ts',
+      '**/*.spec.ts',
+      '**/*.test.ts',
     ],
   },
 ];

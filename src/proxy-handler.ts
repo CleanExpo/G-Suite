@@ -4,19 +4,19 @@
  * Handles session management, rate limiting, authentication, and CORS for all routes.
  */
 
-import {type NextRequest, NextResponse} from 'next/server';
-import {updateSession} from '@/lib/supabase/session';
-import {auth} from '@clerk/nextjs/server';
+import { type NextRequest, NextResponse } from 'next/server';
+import { updateSession } from '@/lib/supabase/session';
+import { auth } from '@clerk/nextjs/server';
 import {
   checkRateLimit,
   getRateLimitConfig,
   getRateLimitHeaders,
 } from '@/lib/gateway/rate-limiter';
-import {validateApiKey} from '@/lib/gateway/api-key-auth';
-import type {RateLimitTier} from '@/lib/gateway/types';
+import { validateApiKey } from '@/lib/gateway/api-key-auth';
+import type { RateLimitTier } from '@/lib/gateway/types';
 
 export async function proxy(request: NextRequest) {
-  const {pathname} = request.nextUrl;
+  const { pathname } = request.nextUrl;
 
   // ─── API Routes: Authentication & Rate Limiting ──────────────────────────
 
@@ -27,8 +27,15 @@ export async function proxy(request: NextRequest) {
     let apiKeyPrefix: string | undefined;
 
     // ─── Public/Test endpoints (no auth required) ───────────────────────────
-    const publicEndpoints = ['/api/webhooks', '/api/health', '/api/geo/test', '/api/geo/analyze', '/api/geo/rankings', '/api/geo/competitors'];
-    const isPublicEndpoint = publicEndpoints.some(ep => pathname.startsWith(ep));
+    const publicEndpoints = [
+      '/api/webhooks',
+      '/api/health',
+      '/api/geo/test',
+      '/api/geo/analyze',
+      '/api/geo/rankings',
+      '/api/geo/competitors',
+    ];
+    const isPublicEndpoint = publicEndpoints.some((ep) => pathname.startsWith(ep));
 
     if (isPublicEndpoint) {
       // Skip authentication for public endpoints
@@ -67,13 +74,13 @@ export async function proxy(request: NextRequest) {
               timestamp: new Date().toISOString(),
             },
           },
-          {status: 401}
+          { status: 401 },
         );
       }
     } else {
       // ─── Clerk Authentication (fallback) ────────────────────────────────
       try {
-        const {userId: clerkUserId} = await auth();
+        const { userId: clerkUserId } = await auth();
         userId = clerkUserId;
       } catch (error) {
         // Clerk not configured - allow unauthenticated access for development
@@ -84,8 +91,7 @@ export async function proxy(request: NextRequest) {
 
     // ─── Rate Limiting ──────────────────────────────────────────────────────
 
-    const ip =
-      request.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown';
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown';
 
     const identifier = userId || ip;
 
@@ -114,7 +120,7 @@ export async function proxy(request: NextRequest) {
         {
           status: 429,
           headers: getRateLimitHeaders(rateLimitResult),
-        }
+        },
       );
     }
 

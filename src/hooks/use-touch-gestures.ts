@@ -43,7 +43,7 @@ interface TouchState {
  */
 export function useTouchGestures<T extends HTMLElement = HTMLElement>(
   handlers: TouchGestureHandlers,
-  options: TouchGestureOptions = {}
+  options: TouchGestureOptions = {},
 ) {
   const {
     swipeThreshold = 50,
@@ -93,7 +93,7 @@ export function useTouchGestures<T extends HTMLElement = HTMLElement>(
         }, longPressDelay);
       }
     },
-    [handlers, longPressDelay, preventDefault, getDistance, clearLongPressTimer]
+    [handlers, longPressDelay, preventDefault, getDistance, clearLongPressTimer],
   );
 
   const handleTouchMove = useCallback(
@@ -116,7 +116,7 @@ export function useTouchGestures<T extends HTMLElement = HTMLElement>(
         handlers.onPinch(scale);
       }
     },
-    [handlers, getDistance, clearLongPressTimer]
+    [handlers, getDistance, clearLongPressTimer],
   );
 
   const handleTouchEnd = useCallback(
@@ -171,7 +171,7 @@ export function useTouchGestures<T extends HTMLElement = HTMLElement>(
 
       touchState.current = null;
     },
-    [handlers, swipeThreshold, swipeTimeout, doubleTapDelay, clearLongPressTimer]
+    [handlers, swipeThreshold, swipeTimeout, doubleTapDelay, clearLongPressTimer],
   );
 
   useEffect(() => {
@@ -201,7 +201,7 @@ export function useTouchGestures<T extends HTMLElement = HTMLElement>(
 export function useSwipeNavigation(
   onNext: () => void,
   onPrevious: () => void,
-  options?: { horizontal?: boolean }
+  options?: { horizontal?: boolean },
 ) {
   const horizontal = options?.horizontal ?? true;
 

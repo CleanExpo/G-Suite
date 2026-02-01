@@ -184,13 +184,13 @@ export async function executorNode(state: ProjectStateType) {
     }
     // High-Precision Real Tools
     else if (state.spec.tool === 'shopify_sync') {
-      const { syncShopifyStore } = await import('../tools/shopifySync.js');
+      const { syncShopifyStore } = await import('../tools/shopifySync');
       results.push(await syncShopifyStore(state.userId));
     } else if (state.spec.tool === 'social_blast') {
-      const { deploySocialBlast } = await import('../tools/socialSync.js');
+      const { deploySocialBlast } = await import('../tools/socialSync');
       results.push(await deploySocialBlast(state.userId, state.spec.payload));
     } else if (state.spec.tool === 'web_mastery_audit') {
-      const { performWebMasteryAudit } = await import('../tools/webMasteryAudit.js');
+      const { performWebMasteryAudit } = await import('../tools/webMasteryAudit');
       results.push(await performWebMasteryAudit(state.spec.payload.url));
     }
     // Agent Routing - Unified through Mission Overseer
@@ -212,8 +212,8 @@ export async function executorNode(state: ProjectStateType) {
           locale: state.locale,
           config: {
             ...state.spec.payload,
-            explicitAgents: [targetAgentName] // <--- Force Overseer to use this agent
-          }
+            explicitAgents: [targetAgentName], // <--- Force Overseer to use this agent
+          },
         };
 
         // Execute the unified loop: Plan -> Execute (w/ Independent Verify) -> Result
@@ -225,9 +225,8 @@ export async function executorNode(state: ProjectStateType) {
           agent: 'mission-overseer',
           targetAgent: targetAgentName,
           unifiedResult: result,
-          verification
+          verification,
         });
-
       } else {
         results.push({ error: 'Critical: Mission Overseer not found in registry.' });
       }
@@ -235,69 +234,92 @@ export async function executorNode(state: ProjectStateType) {
     // Google API Enhanced Skills
     else if (state.spec.tool === 'deep_research') {
       const { deepResearch } = await import('../tools/googleAPISkills');
-      results.push(await deepResearch(state.userId, state.spec.payload.topic, state.spec.payload.options));
-    }
-    else if (state.spec.tool === 'veo_31_generate') {
+      results.push(
+        await deepResearch(state.userId, state.spec.payload.topic, state.spec.payload.options),
+      );
+    } else if (state.spec.tool === 'veo_31_generate') {
       const { veo31Generate } = await import('../tools/googleAPISkills');
-      results.push(await veo31Generate(state.userId, state.spec.payload.prompt, state.spec.payload.options));
-    }
-    else if (state.spec.tool === 'veo_31_upsample') {
+      results.push(
+        await veo31Generate(state.userId, state.spec.payload.prompt, state.spec.payload.options),
+      );
+    } else if (state.spec.tool === 'veo_31_upsample') {
       const { veo31Upsample } = await import('../tools/googleAPISkills');
-      results.push(await veo31Upsample(state.userId, state.spec.payload.videoUrl, state.spec.payload.resolution));
-    }
-    else if (state.spec.tool === 'document_ai_extract') {
+      results.push(
+        await veo31Upsample(
+          state.userId,
+          state.spec.payload.videoUrl,
+          state.spec.payload.resolution,
+        ),
+      );
+    } else if (state.spec.tool === 'document_ai_extract') {
       // For standalone tool call, we assume file is already uploaded or URL provided
       const { getDocumentProcessor } = await import('../lib/document-processor/engine');
       const processor = getDocumentProcessor();
-      results.push(await processor.process({
-        fileName: 'document.pdf',
-        documentUrl: state.spec.payload.documentUrl
-      } as any));
-    }
-    else if (state.spec.tool === 'gemini_3_flash') {
+      results.push(
+        await processor.process({
+          fileName: 'document.pdf',
+          documentUrl: state.spec.payload.documentUrl,
+        } as any),
+      );
+    } else if (state.spec.tool === 'gemini_3_flash') {
       const { gemini3Flash } = await import('../tools/googleAPISkills');
-      results.push(await gemini3Flash(state.userId, state.spec.payload.prompt, state.spec.payload.options));
-    }
-    else if (state.spec.tool === 'geo_marketing_audit') {
+      results.push(
+        await gemini3Flash(state.userId, state.spec.payload.prompt, state.spec.payload.options),
+      );
+    } else if (state.spec.tool === 'geo_marketing_audit') {
       const { businessName, address, phone } = state.spec.payload;
       results.push(await localSEOAnalyzer.auditNAP(businessName, address, phone));
-    }
-    else if (state.spec.tool === 'brand_dna_extraction') {
+    } else if (state.spec.tool === 'brand_dna_extraction') {
       const jina = getJinaClient();
       const { url } = state.spec.payload;
       const { content } = await jina.read(url);
       const { BrandExtractor } = await import('../lib/brand/extractor');
       const extractor = new BrandExtractor();
       results.push(await extractor.extract(content, url));
-    }
-    else if (state.spec.tool === 'deep_research_synthesis') {
+    } else if (state.spec.tool === 'deep_research_synthesis') {
       const { deepResearch } = await import('../tools/googleAPISkills');
-      results.push(await deepResearch(state.userId, state.spec.payload.topic, { depth: 'deep', focusAreas: state.spec.payload.focusAreas }));
+      results.push(
+        await deepResearch(state.userId, state.spec.payload.topic, {
+          depth: 'deep',
+          focusAreas: state.spec.payload.focusAreas,
+        }),
+      );
     }
     // Web Intelligence Skills
     else if (state.spec.tool === 'web_unlocker') {
       const { web_unlocker } = await import('../tools/webIntelligenceSkills');
-      results.push(await web_unlocker(state.userId, state.spec.payload.url, state.spec.payload.options));
-    }
-    else if (state.spec.tool === 'serp_collector') {
+      results.push(
+        await web_unlocker(state.userId, state.spec.payload.url, state.spec.payload.options),
+      );
+    } else if (state.spec.tool === 'serp_collector') {
       const { serp_collector } = await import('../tools/webIntelligenceSkills');
-      results.push(await serp_collector(state.userId, state.spec.payload.query, state.spec.payload.options));
-    }
-    else if (state.spec.tool === 'web_crawler') {
+      results.push(
+        await serp_collector(state.userId, state.spec.payload.query, state.spec.payload.options),
+      );
+    } else if (state.spec.tool === 'web_crawler') {
       const { web_crawler } = await import('../tools/webIntelligenceSkills');
-      results.push(await web_crawler(state.userId, state.spec.payload.startUrl, state.spec.payload.options));
-    }
-    else if (state.spec.tool === 'structured_scraper') {
+      results.push(
+        await web_crawler(state.userId, state.spec.payload.startUrl, state.spec.payload.options),
+      );
+    } else if (state.spec.tool === 'structured_scraper') {
       const { structured_scraper } = await import('../tools/webIntelligenceSkills');
-      results.push(await structured_scraper(state.userId, state.spec.payload.domain, state.spec.payload.options));
-    }
-    else if (state.spec.tool === 'data_archive') {
+      results.push(
+        await structured_scraper(
+          state.userId,
+          state.spec.payload.domain,
+          state.spec.payload.options,
+        ),
+      );
+    } else if (state.spec.tool === 'data_archive') {
       const { data_archive } = await import('../tools/webIntelligenceSkills');
-      results.push(await data_archive(state.userId, state.spec.payload.data, state.spec.payload.options));
-    }
-    else if (state.spec.tool === 'deep_lookup') {
+      results.push(
+        await data_archive(state.userId, state.spec.payload.data, state.spec.payload.options),
+      );
+    } else if (state.spec.tool === 'deep_lookup') {
       const { deep_lookup } = await import('../tools/webIntelligenceSkills');
-      results.push(await deep_lookup(state.userId, state.spec.payload.entityId, state.spec.payload.options));
+      results.push(
+        await deep_lookup(state.userId, state.spec.payload.entityId, state.spec.payload.options),
+      );
     }
 
     return { results, status: 'COMPLETED' };

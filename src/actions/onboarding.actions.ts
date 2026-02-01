@@ -38,7 +38,7 @@ export async function completeOnboarding(data: OnboardingData) {
   // 2. The Mirror: Adaptive Brand Extraction
   if (data.website) {
     try {
-      const { extractBrandIdentity } = await import('../tools/brandMirror.js');
+      const { extractBrandIdentity } = await import('../tools/brandMirror');
       updateData.brandConfig = await extractBrandIdentity(data.website);
     } catch (err) {
       console.warn('Brand extraction failed, using defaults:', err);

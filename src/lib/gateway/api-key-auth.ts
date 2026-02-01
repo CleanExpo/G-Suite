@@ -7,7 +7,7 @@
 
 import crypto from 'crypto';
 import prisma from '@/prisma';
-import type {ApiKeyValidation, RateLimitTier} from './types';
+import type { ApiKeyValidation, RateLimitTier } from './types';
 
 // ─── API Key Generation ─────────────────────────────────────────────────────
 
@@ -31,7 +31,7 @@ export function generateApiKey(): ApiKeyPair {
   const hash = crypto.createHash('sha256').update(key).digest('hex');
   const prefix = key.substring(0, 15); // "gp_live_abc1234"
 
-  return {key, hash, prefix};
+  return { key, hash, prefix };
 }
 
 // ─── API Key Validation ─────────────────────────────────────────────────────
@@ -42,11 +42,9 @@ export function generateApiKey(): ApiKeyPair {
  * @param key - Plaintext API key from request header
  * @returns Validation result with userId, scopes, and tier
  */
-export async function validateApiKey(
-  key: string
-): Promise<ApiKeyValidation> {
+export async function validateApiKey(key: string): Promise<ApiKeyValidation> {
   if (!key || !key.startsWith('gp_live_')) {
-    return {valid: false};
+    return { valid: false };
   }
 
   // Hash the provided key
@@ -55,7 +53,7 @@ export async function validateApiKey(
   try {
     // Lookup key in database
     const apiKey = await prisma.apiKey.findUnique({
-      where: {keyHash: hash},
+      where: { keyHash: hash },
       select: {
         userId: true,
         scopes: true,
@@ -68,23 +66,21 @@ export async function validateApiKey(
 
     // Check if key exists and is active
     if (!apiKey || !apiKey.isActive) {
-      return {valid: false};
+      return { valid: false };
     }
 
     // Check if key has expired
     if (apiKey.expiresAt && new Date(apiKey.expiresAt) < new Date()) {
-      return {valid: false};
+      return { valid: false };
     }
 
     // Update lastUsedAt timestamp asynchronously (don't block)
     prisma.apiKey
       .update({
-        where: {keyHash: hash},
-        data: {lastUsedAt: new Date()},
+        where: { keyHash: hash },
+        data: { lastUsedAt: new Date() },
       })
-      .catch(err =>
-        console.error('[ApiKey] Failed to update lastUsedAt:', err)
-      );
+      .catch((err) => console.error('[ApiKey] Failed to update lastUsedAt:', err));
 
     return {
       valid: true,
@@ -95,7 +91,7 @@ export async function validateApiKey(
     };
   } catch (error) {
     console.error('[ApiKey] Error validating API key:', error);
-    return {valid: false};
+    return { valid: false };
   }
 }
 
@@ -113,11 +109,8 @@ export async function validateApiKey(
  * @param userScopes - User's granted scopes from API key
  * @returns Whether the user has the required scope
  */
-export function checkScope(
-  requiredScope: string,
-  userScopes: string[]
-): boolean {
-  return userScopes.some(scope => {
+export function checkScope(requiredScope: string, userScopes: string[]): boolean {
+  return userScopes.some((scope) => {
     // Wildcard: full access
     if (scope === '*') return true;
 
@@ -143,7 +136,7 @@ export function parseScope(scope: string): {
   action: string;
 } {
   const [resource, action] = scope.split(':');
-  return {resource: resource || '', action: action || ''};
+  return { resource: resource || '', action: action || '' };
 }
 
 /**

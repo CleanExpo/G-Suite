@@ -54,10 +54,7 @@ export async function GET() {
     });
   } catch (error: any) {
     console.error('[Alert Rules GET] Error:', error.message);
-    return NextResponse.json(
-      { success: false, error: error.message },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
 
@@ -86,7 +83,7 @@ export async function POST(req: NextRequest) {
     if (!name || !metric || !condition || threshold === undefined) {
       return NextResponse.json(
         { success: false, error: 'Missing required fields: name, metric, condition, threshold' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -103,7 +100,7 @@ export async function POST(req: NextRequest) {
     if (!validMetrics.includes(metric)) {
       return NextResponse.json(
         { success: false, error: `Invalid metric. Must be one of: ${validMetrics.join(', ')}` },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -111,8 +108,11 @@ export async function POST(req: NextRequest) {
     const validConditions = ['gt', 'gte', 'lt', 'lte', 'eq'];
     if (!validConditions.includes(condition)) {
       return NextResponse.json(
-        { success: false, error: `Invalid condition. Must be one of: ${validConditions.join(', ')}` },
-        { status: 400 }
+        {
+          success: false,
+          error: `Invalid condition. Must be one of: ${validConditions.join(', ')}`,
+        },
+        { status: 400 },
       );
     }
 
@@ -145,10 +145,7 @@ export async function POST(req: NextRequest) {
     });
   } catch (error: any) {
     console.error('[Alert Rules POST] Error:', error.message);
-    return NextResponse.json(
-      { success: false, error: error.message },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
 
@@ -163,10 +160,7 @@ export async function PATCH(req: NextRequest) {
     const { id, ...updates } = body;
 
     if (!id) {
-      return NextResponse.json(
-        { success: false, error: 'Missing rule ID' },
-        { status: 400 }
-      );
+      return NextResponse.json({ success: false, error: 'Missing rule ID' }, { status: 400 });
     }
 
     // Verify ownership
@@ -175,10 +169,7 @@ export async function PATCH(req: NextRequest) {
     });
 
     if (!existing) {
-      return NextResponse.json(
-        { success: false, error: 'Alert rule not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ success: false, error: 'Alert rule not found' }, { status: 404 });
     }
 
     const rule = await prisma.alertRule.update({
@@ -198,10 +189,7 @@ export async function PATCH(req: NextRequest) {
     });
   } catch (error: any) {
     console.error('[Alert Rules PATCH] Error:', error.message);
-    return NextResponse.json(
-      { success: false, error: error.message },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
 
@@ -216,10 +204,7 @@ export async function DELETE(req: NextRequest) {
     const id = searchParams.get('id');
 
     if (!id) {
-      return NextResponse.json(
-        { success: false, error: 'Missing rule ID' },
-        { status: 400 }
-      );
+      return NextResponse.json({ success: false, error: 'Missing rule ID' }, { status: 400 });
     }
 
     // Verify ownership
@@ -228,10 +213,7 @@ export async function DELETE(req: NextRequest) {
     });
 
     if (!existing) {
-      return NextResponse.json(
-        { success: false, error: 'Alert rule not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ success: false, error: 'Alert rule not found' }, { status: 404 });
     }
 
     await prisma.alertRule.delete({
@@ -241,9 +223,6 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ success: true });
   } catch (error: any) {
     console.error('[Alert Rules DELETE] Error:', error.message);
-    return NextResponse.json(
-      { success: false, error: error.message },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }

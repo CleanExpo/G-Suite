@@ -37,7 +37,7 @@ export async function GET() {
           timestamp: new Date().toISOString(),
         },
       },
-      { status: 401 }
+      { status: 401 },
     );
   }
 
@@ -59,7 +59,7 @@ export async function GET() {
         headers: {
           'Cache-Control': 'public, max-age=30', // 30-second cache
         },
-      }
+      },
     );
   } catch (error: any) {
     console.error('[Monitoring API] Error collecting metrics:', error);
@@ -76,7 +76,7 @@ export async function GET() {
           timestamp: new Date().toISOString(),
         },
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

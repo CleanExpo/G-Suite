@@ -70,7 +70,6 @@ export default function InfrastructurePage() {
               core fleet utilizes native GPU acceleration to power multi-modal generation at the
               speed of thought."
             </p>
-
           </motion.div>
 
           {/* Secondary Modules */}

@@ -5,9 +5,9 @@
  */
 
 import prisma from '@/prisma';
-import {encrypt} from '@/lib/encryption';
-import {generateWebhookSecret} from './signature';
-import type {WebhookEndpointConfig, WebhookEndpointInfo} from './types';
+import { encrypt } from '@/lib/encryption';
+import { generateWebhookSecret } from './signature';
+import type { WebhookEndpointConfig, WebhookEndpointInfo } from './types';
 
 // ─── Endpoint CRUD ──────────────────────────────────────────────────────────
 
@@ -20,8 +20,8 @@ import type {WebhookEndpointConfig, WebhookEndpointInfo} from './types';
  */
 export async function createWebhookEndpoint(
   userId: string,
-  config: WebhookEndpointConfig
-): Promise<{endpoint: WebhookEndpointInfo; secret: string}> {
+  config: WebhookEndpointConfig,
+): Promise<{ endpoint: WebhookEndpointInfo; secret: string }> {
   // Generate secret if not provided
   const secret = config.secret || generateWebhookSecret();
 
@@ -60,15 +60,13 @@ export async function createWebhookEndpoint(
  * @param userId - User ID
  * @returns List of webhook endpoints
  */
-export async function listWebhookEndpoints(
-  userId: string
-): Promise<WebhookEndpointInfo[]> {
+export async function listWebhookEndpoints(userId: string): Promise<WebhookEndpointInfo[]> {
   const endpoints = await prisma.webhookEndpoint.findMany({
-    where: {userId},
-    orderBy: {createdAt: 'desc'},
+    where: { userId },
+    orderBy: { createdAt: 'desc' },
   });
 
-  return endpoints.map(endpoint => ({
+  return endpoints.map((endpoint) => ({
     id: endpoint.id,
     url: endpoint.url,
     events: endpoint.events,
@@ -88,7 +86,7 @@ export async function listWebhookEndpoints(
  */
 export async function getWebhookEndpoint(
   endpointId: string,
-  userId: string
+  userId: string,
 ): Promise<WebhookEndpointInfo | null> {
   const endpoint = await prisma.webhookEndpoint.findFirst({
     where: {
@@ -128,11 +126,11 @@ export async function updateWebhookEndpoint(
     events?: string[];
     isActive?: boolean;
     metadata?: Record<string, unknown>;
-  }
+  },
 ): Promise<WebhookEndpointInfo | null> {
   // Verify ownership
   const existing = await prisma.webhookEndpoint.findFirst({
-    where: {id: endpointId, userId},
+    where: { id: endpointId, userId },
   });
 
   if (!existing) {
@@ -141,12 +139,12 @@ export async function updateWebhookEndpoint(
 
   // Update endpoint
   const updated = await prisma.webhookEndpoint.update({
-    where: {id: endpointId},
+    where: { id: endpointId },
     data: {
-      ...(updates.url && {url: updates.url}),
-      ...(updates.events && {events: updates.events}),
-      ...(updates.isActive !== undefined && {isActive: updates.isActive}),
-      ...(updates.metadata && {metadata: updates.metadata as any}),
+      ...(updates.url && { url: updates.url }),
+      ...(updates.events && { events: updates.events }),
+      ...(updates.isActive !== undefined && { isActive: updates.isActive }),
+      ...(updates.metadata && { metadata: updates.metadata as any }),
     },
   });
 
@@ -168,13 +166,10 @@ export async function updateWebhookEndpoint(
  * @param userId - User ID (for ownership check)
  * @returns Whether deletion was successful
  */
-export async function deleteWebhookEndpoint(
-  endpointId: string,
-  userId: string
-): Promise<boolean> {
+export async function deleteWebhookEndpoint(endpointId: string, userId: string): Promise<boolean> {
   // Verify ownership
   const existing = await prisma.webhookEndpoint.findFirst({
-    where: {id: endpointId, userId},
+    where: { id: endpointId, userId },
   });
 
   if (!existing) {
@@ -183,7 +178,7 @@ export async function deleteWebhookEndpoint(
 
   // Delete endpoint and associated deliveries (cascade)
   await prisma.webhookEndpoint.delete({
-    where: {id: endpointId},
+    where: { id: endpointId },
   });
 
   return true;
@@ -202,11 +197,11 @@ export async function deleteWebhookEndpoint(
 export async function listWebhookDeliveries(
   endpointId: string,
   userId: string,
-  limit: number = 50
+  limit: number = 50,
 ) {
   // Verify endpoint ownership
   const endpoint = await prisma.webhookEndpoint.findFirst({
-    where: {id: endpointId, userId},
+    where: { id: endpointId, userId },
   });
 
   if (!endpoint) {
@@ -214,8 +209,8 @@ export async function listWebhookDeliveries(
   }
 
   return await prisma.webhookDelivery.findMany({
-    where: {endpointId},
-    orderBy: {createdAt: 'desc'},
+    where: { endpointId },
+    orderBy: { createdAt: 'desc' },
     take: limit,
   });
 }

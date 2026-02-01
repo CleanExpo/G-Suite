@@ -93,7 +93,10 @@ export default function CreditDialog({
                     </span>
                   </div>
                   <h2 className="text-4xl lg:text-6xl font-black italic uppercase tracking-tighter text-gray-900 dark:text-white leading-none">
-                    {t('title').split(' ')[0]} {t('title').split(' ')[1]} <span className="text-blue-600">{t('title').split(' ').slice(2).join(' ')}</span>
+                    {t('title').split(' ')[0]} {t('title').split(' ')[1]}{' '}
+                    <span className="text-blue-600">
+                      {t('title').split(' ').slice(2).join(' ')}
+                    </span>
                   </h2>
                   <p className="text-gray-600 dark:text-gray-400 font-medium text-lg">
                     {t('description')}

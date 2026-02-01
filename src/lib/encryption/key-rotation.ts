@@ -41,9 +41,7 @@ export interface RotateKeysResult {
  * @param options - Rotation options including userId and reason
  * @returns Result with new key version and audit details
  */
-export async function rotateEncryptionKeys(
-  options: RotateKeysOptions
-): Promise<RotateKeysResult> {
+export async function rotateEncryptionKeys(options: RotateKeysOptions): Promise<RotateKeysResult> {
   const { userId, reason, rotatedBy } = options;
 
   try {
@@ -132,9 +130,7 @@ function countVaultSecrets(profile: any): number {
 /**
  * Get key rotation history for a user
  */
-export async function getKeyRotationHistory(
-  userId: string
-): Promise<KeyRotationEntry[]> {
+export async function getKeyRotationHistory(userId: string): Promise<KeyRotationEntry[]> {
   const profile = await prisma.userProfile.findUnique({
     where: { clerkId: userId },
     select: { keyRotationHistory: true },

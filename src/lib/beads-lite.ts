@@ -17,31 +17,37 @@ import { execSync } from 'child_process';
 // TYPES
 // ============================================================================
 
-export type TaskStatus = 'pending' | 'ready' | 'in_progress' | 'blocked' | 'completed' | 'cancelled';
+export type TaskStatus =
+  | 'pending'
+  | 'ready'
+  | 'in_progress'
+  | 'blocked'
+  | 'completed'
+  | 'cancelled';
 export type TaskPriority = 0 | 1 | 2 | 3; // 0=Urgent, 1=High, 2=Medium, 3=Low
 
 export interface BeadsTask {
-  id: string;                    // Unique ID (e.g., "bd-a1b2c3" or hierarchical "phase-9.0.1")
-  title: string;                 // Short description
-  status: TaskStatus;            // Current status
-  priority: TaskPriority;        // Priority level
-  description?: string;          // Detailed description
-  parent?: string;               // Parent task ID (for hierarchy)
-  dependencies?: string[];       // IDs of tasks that must complete first
-  assignee?: string;             // Agent or user assigned
-  tags?: string[];               // Tags for filtering
-  createdAt: string;             // ISO timestamp
-  updatedAt: string;             // ISO timestamp
-  completedAt?: string;          // ISO timestamp
+  id: string; // Unique ID (e.g., "bd-a1b2c3" or hierarchical "phase-9.0.1")
+  title: string; // Short description
+  status: TaskStatus; // Current status
+  priority: TaskPriority; // Priority level
+  description?: string; // Detailed description
+  parent?: string; // Parent task ID (for hierarchy)
+  dependencies?: string[]; // IDs of tasks that must complete first
+  assignee?: string; // Agent or user assigned
+  tags?: string[]; // Tags for filtering
+  createdAt: string; // ISO timestamp
+  updatedAt: string; // ISO timestamp
+  completedAt?: string; // ISO timestamp
   metadata?: Record<string, any>; // Additional data
 }
 
 export interface BeadsConfig {
-  repoRoot: string;              // Git repository root
-  beadsDir: string;              // .beads directory path
-  issuesFile: string;            // issues.jsonl path
-  autoSync: boolean;             // Auto-sync with Git
-  syncDebounceMs: number;        // Debounce window for auto-sync
+  repoRoot: string; // Git repository root
+  beadsDir: string; // .beads directory path
+  issuesFile: string; // issues.jsonl path
+  autoSync: boolean; // Auto-sync with Git
+  syncDebounceMs: number; // Debounce window for auto-sync
 }
 
 // ============================================================================
@@ -59,7 +65,7 @@ export class BeadsLite {
       beadsDir: path.join(repoRoot, '.beads'),
       issuesFile: path.join(repoRoot, '.beads', 'issues.jsonl'),
       autoSync: true,
-      syncDebounceMs: 30000 // 30 seconds
+      syncDebounceMs: 30000, // 30 seconds
     };
     this.tasks = new Map();
   }
@@ -107,7 +113,7 @@ export class BeadsLite {
     }
 
     const content = fs.readFileSync(this.config.issuesFile, 'utf-8');
-    const lines = content.split('\n').filter(line => line.trim());
+    const lines = content.split('\n').filter((line) => line.trim());
 
     for (const line of lines) {
       try {
@@ -126,7 +132,7 @@ export class BeadsLite {
    */
   async save(): Promise<void> {
     const lines = Array.from(this.tasks.values())
-      .map(task => JSON.stringify(task))
+      .map((task) => JSON.stringify(task))
       .join('\n');
 
     fs.writeFileSync(this.config.issuesFile, lines + '\n', 'utf-8');
@@ -161,9 +167,9 @@ export class BeadsLite {
       if (!parentTask) {
         throw new Error(`Parent task not found: ${params.parent}`);
       }
-      const siblingCount = Array.from(this.tasks.values())
-        .filter(t => t.parent === params.parent)
-        .length;
+      const siblingCount = Array.from(this.tasks.values()).filter(
+        (t) => t.parent === params.parent,
+      ).length;
       id = `${params.parent}.${siblingCount + 1}`;
     } else {
       // Hash-based ID (simplified)
@@ -182,7 +188,7 @@ export class BeadsLite {
       assignee: params.assignee,
       tags: params.tags || [],
       createdAt: now,
-      updatedAt: now
+      updatedAt: now,
     };
 
     // Update status based on dependencies
@@ -209,7 +215,7 @@ export class BeadsLite {
       ...updates,
       id: task.id, // Prevent ID changes
       createdAt: task.createdAt, // Preserve creation time
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
 
     // Update status if dependencies changed
@@ -238,7 +244,7 @@ export class BeadsLite {
       ...task,
       status: 'completed',
       completedAt: now,
-      updatedAt: now
+      updatedAt: now,
     };
 
     this.tasks.set(id, completedTask);
@@ -289,7 +295,7 @@ export class BeadsLite {
    */
   getReady(): BeadsTask[] {
     return this.getAll()
-      .filter(t => t.status === 'ready')
+      .filter((t) => t.status === 'ready')
       .sort((a, b) => a.priority - b.priority);
   }
 
@@ -297,28 +303,28 @@ export class BeadsLite {
    * Get tasks by status
    */
   getByStatus(status: TaskStatus): BeadsTask[] {
-    return this.getAll().filter(t => t.status === status);
+    return this.getAll().filter((t) => t.status === status);
   }
 
   /**
    * Get tasks by assignee
    */
   getByAssignee(assignee: string): BeadsTask[] {
-    return this.getAll().filter(t => t.assignee === assignee);
+    return this.getAll().filter((t) => t.assignee === assignee);
   }
 
   /**
    * Get tasks by tag
    */
   getByTag(tag: string): BeadsTask[] {
-    return this.getAll().filter(t => t.tags?.includes(tag));
+    return this.getAll().filter((t) => t.tags?.includes(tag));
   }
 
   /**
    * Get child tasks
    */
   getChildren(parentId: string): BeadsTask[] {
-    return this.getAll().filter(t => t.parent === parentId);
+    return this.getAll().filter((t) => t.parent === parentId);
   }
 
   /**
@@ -336,7 +342,7 @@ export class BeadsLite {
       const currentId = queue.shift()!;
       const children = this.getChildren(currentId);
       hierarchy.push(...children);
-      queue.push(...children.map(c => c.id));
+      queue.push(...children.map((c) => c.id));
     }
 
     return hierarchy;
@@ -359,7 +365,7 @@ export class BeadsLite {
       return;
     }
 
-    const allDepsCompleted = task.dependencies.every(depId => {
+    const allDepsCompleted = task.dependencies.every((depId) => {
       const dep = this.tasks.get(depId);
       return dep?.status === 'completed';
     });
@@ -427,7 +433,7 @@ export class BeadsLite {
       // Check if there are changes
       const status = execSync('git status --porcelain .beads/', {
         cwd: this.config.repoRoot,
-        encoding: 'utf-8'
+        encoding: 'utf-8',
       });
 
       if (!status.trim()) {
@@ -438,13 +444,13 @@ export class BeadsLite {
       // Add .beads directory
       execSync('git add .beads/', {
         cwd: this.config.repoRoot,
-        stdio: 'inherit'
+        stdio: 'inherit',
       });
 
       // Commit
       execSync('git commit -m "chore: update task tracking (beads-lite auto-sync)"', {
         cwd: this.config.repoRoot,
-        stdio: 'inherit'
+        stdio: 'inherit',
       });
 
       console.log('✅ Synced tasks to Git');
@@ -482,19 +488,19 @@ export class BeadsLite {
     return {
       total: all.length,
       byStatus: {
-        pending: all.filter(t => t.status === 'pending').length,
-        ready: all.filter(t => t.status === 'ready').length,
-        in_progress: all.filter(t => t.status === 'in_progress').length,
-        blocked: all.filter(t => t.status === 'blocked').length,
-        completed: all.filter(t => t.status === 'completed').length,
-        cancelled: all.filter(t => t.status === 'cancelled').length
+        pending: all.filter((t) => t.status === 'pending').length,
+        ready: all.filter((t) => t.status === 'ready').length,
+        in_progress: all.filter((t) => t.status === 'in_progress').length,
+        blocked: all.filter((t) => t.status === 'blocked').length,
+        completed: all.filter((t) => t.status === 'completed').length,
+        cancelled: all.filter((t) => t.status === 'cancelled').length,
       },
       byPriority: {
-        urgent: all.filter(t => t.priority === 0).length,
-        high: all.filter(t => t.priority === 1).length,
-        medium: all.filter(t => t.priority === 2).length,
-        low: all.filter(t => t.priority === 3).length
-      }
+        urgent: all.filter((t) => t.priority === 0).length,
+        high: all.filter((t) => t.priority === 1).length,
+        medium: all.filter((t) => t.priority === 2).length,
+        low: all.filter((t) => t.priority === 3).length,
+      },
     };
   }
 }

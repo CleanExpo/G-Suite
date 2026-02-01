@@ -5,8 +5,8 @@
  * DELETE /api/keys/:id - Revoke/delete key
  */
 
-import {NextResponse} from 'next/server';
-import {auth} from '@clerk/nextjs/server';
+import { NextResponse } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
 import prisma from '@/prisma';
 
 export const dynamic = 'force-dynamic';
@@ -14,11 +14,8 @@ export const dynamic = 'force-dynamic';
 /**
  * GET /api/keys/:id - Get API key details
  */
-export async function GET(
-  _req: Request,
-  {params}: {params: Promise<{id: string}>}
-) {
-  const {userId} = await auth();
+export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { userId } = await auth();
 
   if (!userId) {
     return NextResponse.json(
@@ -33,12 +30,12 @@ export async function GET(
           timestamp: new Date().toISOString(),
         },
       },
-      {status: 401}
+      { status: 401 },
     );
   }
 
   try {
-    const {id} = await params;
+    const { id } = await params;
 
     const key = await prisma.apiKey.findFirst({
       where: {
@@ -72,7 +69,7 @@ export async function GET(
             timestamp: new Date().toISOString(),
           },
         },
-        {status: 404}
+        { status: 404 },
       );
     }
 
@@ -105,7 +102,7 @@ export async function GET(
           timestamp: new Date().toISOString(),
         },
       },
-      {status: 500}
+      { status: 500 },
     );
   }
 }
@@ -113,11 +110,8 @@ export async function GET(
 /**
  * DELETE /api/keys/:id - Revoke/delete API key
  */
-export async function DELETE(
-  _req: Request,
-  {params}: {params: Promise<{id: string}>}
-) {
-  const {userId} = await auth();
+export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { userId } = await auth();
 
   if (!userId) {
     return NextResponse.json(
@@ -132,12 +126,12 @@ export async function DELETE(
           timestamp: new Date().toISOString(),
         },
       },
-      {status: 401}
+      { status: 401 },
     );
   }
 
   try {
-    const {id} = await params;
+    const { id } = await params;
 
     // Verify ownership before deletion
     const key = await prisma.apiKey.findFirst({
@@ -160,13 +154,13 @@ export async function DELETE(
             timestamp: new Date().toISOString(),
           },
         },
-        {status: 404}
+        { status: 404 },
       );
     }
 
     // Delete the key
     await prisma.apiKey.delete({
-      where: {id},
+      where: { id },
     });
 
     return NextResponse.json({
@@ -196,7 +190,7 @@ export async function DELETE(
           timestamp: new Date().toISOString(),
         },
       },
-      {status: 500}
+      { status: 500 },
     );
   }
 }

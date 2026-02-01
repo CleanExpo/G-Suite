@@ -1,8 +1,8 @@
 /**
  * Jina AI Client
- * 
+ *
  * Provides interface to Jina's Reader and Search APIs for AI-friendly web access.
- * 
+ *
  * Capability:
  * - Reader: Converts URLs to clean LLM-ready markdown
  * - Search: Performs web searches optimized for RAG
@@ -10,10 +10,10 @@
 
 export interface JinaReaderOptions {
   withImagesSummary?: boolean; // Summarize images
-  withGeneratedAlt?: boolean;  // Generate alt text for images
-  targetSelector?: string;     // CSS selector for specific content
-  waitForSelector?: string;    // Wait for selector before scraping
-  proxyUrl?: string;           // Use custom proxy if needed
+  withGeneratedAlt?: boolean; // Generate alt text for images
+  targetSelector?: string; // CSS selector for specific content
+  waitForSelector?: string; // Wait for selector before scraping
+  proxyUrl?: string; // Use custom proxy if needed
 }
 
 export interface JinaSearchResult {
@@ -29,7 +29,7 @@ export interface JinaReaderResult {
   url: string;
   content: string; // Markdown
   images?: Record<string, string>; // Image URL -> Alt/Summary
-  links?: Record<string, string>;  // Link Text -> URL
+  links?: Record<string, string>; // Link Text -> URL
 }
 
 export class JinaClient {
@@ -39,7 +39,7 @@ export class JinaClient {
 
   constructor(apiKey?: string) {
     this.apiKey = apiKey || process.env.JINA_API_KEY || '';
-    
+
     if (!this.apiKey) {
       console.warn('[JinaClient] Warning: No API key provided. Free tier limits may apply.');
     }
@@ -52,13 +52,13 @@ export class JinaClient {
     try {
       // Clean up URL
       const cleanUrl = url.trim();
-      
+
       // Construct endpoint request
       const requestUrl = `${this.baseUrl}${cleanUrl}`;
-      
+
       const headers: Record<string, string> = {
-        'Accept': 'application/json',
-        ...(this.apiKey ? { 'Authorization': `Bearer ${this.apiKey}` } : {})
+        Accept: 'application/json',
+        ...(this.apiKey ? { Authorization: `Bearer ${this.apiKey}` } : {}),
       };
 
       // Add specialized headers
@@ -75,7 +75,7 @@ export class JinaClient {
 
       const response = await fetch(requestUrl, {
         method: 'POST', // Jina supports GET but POST/JSON body or headers is cleaner for complex opts
-        headers
+        headers,
       });
 
       if (!response.ok) {
@@ -89,16 +89,15 @@ export class JinaClient {
       }
 
       // Check format of response.
-      // Jina usually returns the raw content if Accept is text/plain, 
+      // Jina usually returns the raw content if Accept is text/plain,
       // or JSON wrapper if Accept is application/json.
       return {
         title: data.data?.title || 'No Title',
         url: data.data?.url || url,
         content: data.data?.content || '',
         links: data.data?.links,
-        images: data.data?.images
+        images: data.data?.images,
       };
-
     } catch (error: any) {
       console.error('[JinaClient] Read error:', error.message);
       throw error;
@@ -111,17 +110,17 @@ export class JinaClient {
   async search(query: string): Promise<JinaSearchResult[]> {
     try {
       const requestUrl = `${this.searchUrl}${encodeURIComponent(query)}`;
-      
+
       const headers: Record<string, string> = {
-        'Accept': 'application/json',
-        ...(this.apiKey ? { 'Authorization': `Bearer ${this.apiKey}` } : {})
+        Accept: 'application/json',
+        ...(this.apiKey ? { Authorization: `Bearer ${this.apiKey}` } : {}),
       };
 
       console.log(`[JinaClient] Searching: ${query}...`);
 
       const response = await fetch(requestUrl, {
         method: 'GET',
-        headers
+        headers,
       });
 
       if (!response.ok) {
@@ -139,9 +138,8 @@ export class JinaClient {
         url: item.url,
         description: item.description,
         content: item.content,
-        score: item.score
+        score: item.score,
       }));
-
     } catch (error: any) {
       console.error('[JinaClient] Search error:', error.message);
       throw error;

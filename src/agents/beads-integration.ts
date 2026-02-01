@@ -16,19 +16,19 @@ import { AgentContext, PlanStep, AgentResult } from './base/agent-interface';
 // ============================================================================
 
 export interface BeadsMissionContext extends AgentContext {
-  beadsTaskId?: string;           // Associated Beads task ID
-  beadsAutoTrack?: boolean;       // Enable auto-tracking (default: true)
+  beadsTaskId?: string; // Associated Beads task ID
+  beadsAutoTrack?: boolean; // Enable auto-tracking (default: true)
 }
 
 export interface MissionTaskMapping {
-  missionId: string;              // G-Pilot mission ID
-  beadsTaskId: string;            // Beads task ID
-  planSteps: PlanStepMapping[];   // Step-to-task mappings
+  missionId: string; // G-Pilot mission ID
+  beadsTaskId: string; // Beads task ID
+  planSteps: PlanStepMapping[]; // Step-to-task mappings
 }
 
 export interface PlanStepMapping {
-  stepIndex: number;              // Index in plan.steps array
-  beadsTaskId: string;            // Beads task ID for this step
+  stepIndex: number; // Index in plan.steps array
+  beadsTaskId: string; // Beads task ID for this step
 }
 
 // ============================================================================
@@ -58,7 +58,7 @@ export class BeadsMissionTracker {
       description: context.mission,
       priority: this.inferPriority(context),
       assignee: 'mission-overseer',
-      tags: ['mission', context.userId || 'api-user']
+      tags: ['mission', context.userId || 'api-user'],
     });
 
     return missionTask.id;
@@ -70,7 +70,7 @@ export class BeadsMissionTracker {
   async trackPlan(
     missionId: string,
     parentTaskId: string,
-    steps: PlanStep[]
+    steps: PlanStep[],
   ): Promise<MissionTaskMapping> {
     const stepMappings: PlanStepMapping[] = [];
 
@@ -91,19 +91,19 @@ export class BeadsMissionTracker {
         dependencies,
         priority: this.mapStepPriority(step),
         assignee: step.tool,
-        tags: ['plan-step', missionId]
+        tags: ['plan-step', missionId],
       });
 
       stepMappings.push({
         stepIndex: i,
-        beadsTaskId: stepTask.id
+        beadsTaskId: stepTask.id,
       });
     }
 
     const mapping: MissionTaskMapping = {
       missionId,
       beadsTaskId: parentTaskId,
-      planSteps: stepMappings
+      planSteps: stepMappings,
     };
 
     this.mappings.set(missionId, mapping);
@@ -116,7 +116,7 @@ export class BeadsMissionTracker {
   async updateStepProgress(
     missionId: string,
     stepIndex: number,
-    status: 'in_progress' | 'completed' | 'blocked'
+    status: 'in_progress' | 'completed' | 'blocked',
   ): Promise<void> {
     const mapping = this.mappings.get(missionId);
     if (!mapping) {
@@ -140,10 +140,7 @@ export class BeadsMissionTracker {
   /**
    * Complete mission task
    */
-  async completeMission(
-    missionId: string,
-    result: AgentResult
-  ): Promise<void> {
+  async completeMission(missionId: string, result: AgentResult): Promise<void> {
     const mapping = this.mappings.get(missionId);
     if (!mapping) {
       console.warn(`No mapping found for mission: ${missionId}`);
@@ -156,8 +153,8 @@ export class BeadsMissionTracker {
         success: result.success,
         duration: result.duration,
         cost: result.cost,
-        artifacts: result.artifacts?.length || 0
-      }
+        artifacts: result.artifacts?.length || 0,
+      },
     });
 
     // Complete main task
@@ -172,7 +169,7 @@ export class BeadsMissionTracker {
    */
   async getReadyTasksForAgent(agentName: string): Promise<BeadsTask[]> {
     const readyTasks = this.beads.getReady();
-    return readyTasks.filter(t => t.assignee === agentName);
+    return readyTasks.filter((t) => t.assignee === agentName);
   }
 
   /**
@@ -298,7 +295,7 @@ export interface BeadsOverseerIntegration {
  * Create Beads integration for Mission Overseer
  */
 export async function createBeadsOverseerIntegration(
-  repoRoot?: string
+  repoRoot?: string,
 ): Promise<BeadsOverseerIntegration> {
   const beads = new BeadsLite(repoRoot);
   await beads.init();
@@ -333,15 +330,18 @@ export class BeadsCLI {
   /**
    * bd create <title> - Create new task
    */
-  async cmdCreate(title: string, options: {
-    priority?: TaskPriority;
-    description?: string;
-    parent?: string;
-    assignee?: string;
-  } = {}): Promise<BeadsTask> {
+  async cmdCreate(
+    title: string,
+    options: {
+      priority?: TaskPriority;
+      description?: string;
+      parent?: string;
+      assignee?: string;
+    } = {},
+  ): Promise<BeadsTask> {
     const task = await this.beads.create({
       title,
-      ...options
+      ...options,
     });
     console.log(`✅ Created: ${task.id} - ${task.title}`);
     return task;

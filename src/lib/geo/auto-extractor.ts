@@ -11,8 +11,8 @@ export interface ExtractedBusinessInfo {
   businessName: string | null;
   address: string | null;
   phone: string | null;
-  location: string | null;  // City, State
-  confidence: number;       // 0-100
+  location: string | null; // City, State
+  confidence: number; // 0-100
   source: 'schema' | 'footer' | 'contact' | 'header' | 'none';
 }
 
@@ -36,40 +36,52 @@ export async function extractBusinessInfo(url: string): Promise<ExtractedBusines
     // Strategy 1: Extract from LocalBusiness schema (highest confidence)
     const schemaResult = extractFromSchema(document);
     if (schemaResult.confidence > 80) {
-      console.log(`[AutoExtractor] Schema extraction successful (${schemaResult.confidence}% confidence)`);
+      console.log(
+        `[AutoExtractor] Schema extraction successful (${schemaResult.confidence}% confidence)`,
+      );
       return schemaResult;
     }
 
     // Strategy 2: Extract from footer (high confidence)
     const footerResult = extractFromFooter(document);
     if (footerResult.confidence > schemaResult.confidence) {
-      console.log(`[AutoExtractor] Footer extraction successful (${footerResult.confidence}% confidence)`);
+      console.log(
+        `[AutoExtractor] Footer extraction successful (${footerResult.confidence}% confidence)`,
+      );
       return footerResult;
     }
 
     // Strategy 3: Extract from header (medium confidence)
     const headerResult = extractFromHeader(document);
     if (headerResult.confidence > footerResult.confidence) {
-      console.log(`[AutoExtractor] Header extraction successful (${headerResult.confidence}% confidence)`);
+      console.log(
+        `[AutoExtractor] Header extraction successful (${headerResult.confidence}% confidence)`,
+      );
       return headerResult;
     }
 
     // Strategy 4: Try contact page (high confidence but requires additional request)
     const contactResult = await extractFromContactPage(url, document);
-    if (contactResult.confidence > Math.max(schemaResult.confidence, footerResult.confidence, headerResult.confidence)) {
-      console.log(`[AutoExtractor] Contact page extraction successful (${contactResult.confidence}% confidence)`);
+    if (
+      contactResult.confidence >
+      Math.max(schemaResult.confidence, footerResult.confidence, headerResult.confidence)
+    ) {
+      console.log(
+        `[AutoExtractor] Contact page extraction successful (${contactResult.confidence}% confidence)`,
+      );
       return contactResult;
     }
 
     // Return best result
     const results = [schemaResult, footerResult, headerResult, contactResult];
     const bestResult = results.reduce((best, current) =>
-      current.confidence > best.confidence ? current : best
+      current.confidence > best.confidence ? current : best,
     );
 
-    console.log(`[AutoExtractor] Best result: ${bestResult.source} (${bestResult.confidence}% confidence)`);
+    console.log(
+      `[AutoExtractor] Best result: ${bestResult.source} (${bestResult.confidence}% confidence)`,
+    );
     return bestResult;
-
   } catch (error: any) {
     console.error(`[AutoExtractor] Error extracting from ${url}:`, error.message);
     return createEmptyResult();
@@ -99,7 +111,7 @@ function extractFromSchema(document: any): ExtractedBusinessInfo {
               phone: cleanPhone(schema.telephone),
               location: extractLocation(schema.address),
               confidence: 0,
-              source: 'schema'
+              source: 'schema',
             };
 
             // Calculate confidence based on completeness
@@ -138,7 +150,7 @@ function extractFromFooter(document: any): ExtractedBusinessInfo {
       phone: extractPhoneFromText(footerText),
       location: null,
       confidence: 0,
-      source: 'footer'
+      source: 'footer',
     };
 
     // Extract location from address
@@ -172,7 +184,7 @@ function extractFromHeader(document: any): ExtractedBusinessInfo {
       phone: extractPhoneFromText(headerText),
       location: null,
       confidence: 0,
-      source: 'header'
+      source: 'header',
     };
 
     if (result.address) {
@@ -193,13 +205,16 @@ function extractFromHeader(document: any): ExtractedBusinessInfo {
 async function extractFromContactPage(url: string, document: any): Promise<ExtractedBusinessInfo> {
   try {
     // Find contact page link
-    const contactLinks = Array.from(document.querySelectorAll('a'))
-      .filter((a: any) => {
-        const href = a.getAttribute('href') || '';
-        const text = (a.textContent || '').toLowerCase();
-        return href.includes('contact') || text.includes('contact') ||
-          href.includes('about') || text.includes('about');
-      });
+    const contactLinks = Array.from(document.querySelectorAll('a')).filter((a: any) => {
+      const href = a.getAttribute('href') || '';
+      const text = (a.textContent || '').toLowerCase();
+      return (
+        href.includes('contact') ||
+        text.includes('contact') ||
+        href.includes('about') ||
+        text.includes('about')
+      );
+    });
 
     if (contactLinks.length === 0) {
       return createEmptyResult();
@@ -224,7 +239,7 @@ async function extractFromContactPage(url: string, document: any): Promise<Extra
       phone: extractPhoneFromText(contactText),
       location: null,
       confidence: 0,
-      source: 'contact'
+      source: 'contact',
     };
 
     if (result.address) {
@@ -250,8 +265,8 @@ async function fetchHTML(url: string): Promise<string | null> {
     const response = await fetch(url, {
       signal: controller.signal,
       headers: {
-        'User-Agent': 'G-Pilot SEO Analyzer/1.0'
-      }
+        'User-Agent': 'G-Pilot SEO Analyzer/1.0',
+      },
     });
 
     clearTimeout(timeout);
@@ -279,7 +294,7 @@ function formatAddress(addressObj: any): string | null {
     addressObj.streetAddress,
     addressObj.addressLocality,
     addressObj.addressRegion,
-    addressObj.postalCode
+    addressObj.postalCode,
   ].filter(Boolean);
 
   return parts.length > 0 ? parts.join(', ') : null;
@@ -360,7 +375,8 @@ function extractBusinessNameFromText(text: string, document: any): string | null
  */
 function extractAddressFromText(text: string): string | null {
   // Pattern: Street, City, State ZIP
-  const fullAddressPattern = /\d+\s+[A-Za-z\s]+(?:Street|St|Avenue|Ave|Road|Rd|Drive|Dr|Boulevard|Blvd|Lane|Ln|Way|Court|Ct),\s*[A-Z][a-zA-Z\s]+,\s*[A-Z]{2}\s*\d{5}/;
+  const fullAddressPattern =
+    /\d+\s+[A-Za-z\s]+(?:Street|St|Avenue|Ave|Road|Rd|Drive|Dr|Boulevard|Blvd|Lane|Ln|Way|Court|Ct),\s*[A-Z][a-zA-Z\s]+,\s*[A-Z]{2}\s*\d{5}/;
   const match = text.match(fullAddressPattern);
   if (match) {
     return match[0];
@@ -375,10 +391,10 @@ function extractAddressFromText(text: string): string | null {
 function extractPhoneFromText(text: string): string | null {
   // Patterns for phone numbers
   const patterns = [
-    /\(\d{3}\)\s*\d{3}-\d{4}/,      // (555) 123-4567
-    /\d{3}-\d{3}-\d{4}/,             // 555-123-4567
-    /\d{3}\.\d{3}\.\d{4}/,           // 555.123.4567
-    /\d{10}/                         // 5551234567
+    /\(\d{3}\)\s*\d{3}-\d{4}/, // (555) 123-4567
+    /\d{3}-\d{3}-\d{4}/, // 555-123-4567
+    /\d{3}\.\d{3}\.\d{4}/, // 555.123.4567
+    /\d{10}/, // 5551234567
   ];
 
   for (const pattern of patterns) {
@@ -417,7 +433,7 @@ function cleanPhone(phone: string | undefined): string | null {
  */
 function calculateConfidence(result: ExtractedBusinessInfo, baseConfidence: number): number {
   let fieldsFound = 0;
-  let totalFields = 3; // name, address, phone
+  const totalFields = 3; // name, address, phone
 
   if (result.businessName) fieldsFound++;
   if (result.address) fieldsFound++;
@@ -440,6 +456,6 @@ function createEmptyResult(): ExtractedBusinessInfo {
     phone: null,
     location: null,
     confidence: 0,
-    source: 'none'
+    source: 'none',
   };
 }

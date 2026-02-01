@@ -37,7 +37,7 @@ export async function GET(req: Request) {
           timestamp: new Date().toISOString(),
         },
       },
-      { status: 401 }
+      { status: 401 },
     );
   }
 
@@ -60,7 +60,7 @@ export async function GET(req: Request) {
             timestamp: new Date().toISOString(),
           },
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -87,7 +87,7 @@ export async function GET(req: Request) {
             timestamp: new Date().toISOString(),
           },
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -95,7 +95,7 @@ export async function GET(req: Request) {
       userId,
       metric,
       timeRange,
-      resolution
+      resolution,
     );
 
     return NextResponse.json(
@@ -116,7 +116,7 @@ export async function GET(req: Request) {
         headers: {
           'Cache-Control': 'public, max-age=60', // 1-minute cache
         },
-      }
+      },
     );
   } catch (error: any) {
     console.error('[Monitoring API] Error fetching metrics:', error);
@@ -133,7 +133,7 @@ export async function GET(req: Request) {
           timestamp: new Date().toISOString(),
         },
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

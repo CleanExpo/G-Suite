@@ -14,7 +14,7 @@ import type { SchedulerTask, ExecutionLevel } from './types';
 export class DAGSchedulerError extends Error {
   constructor(
     message: string,
-    public readonly involvedSteps?: string[]
+    public readonly involvedSteps?: string[],
   ) {
     super(message);
     this.name = 'DAGSchedulerError';
@@ -89,12 +89,10 @@ export class DAGScheduler {
 
     // 4. Cycle detection: if not all steps were processed, a cycle exists
     if (processed < steps.length) {
-      const cycleSteps = steps
-        .filter((s) => !queue.some((q) => q.id === s.id))
-        .map((s) => s.id);
+      const cycleSteps = steps.filter((s) => !queue.some((q) => q.id === s.id)).map((s) => s.id);
       throw new DAGSchedulerError(
         `Circular dependency detected among steps: ${cycleSteps.join(', ')}`,
-        cycleSteps
+        cycleSteps,
       );
     }
 
@@ -107,10 +105,7 @@ export class DAGScheduler {
       const id = topoOrder[i];
       let maxChildWeight = 0;
       for (const childId of dependents.get(id) ?? []) {
-        maxChildWeight = Math.max(
-          maxChildWeight,
-          criticalWeight.get(childId) ?? 0
-        );
+        maxChildWeight = Math.max(maxChildWeight, criticalWeight.get(childId) ?? 0);
       }
       criticalWeight.set(id, 1 + maxChildWeight);
     }
@@ -124,11 +119,7 @@ export class DAGScheduler {
       const task: SchedulerTask = {
         step,
         status: level === 0 ? 'ready' : 'pending',
-        priority: this.computePriority(
-          step,
-          level,
-          criticalWeight.get(step.id) ?? 0
-        ),
+        priority: this.computePriority(step, level, criticalWeight.get(step.id) ?? 0),
         level,
         criticalPathWeight: criticalWeight.get(step.id) ?? 0,
       };
@@ -167,7 +158,7 @@ export class DAGScheduler {
   private static computePriority(
     step: PlanStep,
     _level: number,
-    criticalPathWeight: number
+    criticalPathWeight: number,
   ): number {
     let priority = 0;
 
@@ -181,9 +172,7 @@ export class DAGScheduler {
     }
 
     // Stable tiebreaker from step ID
-    const hash = step.id
-      .split('')
-      .reduce((a, c) => a + c.charCodeAt(0), 0);
+    const hash = step.id.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
     priority += hash % 10;
 
     return priority;

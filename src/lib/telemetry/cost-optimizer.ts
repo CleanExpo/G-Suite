@@ -10,7 +10,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import type { AgentCostEntry } from './agent-cost-collector';
 
 const genAI = new GoogleGenerativeAI(
-  process.env.GOOGLE_AI_STUDIO_API_KEY || process.env.GOOGLE_API_KEY || ''
+  process.env.GOOGLE_AI_STUDIO_API_KEY || process.env.GOOGLE_API_KEY || '',
 );
 
 export interface CostPattern {
@@ -78,14 +78,17 @@ export class CostOptimizer {
 
     // Aggregate costs by agent
     const costByAgent: Record<string, number> = {};
-    const agentMetrics: Record<string, {
-      costs: number[];
-      tokens: number[];
-      durations: number[];
-      successes: number;
-      failures: number;
-      hours: number[];
-    }> = {};
+    const agentMetrics: Record<
+      string,
+      {
+        costs: number[];
+        tokens: number[];
+        durations: number[];
+        successes: number;
+        failures: number;
+        hours: number[];
+      }
+    > = {};
 
     for (const mission of missions) {
       if (!mission.agentCosts || typeof mission.agentCosts !== 'object') continue;
@@ -129,16 +132,20 @@ export class CostOptimizer {
     const recommendations = await this.generateRecommendations(patterns, totalCost);
 
     // Project monthly cost
-    const daysInData = missions.length > 0
-      ? Math.ceil((Date.now() - new Date(missions[missions.length - 1].createdAt).getTime()) / (24 * 60 * 60 * 1000))
-      : 30;
+    const daysInData =
+      missions.length > 0
+        ? Math.ceil(
+            (Date.now() - new Date(missions[missions.length - 1].createdAt).getTime()) /
+              (24 * 60 * 60 * 1000),
+          )
+        : 30;
     const dailyRate = totalCost / Math.max(daysInData, 1);
     const projectedMonthlyCost = Math.round(dailyRate * 30);
 
     // Calculate potential savings
     const potentialSavings = recommendations.reduce(
       (sum, r) => sum + (r.estimatedSavings / 100) * projectedMonthlyCost,
-      0
+      0,
     );
 
     return {
@@ -156,14 +163,17 @@ export class CostOptimizer {
    * Calculate cost patterns for each agent.
    */
   private calculatePatterns(
-    agentMetrics: Record<string, {
-      costs: number[];
-      tokens: number[];
-      durations: number[];
-      successes: number;
-      failures: number;
-      hours: number[];
-    }>
+    agentMetrics: Record<
+      string,
+      {
+        costs: number[];
+        tokens: number[];
+        durations: number[];
+        successes: number;
+        failures: number;
+        hours: number[];
+      }
+    >,
   ): CostPattern[] {
     const patterns: CostPattern[] = [];
 
@@ -191,12 +201,10 @@ export class CostOptimizer {
       const midpoint = Math.floor(metrics.costs.length / 2);
       const firstHalf = metrics.costs.slice(0, midpoint);
       const secondHalf = metrics.costs.slice(midpoint);
-      const firstAvg = firstHalf.length > 0
-        ? firstHalf.reduce((a, b) => a + b, 0) / firstHalf.length
-        : 0;
-      const secondAvg = secondHalf.length > 0
-        ? secondHalf.reduce((a, b) => a + b, 0) / secondHalf.length
-        : 0;
+      const firstAvg =
+        firstHalf.length > 0 ? firstHalf.reduce((a, b) => a + b, 0) / firstHalf.length : 0;
+      const secondAvg =
+        secondHalf.length > 0 ? secondHalf.reduce((a, b) => a + b, 0) / secondHalf.length : 0;
 
       let trend: 'increasing' | 'stable' | 'decreasing' = 'stable';
       if (secondAvg > firstAvg * 1.1) trend = 'increasing';
@@ -215,7 +223,7 @@ export class CostOptimizer {
     }
 
     // Sort by total cost (avgCost * executionCount)
-    return patterns.sort((a, b) => (b.avgCost * b.executionCount) - (a.avgCost * a.executionCount));
+    return patterns.sort((a, b) => b.avgCost * b.executionCount - a.avgCost * a.executionCount);
   }
 
   /**
@@ -223,7 +231,7 @@ export class CostOptimizer {
    */
   private async generateRecommendations(
     patterns: CostPattern[],
-    totalCost: number
+    totalCost: number,
   ): Promise<OptimizationRecommendation[]> {
     // Generate rule-based recommendations first
     const recommendations: OptimizationRecommendation[] = [];
@@ -238,9 +246,11 @@ export class CostOptimizer {
           type: 'agent_optimization',
           priority: 'high',
           title: `Optimise ${pattern.agentName} (${Math.round(costShare * 100)}% of costs)`,
-          description: `This agent accounts for over half of your costs. Consider caching results, reducing token usage, or using a lighter model for simple tasks.`,
+          description:
+            'This agent accounts for over half of your costs. Consider caching results, reducing token usage, or using a lighter model for simple tasks.',
           estimatedSavings: 15,
-          implementation: 'Review agent prompts for verbosity. Implement result caching for repeated queries. Consider prompt compression.',
+          implementation:
+            'Review agent prompts for verbosity. Implement result caching for repeated queries. Consider prompt compression.',
         });
       }
 
@@ -249,9 +259,11 @@ export class CostOptimizer {
           type: 'agent_optimization',
           priority: 'high',
           title: `Improve ${pattern.agentName} reliability (${Math.round(pattern.successRate * 100)}% success)`,
-          description: `Low success rate means wasted tokens on failed attempts. Improving reliability will reduce retry costs.`,
+          description:
+            'Low success rate means wasted tokens on failed attempts. Improving reliability will reduce retry costs.',
           estimatedSavings: Math.round((1 - pattern.successRate) * 100 * 0.5),
-          implementation: 'Add better error handling. Validate inputs before agent execution. Consider fallback strategies.',
+          implementation:
+            'Add better error handling. Validate inputs before agent execution. Consider fallback strategies.',
         });
       }
 
@@ -260,15 +272,17 @@ export class CostOptimizer {
           type: 'general',
           priority: 'medium',
           title: `Monitor ${pattern.agentName} cost trend`,
-          description: `Costs for this agent are increasing. Review recent changes and set up budget alerts.`,
+          description:
+            'Costs for this agent are increasing. Review recent changes and set up budget alerts.',
           estimatedSavings: 10,
-          implementation: 'Create a budget alert rule for this agent. Review recent prompt or workflow changes.',
+          implementation:
+            'Create a budget alert rule for this agent. Review recent prompt or workflow changes.',
         });
       }
     }
 
     // Check for peak hour optimizations
-    const allPeakHours = patterns.flatMap(p => p.peakHours);
+    const allPeakHours = patterns.flatMap((p) => p.peakHours);
     const peakHourCounts: Record<number, number> = {};
     for (const hour of allPeakHours) {
       peakHourCounts[hour] = (peakHourCounts[hour] || 0) + 1;
@@ -282,9 +296,10 @@ export class CostOptimizer {
         type: 'scheduling',
         priority: 'low',
         title: 'Consider load balancing across hours',
-        description: `Most missions run during ${busyHours.map(h => `${h}:00`).join(', ')}. Spreading workload may reduce peak costs.`,
+        description: `Most missions run during ${busyHours.map((h) => `${h}:00`).join(', ')}. Spreading workload may reduce peak costs.`,
         estimatedSavings: 5,
-        implementation: 'Schedule non-urgent missions during off-peak hours. Consider batch processing.',
+        implementation:
+          'Schedule non-urgent missions during off-peak hours. Consider batch processing.',
       });
     }
 
@@ -310,7 +325,9 @@ export class CostOptimizer {
   /**
    * Get AI-powered recommendations from Gemini.
    */
-  private async getAIRecommendations(patterns: CostPattern[]): Promise<OptimizationRecommendation[]> {
+  private async getAIRecommendations(
+    patterns: CostPattern[],
+  ): Promise<OptimizationRecommendation[]> {
     const prompt = `Analyze these agent cost patterns and provide 2-3 specific optimization recommendations:
 
 ${JSON.stringify(patterns, null, 2)}
@@ -333,7 +350,10 @@ Return JSON array:
 ]`;
 
     const result = await this.model.generateContent(prompt);
-    const text = result.response.text().replace(/```json|```/gi, '').trim();
+    const text = result.response
+      .text()
+      .replace(/```json|```/gi, '')
+      .trim();
     return JSON.parse(text);
   }
 

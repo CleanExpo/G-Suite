@@ -18,13 +18,12 @@ let connection: IORedis | null = null;
 export function getRedisConnection(): IORedis | null {
   if (connection) return connection;
 
-  const redisUrl =
-    process.env.REDIS_URL ||
-    process.env.UPSTASH_REDIS_URL ||
-    '';
+  const redisUrl = process.env.REDIS_URL || process.env.UPSTASH_REDIS_URL || '';
 
   if (!redisUrl) {
-    console.warn('[queue/redis] No REDIS_URL or UPSTASH_REDIS_URL configured. Queue system disabled.');
+    console.warn(
+      '[queue/redis] No REDIS_URL or UPSTASH_REDIS_URL configured. Queue system disabled.',
+    );
     return null;
   }
 
@@ -33,7 +32,7 @@ export function getRedisConnection(): IORedis | null {
 
     connection = new IORedis(redisUrl, {
       maxRetriesPerRequest: null, // Required by BullMQ
-      enableReadyCheck: false,    // Upstash compatibility
+      enableReadyCheck: false, // Upstash compatibility
       ...(useTls ? { tls: { rejectUnauthorized: false } } : {}),
     });
 

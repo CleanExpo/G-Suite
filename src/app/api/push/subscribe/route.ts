@@ -12,7 +12,10 @@ export async function POST(request: NextRequest) {
     const supabase = await createClient();
 
     // Verify authentication
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -27,22 +30,20 @@ export async function POST(request: NextRequest) {
 
     // Store subscription in database
     // Using upsert to update existing subscription if endpoint matches
-    const { error: dbError } = await supabase
-      .from('push_subscriptions')
-      .upsert(
-        {
-          user_id: user.id,
-          endpoint,
-          p256dh: keys.p256dh,
-          auth: keys.auth,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        },
-        {
-          onConflict: 'user_id,endpoint',
-          ignoreDuplicates: false,
-        }
-      );
+    const { error: dbError } = await supabase.from('push_subscriptions').upsert(
+      {
+        user_id: user.id,
+        endpoint,
+        p256dh: keys.p256dh,
+        auth: keys.auth,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+      {
+        onConflict: 'user_id,endpoint',
+        ignoreDuplicates: false,
+      },
+    );
 
     if (dbError) {
       console.error('Failed to save push subscription:', dbError);

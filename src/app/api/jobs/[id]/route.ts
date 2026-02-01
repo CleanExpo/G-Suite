@@ -4,10 +4,7 @@ import { auth } from '@clerk/nextjs/server';
 /**
  * GET /api/jobs/[id] — Get job details
  */
-export async function GET(
-  _req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { userId } = await auth();
     if (!userId) {
@@ -59,10 +56,7 @@ export async function GET(
 /**
  * DELETE /api/jobs/[id] — Cancel a pending/delayed job
  */
-export async function DELETE(
-  _req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { userId } = await auth();
     if (!userId) {
@@ -87,8 +81,10 @@ export async function DELETE(
     // Can only cancel waiting or delayed jobs
     if (job.status !== 'waiting' && job.status !== 'delayed') {
       return NextResponse.json(
-        { message: `Cannot cancel job with status "${job.status}". Only waiting or delayed jobs can be cancelled.` },
-        { status: 409 }
+        {
+          message: `Cannot cancel job with status "${job.status}". Only waiting or delayed jobs can be cancelled.`,
+        },
+        { status: 409 },
       );
     }
 

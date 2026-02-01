@@ -15,11 +15,7 @@
  */
 
 import type { PlanStep } from '@/agents/base';
-import type {
-  SchedulerTask,
-  SchedulerConfig,
-  SchedulerResult,
-} from './types';
+import type { SchedulerTask, SchedulerConfig, SchedulerResult } from './types';
 import { DAGScheduler } from './dag-scheduler';
 
 type TaskExecutor = (task: SchedulerTask) => Promise<void>;
@@ -64,10 +60,7 @@ export class ExecutionPool {
    * @param executor - A function that runs a single task (provided by the overseer)
    * @returns SchedulerResult with outcome of all tasks
    */
-  async execute(
-    steps: PlanStep[],
-    executor: TaskExecutor
-  ): Promise<SchedulerResult> {
+  async execute(steps: PlanStep[], executor: TaskExecutor): Promise<SchedulerResult> {
     const startTime = Date.now();
 
     // Handle empty plan
@@ -193,12 +186,8 @@ export class ExecutionPool {
     const timeoutPromise = new Promise<never>((_, reject) => {
       setTimeout(
         () =>
-          reject(
-            new Error(
-              `Task ${task.step.id} timed out after ${this.config.taskTimeoutMs}ms`
-            )
-          ),
-        this.config.taskTimeoutMs
+          reject(new Error(`Task ${task.step.id} timed out after ${this.config.taskTimeoutMs}ms`)),
+        this.config.taskTimeoutMs,
       );
     });
 
@@ -217,10 +206,7 @@ export class ExecutionPool {
         }
 
         try {
-          this.config.onProgress?.(
-            this.completedCount + this.failedCount,
-            this.totalTasks
-          );
+          this.config.onProgress?.(this.completedCount + this.failedCount, this.totalTasks);
         } catch {
           // Callback errors don't affect scheduling
         }
@@ -242,10 +228,7 @@ export class ExecutionPool {
         }
 
         try {
-          this.config.onProgress?.(
-            this.completedCount + this.failedCount,
-            this.totalTasks
-          );
+          this.config.onProgress?.(this.completedCount + this.failedCount, this.totalTasks);
         } catch {
           // Callback errors don't affect scheduling
         }
@@ -290,11 +273,7 @@ export class ExecutionPool {
   /**
    * Check if a task transitively depends on targetId.
    */
-  private dependsOn(
-    task: SchedulerTask,
-    targetId: string,
-    visited = new Set<string>()
-  ): boolean {
+  private dependsOn(task: SchedulerTask, targetId: string, visited = new Set<string>()): boolean {
     if (visited.has(task.step.id)) return false;
     visited.add(task.step.id);
 
@@ -311,8 +290,7 @@ export class ExecutionPool {
    * if no tasks are running but unsettled tasks remain, mark them as cancelled.
    */
   private checkDone(): void {
-    const settledCount =
-      this.completedCount + this.failedCount + this.cancelledCount;
+    const settledCount = this.completedCount + this.failedCount + this.cancelledCount;
 
     if (settledCount >= this.totalTasks) {
       // All tasks are settled

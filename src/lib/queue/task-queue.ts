@@ -11,13 +11,7 @@
 import { Queue, type Job } from 'bullmq';
 import { getRedisConnection } from './redis';
 import { DEFAULT_BACKOFF } from './retry-strategy';
-import type {
-  JobOptions,
-  JobStatus,
-  AddJobResult,
-  QueueJobData,
-  QueueMetrics,
-} from './types';
+import type { JobOptions, JobStatus, AddJobResult, QueueJobData, QueueMetrics } from './types';
 
 export class TaskQueue {
   private queues: Map<string, Queue> = new Map();
@@ -45,7 +39,7 @@ export class TaskQueue {
     queueName: string,
     jobName: string,
     data: Record<string, unknown>,
-    options: JobOptions
+    options: JobOptions,
   ): Promise<AddJobResult> {
     const queue = this.getQueue(queueName);
     if (!queue) {
@@ -65,9 +59,7 @@ export class TaskQueue {
             priority: options.priority ?? 0,
             payload: data as Record<string, any>,
             maxAttempts: options.attempts ?? 3,
-            scheduledFor: options.delay
-              ? new Date(Date.now() + options.delay)
-              : null,
+            scheduledFor: options.delay ? new Date(Date.now() + options.delay) : null,
             userId: options.userId,
           },
         });
@@ -130,12 +122,7 @@ export class TaskQueue {
   /**
    * List jobs in a queue filtered by status.
    */
-  async listJobs(
-    queueName: string,
-    status: JobStatus,
-    start = 0,
-    end = 25
-  ): Promise<Job[]> {
+  async listJobs(queueName: string, status: JobStatus, start = 0, end = 25): Promise<Job[]> {
     const queue = this.getQueue(queueName);
     if (!queue) return [];
 
@@ -194,7 +181,7 @@ export class TaskQueue {
         'active',
         'completed',
         'failed',
-        'delayed'
+        'delayed',
       );
       return {
         waiting: counts.waiting ?? 0,

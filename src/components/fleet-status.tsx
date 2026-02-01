@@ -11,7 +11,7 @@ export function FleetStatus() {
     totalMissions: 0,
     successRate: 100,
     totalFuelConsumed: 0,
-    activeAgents: 5
+    activeAgents: 5,
   });
   const t = useTranslations('FleetStatus');
 
@@ -20,12 +20,42 @@ export function FleetStatus() {
   }, []);
 
   const systems = [
-    { name: t('systems.architect'), status: t('statuses.ready'), icon: Cpu, color: 'text-blue-600' },
-    { name: t('systems.executor'), status: t('statuses.standby'), icon: Rocket, color: 'text-amber-500' },
-    { name: t('systems.vault'), status: t('statuses.encrypted'), icon: Shield, color: 'text-emerald-500' },
-    { name: t('systems.mirror'), status: t('statuses.synced'), icon: Globe, color: 'text-indigo-500' },
-    { name: t('systems.commerce'), status: t('statuses.active'), icon: ShoppingCart, color: 'text-rose-500' },
-    { name: t('systems.social'), status: t('statuses.linked'), icon: Share2, color: 'text-sky-500' },
+    {
+      name: t('systems.architect'),
+      status: t('statuses.ready'),
+      icon: Cpu,
+      color: 'text-blue-600',
+    },
+    {
+      name: t('systems.executor'),
+      status: t('statuses.standby'),
+      icon: Rocket,
+      color: 'text-amber-500',
+    },
+    {
+      name: t('systems.vault'),
+      status: t('statuses.encrypted'),
+      icon: Shield,
+      color: 'text-emerald-500',
+    },
+    {
+      name: t('systems.mirror'),
+      status: t('statuses.synced'),
+      icon: Globe,
+      color: 'text-indigo-500',
+    },
+    {
+      name: t('systems.commerce'),
+      status: t('statuses.active'),
+      icon: ShoppingCart,
+      color: 'text-rose-500',
+    },
+    {
+      name: t('systems.social'),
+      status: t('statuses.linked'),
+      icon: Share2,
+      color: 'text-sky-500',
+    },
   ];
 
   return (
@@ -43,16 +73,28 @@ export function FleetStatus() {
         {/* Real Metrics */}
         <div className="flex gap-8">
           <div className="space-y-1">
-            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">{t('totalMissions')}</p>
-            <p className="text-2xl font-black text-gray-900 dark:text-white leading-none">{stats.totalMissions}</p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">
+              {t('totalMissions')}
+            </p>
+            <p className="text-2xl font-black text-gray-900 dark:text-white leading-none">
+              {stats.totalMissions}
+            </p>
           </div>
           <div className="space-y-1">
-            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">{t('successRate')}</p>
-            <p className="text-2xl font-black text-emerald-500 leading-none">{stats.successRate.toFixed(1)}%</p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">
+              {t('successRate')}
+            </p>
+            <p className="text-2xl font-black text-emerald-500 leading-none">
+              {stats.successRate.toFixed(1)}%
+            </p>
           </div>
           <div className="space-y-1">
-            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">{t('fuelConsumed')}</p>
-            <p className="text-2xl font-black text-blue-600 leading-none">{stats.totalFuelConsumed} PTS</p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">
+              {t('fuelConsumed')}
+            </p>
+            <p className="text-2xl font-black text-blue-600 leading-none">
+              {stats.totalFuelConsumed} PTS
+            </p>
           </div>
         </div>
       </div>

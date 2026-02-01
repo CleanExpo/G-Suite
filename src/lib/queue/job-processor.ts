@@ -25,14 +25,12 @@ export class JobProcessor {
    * Register a worker for a named queue.
    * The handler receives a BullMQ Job and should return a result or throw.
    */
-  registerProcessor(
-    queueName: string,
-    handler: ProcessorHandler,
-    concurrency = 3
-  ): void {
+  registerProcessor(queueName: string, handler: ProcessorHandler, concurrency = 3): void {
     const connection = getRedisConnection();
     if (!connection) {
-      console.warn(`[JobProcessor] Cannot register processor for "${queueName}": Redis not configured.`);
+      console.warn(
+        `[JobProcessor] Cannot register processor for "${queueName}": Redis not configured.`,
+      );
       return;
     }
 
@@ -47,7 +45,7 @@ export class JobProcessor {
         console.log(`[JobProcessor] Processing job ${job.id} on queue "${queueName}"`);
         return handler(job);
       },
-      { connection, concurrency }
+      { connection, concurrency },
     );
 
     // Lifecycle hooks — sync to Prisma
@@ -76,7 +74,9 @@ export class JobProcessor {
     });
 
     this.workers.set(queueName, worker);
-    console.log(`[JobProcessor] Registered processor for "${queueName}" (concurrency: ${concurrency})`);
+    console.log(
+      `[JobProcessor] Registered processor for "${queueName}" (concurrency: ${concurrency})`,
+    );
   }
 
   /**
@@ -84,33 +84,37 @@ export class JobProcessor {
    * Invokes the LangGraph workflow for mission execution.
    */
   async registerMissionsProcessor(concurrency = 2): Promise<void> {
-    this.registerProcessor('missions', async (job) => {
-      const { userId, payload } = job.data;
-      const description = payload.description as string;
+    this.registerProcessor(
+      'missions',
+      async (job) => {
+        const { userId, payload } = job.data;
+        const description = payload.description as string;
 
-      if (!description) throw new Error('Mission description is required');
+        if (!description) throw new Error('Mission description is required');
 
-      // Dynamic import to avoid circular dependencies at module load
-      const { app: workflow } = await import('@/graph/workflow');
+        // Dynamic import to avoid circular dependencies at module load
+        const { app: workflow } = await import('@/graph/workflow');
 
-      console.log(`[JobProcessor:missions] Executing mission for ${userId}`);
+        console.log(`[JobProcessor:missions] Executing mission for ${userId}`);
 
-      const result = await workflow.invoke({
-        userRequest: description,
-        userId,
-        status: 'starting',
-      });
+        const result = await workflow.invoke({
+          userRequest: description,
+          userId,
+          status: 'starting',
+        });
 
-      if (result.error) {
-        throw new Error(result.error);
-      }
+        if (result.error) {
+          throw new Error(result.error);
+        }
 
-      return {
-        success: true,
-        results: result.results,
-        status: result.status,
-      };
-    }, concurrency);
+        return {
+          success: true,
+          results: result.results,
+          status: result.status,
+        };
+      },
+      concurrency,
+    );
   }
 
   /**
@@ -118,32 +122,36 @@ export class JobProcessor {
    * Runs a single agent's plan/execute/verify lifecycle.
    */
   async registerAgentsProcessor(concurrency = 3): Promise<void> {
-    this.registerProcessor('agents', async (job) => {
-      const { userId, payload } = job.data;
-      const agentName = payload.agentName as string;
-      const mission = payload.mission as string;
+    this.registerProcessor(
+      'agents',
+      async (job) => {
+        const { userId, payload } = job.data;
+        const agentName = payload.agentName as string;
+        const mission = payload.mission as string;
 
-      if (!agentName) throw new Error('Agent name is required');
-      if (!mission) throw new Error('Mission description is required');
+        if (!agentName) throw new Error('Agent name is required');
+        if (!mission) throw new Error('Mission description is required');
 
-      // Dynamic import to avoid circular dependencies
-      const { AgentRegistry, initializeAgents } = await import('@/agents/registry');
-      await initializeAgents();
+        // Dynamic import to avoid circular dependencies
+        const { AgentRegistry, initializeAgents } = await import('@/agents/registry');
+        await initializeAgents();
 
-      const agent = AgentRegistry.get(agentName);
-      if (!agent) throw new Error(`Agent "${agentName}" not found in registry`);
+        const agent = AgentRegistry.get(agentName);
+        if (!agent) throw new Error(`Agent "${agentName}" not found in registry`);
 
-      const context = {
-        mission,
-        userId,
-        config: payload.config as Record<string, unknown> || {},
-      };
+        const context = {
+          mission,
+          userId,
+          config: (payload.config as Record<string, unknown>) || {},
+        };
 
-      const plan = await agent.plan(context);
-      const result = await agent.execute(plan, context);
+        const plan = await agent.plan(context);
+        const result = await agent.execute(plan, context);
 
-      return result;
-    }, concurrency);
+        return result;
+      },
+      concurrency,
+    );
   }
 
   // ===========================================================================
@@ -223,9 +231,11 @@ export class JobProcessor {
           job.data?.payload ?? {},
           error.message,
           job.attemptsMade,
-          job.data?.userId ?? 'unknown'
+          job.data?.userId ?? 'unknown',
         );
-        console.log(`[JobProcessor] Job ${job.id} moved to dead letter queue after ${job.attemptsMade} attempts`);
+        console.log(
+          `[JobProcessor] Job ${job.id} moved to dead letter queue after ${job.attemptsMade} attempts`,
+        );
       } catch (dlqErr: any) {
         console.error('[JobProcessor] DLQ insertion failed:', dlqErr.message);
       }

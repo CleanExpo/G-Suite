@@ -12,10 +12,7 @@ import {
   CheckCircle,
   XCircle,
 } from 'lucide-react';
-import type {
-  SystemMetrics,
-  AgentStatusDetail,
-} from '@/lib/monitoring/types';
+import type { SystemMetrics, AgentStatusDetail } from '@/lib/monitoring/types';
 
 export default function MonitoringPage() {
   const [data, setData] = useState<SystemMetrics | null>(null);
@@ -112,8 +109,8 @@ export default function MonitoringPage() {
                       healthStatus === 'healthy'
                         ? 'bg-green-50 dark:bg-green-900/20'
                         : healthStatus === 'degraded'
-                        ? 'bg-amber-50 dark:bg-amber-900/20'
-                        : 'bg-red-50 dark:bg-red-900/20'
+                          ? 'bg-amber-50 dark:bg-amber-900/20'
+                          : 'bg-red-50 dark:bg-red-900/20'
                     }`}
                   >
                     <Activity
@@ -121,8 +118,8 @@ export default function MonitoringPage() {
                         healthStatus === 'healthy'
                           ? 'text-green-600'
                           : healthStatus === 'degraded'
-                          ? 'text-amber-600'
-                          : 'text-red-600'
+                            ? 'text-amber-600'
+                            : 'text-red-600'
                       }`}
                     />
                   </div>
@@ -140,8 +137,8 @@ export default function MonitoringPage() {
                     healthStatus === 'healthy'
                       ? 'text-green-600'
                       : healthStatus === 'degraded'
-                      ? 'text-amber-600'
-                      : 'text-red-600'
+                        ? 'text-amber-600'
+                        : 'text-red-600'
                   }`}
                 >
                   {healthStatus}
@@ -226,9 +223,7 @@ export default function MonitoringPage() {
                       className="flex items-start gap-3 p-3 bg-white dark:bg-gray-900 rounded-xl"
                     >
                       <div className="flex-1">
-                        <div className="font-bold text-gray-900 dark:text-white">
-                          {alert.name}
-                        </div>
+                        <div className="font-bold text-gray-900 dark:text-white">{alert.name}</div>
                         <div className="text-sm text-gray-500 mt-1">{alert.message}</div>
                         <div className="text-xs text-gray-400 mt-2">
                           Triggered {new Date(alert.triggeredAt).toLocaleString()}
@@ -239,8 +234,8 @@ export default function MonitoringPage() {
                           alert.severity === 'critical'
                             ? 'bg-red-100 text-red-600'
                             : alert.severity === 'warning'
-                            ? 'bg-amber-100 text-amber-600'
-                            : 'bg-blue-100 text-blue-600'
+                              ? 'bg-amber-100 text-amber-600'
+                              : 'bg-blue-100 text-blue-600'
                         }`}
                       >
                         {alert.severity}
@@ -259,9 +254,7 @@ export default function MonitoringPage() {
               </h2>
 
               {agentDetails.length === 0 ? (
-                <div className="text-center py-12 text-gray-400">
-                  No agent data available
-                </div>
+                <div className="text-center py-12 text-gray-400">No agent data available</div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full">
@@ -295,8 +288,8 @@ export default function MonitoringPage() {
                           minutesSince < 1
                             ? 'Just now'
                             : minutesSince < 60
-                            ? `${minutesSince}m ago`
-                            : `${Math.floor(minutesSince / 60)}h ago`;
+                              ? `${minutesSince}m ago`
+                              : `${Math.floor(minutesSince / 60)}h ago`;
 
                         return (
                           <tr
@@ -339,8 +332,8 @@ export default function MonitoringPage() {
                                   agent.metrics.successRate >= 0.9
                                     ? 'text-green-600'
                                     : agent.metrics.successRate >= 0.7
-                                    ? 'text-amber-600'
-                                    : 'text-red-600'
+                                      ? 'text-amber-600'
+                                      : 'text-red-600'
                                 } font-bold`}
                               >
                                 {(agent.metrics.successRate * 100).toFixed(0)}%

@@ -88,7 +88,7 @@ export class AlertEvaluator {
    */
   private evaluateRule(
     rule: { metric: string; condition: string; threshold: number },
-    metrics: any
+    metrics: any,
   ): AlertEvaluationResult {
     const value = this.extractMetricValue(rule.metric, metrics);
     const shouldFire = this.checkCondition(value, rule.condition, rule.threshold);
@@ -159,7 +159,7 @@ export class AlertEvaluator {
    */
   private async fireAlert(
     rule: { id: string; name: string; channels: string[]; webhookIds: string[]; userId: string },
-    evaluation: AlertEvaluationResult
+    evaluation: AlertEvaluationResult,
   ): Promise<void> {
     // Update rule state
     await prisma.alertRule.update({
@@ -204,7 +204,7 @@ export class AlertEvaluator {
    */
   private async sendNotifications(
     rule: { channels: string[]; webhookIds: string[]; name: string },
-    evaluation: AlertEvaluationResult
+    evaluation: AlertEvaluationResult,
   ): Promise<void> {
     for (const channel of rule.channels) {
       try {
@@ -214,11 +214,15 @@ export class AlertEvaluator {
             break;
           case 'email':
             // Email notification (requires email service integration)
-            console.log(`[AlertEvaluator] Email notification for ${rule.name}: ${evaluation.message}`);
+            console.log(
+              `[AlertEvaluator] Email notification for ${rule.name}: ${evaluation.message}`,
+            );
             break;
           case 'in_app':
             // In-app notification (stored in database, shown in UI)
-            console.log(`[AlertEvaluator] In-app notification for ${rule.name}: ${evaluation.message}`);
+            console.log(
+              `[AlertEvaluator] In-app notification for ${rule.name}: ${evaluation.message}`,
+            );
             break;
         }
       } catch (err: any) {
@@ -233,7 +237,7 @@ export class AlertEvaluator {
   private async sendWebhookNotifications(
     webhookIds: string[],
     ruleName: string,
-    evaluation: AlertEvaluationResult
+    evaluation: AlertEvaluationResult,
   ): Promise<void> {
     for (const webhookId of webhookIds) {
       const webhook = await prisma.webhookEndpoint.findUnique({
@@ -265,7 +269,7 @@ export class AlertEvaluator {
    */
   async createBudgetAlertRule(
     userId: string,
-    config: BudgetAlertConfig
+    config: BudgetAlertConfig,
   ): Promise<{ id: string; name: string }> {
     const rule = await prisma.alertRule.create({
       data: {
@@ -292,15 +296,14 @@ export class AlertEvaluator {
   async evaluateBudgetAlerts(
     userId: string,
     currentSpend: number,
-    walletBalance: number
+    walletBalance: number,
   ): Promise<{
     alerts: { level: 'warning' | 'critical'; message: string }[];
     budgetUsage: number;
   }> {
     const alerts: { level: 'warning' | 'critical'; message: string }[] = [];
-    const budgetUsage = walletBalance > 0
-      ? Math.round((currentSpend / (currentSpend + walletBalance)) * 100)
-      : 0;
+    const budgetUsage =
+      walletBalance > 0 ? Math.round((currentSpend / (currentSpend + walletBalance)) * 100) : 0;
 
     // Check for budget rules
     const rules = await prisma.alertRule.findMany({

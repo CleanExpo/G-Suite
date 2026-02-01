@@ -25,7 +25,6 @@ export function CommandCTA({ title, subtitle, buttonText, href, id }: CommandCTA
       <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay pointer-events-none" />
 
       <div className="relative z-10 flex flex-col items-center text-center space-y-12 max-w-4xl mx-auto">
-
         <h2 className="text-5xl lg:text-9xl font-black italic tracking-tighter uppercase leading-[0.8]">
           {title}
         </h2>
@@ -42,7 +41,6 @@ export function CommandCTA({ title, subtitle, buttonText, href, id }: CommandCTA
             </button>
           </Link>
         </div>
-
       </div>
     </motion.section>
   );

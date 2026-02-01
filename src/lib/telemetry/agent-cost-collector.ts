@@ -11,11 +11,11 @@ import type { AgentResult } from '@/agents/base';
 
 export interface AgentCostEntry {
   agentName: string;
-  tokens: number;       // Total tokens used (input + output)
-  cost: number;         // Cost in credits
-  duration: number;     // Duration in ms
-  startTime: string;    // ISO timestamp
-  endTime: string;      // ISO timestamp
+  tokens: number; // Total tokens used (input + output)
+  cost: number; // Cost in credits
+  duration: number; // Duration in ms
+  startTime: string; // ISO timestamp
+  endTime: string; // ISO timestamp
   success: boolean;
 }
 
@@ -38,7 +38,7 @@ export class CostCollector {
     return {
       stop: (result: AgentResult) => {
         const endTime = new Date().toISOString();
-        const duration = result.duration || (Date.now() - startMs);
+        const duration = result.duration || Date.now() - startMs;
 
         // Phase 9.2: Extract token count from result.tokensUsed (preferred)
         // Fall back to result.data.tokensUsed or result.data.tokens for backward compat

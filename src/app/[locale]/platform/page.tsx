@@ -78,7 +78,6 @@ export default function PlatformPage() {
           ))}
         </div>
 
-
         <div className="mt-40">
           <CommandCTA
             title="Build on Google Max."

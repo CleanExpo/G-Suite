@@ -11,15 +11,8 @@ import { motion, AnimatePresence } from 'framer-motion';
  * Shows current status and handles permission requests.
  */
 export function NotificationSettings() {
-  const {
-    isSupported,
-    permission,
-    isSubscribed,
-    isLoading,
-    error,
-    subscribe,
-    unsubscribe,
-  } = usePushNotifications();
+  const { isSupported, permission, isSubscribed, isLoading, error, subscribe, unsubscribe } =
+    usePushNotifications();
 
   if (!isSupported) {
     return (
@@ -51,11 +44,11 @@ export function NotificationSettings() {
     <div className="space-y-4">
       <div className="flex items-center justify-between p-4 bg-white dark:bg-[#161b22] rounded-2xl border border-gray-100 dark:border-white/10 shadow-sm">
         <div className="flex items-center gap-3">
-          <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${
-            isSubscribed
-              ? 'bg-blue-100 dark:bg-blue-900/30'
-              : 'bg-gray-100 dark:bg-white/10'
-          }`}>
+          <div
+            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${
+              isSubscribed ? 'bg-blue-100 dark:bg-blue-900/30' : 'bg-gray-100 dark:bg-white/10'
+            }`}
+          >
             {isSubscribed ? (
               <Bell className="w-5 h-5 text-blue-600" />
             ) : (
@@ -67,10 +60,7 @@ export function NotificationSettings() {
               Push Notifications
             </p>
             <p className="text-xs text-gray-500 dark:text-gray-400">
-              {isSubscribed
-                ? 'Receive alerts for mission updates'
-                : 'Enable to stay informed'
-              }
+              {isSubscribed ? 'Receive alerts for mission updates' : 'Enable to stay informed'}
             </p>
           </div>
         </div>
@@ -79,9 +69,7 @@ export function NotificationSettings() {
           onClick={handleToggle}
           disabled={isLoading || permission === 'denied'}
           className={`relative w-14 h-8 rounded-full transition-colors ${
-            isSubscribed
-              ? 'bg-blue-600'
-              : 'bg-gray-200 dark:bg-white/10'
+            isSubscribed ? 'bg-blue-600' : 'bg-gray-200 dark:bg-white/10'
           } ${
             isLoading || permission === 'denied'
               ? 'opacity-50 cursor-not-allowed'
@@ -95,9 +83,7 @@ export function NotificationSettings() {
             transition={{ type: 'spring', stiffness: 500, damping: 30 }}
             className="absolute top-1 w-6 h-6 bg-white rounded-full shadow-md flex items-center justify-center"
           >
-            {isLoading && (
-              <Loader2 className="w-3 h-3 text-gray-400 animate-spin" />
-            )}
+            {isLoading && <Loader2 className="w-3 h-3 text-gray-400 animate-spin" />}
           </motion.div>
         </button>
       </div>

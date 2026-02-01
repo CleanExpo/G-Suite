@@ -91,7 +91,7 @@ export function TouchModal({
         controls.start({ y: 0, opacity: 1 });
       }
     },
-    [controls, onClose]
+    [controls, onClose],
   );
 
   const shouldBeFullscreen = fullscreenOnMobile && isMobile && isPortrait;
@@ -137,7 +137,7 @@ export function TouchModal({
               'overflow-hidden',
               'flex flex-col',
               // Safe area padding
-              'safe-bottom'
+              'safe-bottom',
             )}
           >
             {/* Drag Handle (mobile only) */}
@@ -154,7 +154,7 @@ export function TouchModal({
                   'flex items-center justify-between',
                   'px-4 sm:px-6',
                   swipeToDismiss && isMobile ? 'pb-3' : 'py-4 sm:py-5',
-                  'border-b border-gray-100 dark:border-white/5'
+                  'border-b border-gray-100 dark:border-white/5',
                 )}
               >
                 {title && (
@@ -171,7 +171,7 @@ export function TouchModal({
                       'hover:bg-gray-100 dark:hover:bg-white/5',
                       'transition-colors',
                       // Touch-friendly size
-                      'min-w-[44px] min-h-[44px] flex items-center justify-center'
+                      'min-w-[44px] min-h-[44px] flex items-center justify-center',
                     )}
                   >
                     <X className="w-5 h-5" />
@@ -187,7 +187,7 @@ export function TouchModal({
                 'px-4 sm:px-6 py-4 sm:py-6',
                 // Prevent content from being draggable
                 isDragging && 'pointer-events-none',
-                className
+                className,
               )}
             >
               {children}
@@ -221,13 +221,7 @@ export function ActionSheet({
   }>;
 }) {
   return (
-    <TouchModal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={title}
-      size="sm"
-      showCloseButton={false}
-    >
+    <TouchModal isOpen={isOpen} onClose={onClose} title={title} size="sm" showCloseButton={false}>
       <div className="space-y-1">
         {actions.map((action, index) => (
           <button
@@ -244,15 +238,12 @@ export function ActionSheet({
               'min-h-[52px]', // Touch-friendly height
               action.destructive
                 ? 'text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20'
-                : 'text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-white/5'
+                : 'text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-white/5',
             )}
           >
             {action.icon && (
               <span
-                className={cn(
-                  'w-5 h-5',
-                  action.destructive ? 'text-red-500' : 'text-gray-400'
-                )}
+                className={cn('w-5 h-5', action.destructive ? 'text-red-500' : 'text-gray-400')}
               >
                 {action.icon}
               </span>
@@ -270,7 +261,7 @@ export function ActionSheet({
           'bg-gray-100 dark:bg-white/5',
           'text-gray-600 dark:text-gray-300 font-medium',
           'transition-colors hover:bg-gray-200 dark:hover:bg-white/10',
-          'min-h-[52px]'
+          'min-h-[52px]',
         )}
       >
         Cancel

@@ -17,7 +17,8 @@ export function PWAInstallPrompt() {
 
   useEffect(() => {
     // Check if already installed (standalone mode)
-    const standalone = window.matchMedia('(display-mode: standalone)').matches ||
+    const standalone =
+      window.matchMedia('(display-mode: standalone)').matches ||
       (window.navigator as any).standalone ||
       document.referrer.includes('android-app://');
     setIsStandalone(standalone);
@@ -143,7 +144,9 @@ export function PWAInstallPrompt() {
                     To install on iOS:
                   </p>
                   <ol className="text-xs text-gray-600 dark:text-gray-400 space-y-2 list-decimal list-inside">
-                    <li>Tap the <Share className="inline w-4 h-4 mx-1" /> Share button</li>
+                    <li>
+                      Tap the <Share className="inline w-4 h-4 mx-1" /> Share button
+                    </li>
                     <li>Scroll down and tap "Add to Home Screen"</li>
                     <li>Tap "Add" to confirm</li>
                   </ol>

@@ -6,8 +6,8 @@
  * DELETE /api/webhooks/:id - Delete webhook
  */
 
-import {NextResponse} from 'next/server';
-import {auth} from '@clerk/nextjs/server';
+import { NextResponse } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
 import {
   getWebhookEndpoint,
   updateWebhookEndpoint,
@@ -20,11 +20,8 @@ export const dynamic = 'force-dynamic';
 /**
  * GET /api/webhooks/:id - Get webhook endpoint details with recent deliveries
  */
-export async function GET(
-  _req: Request,
-  {params}: {params: Promise<{id: string}>}
-) {
-  const {userId} = await auth();
+export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { userId } = await auth();
 
   if (!userId) {
     return NextResponse.json(
@@ -39,12 +36,12 @@ export async function GET(
           timestamp: new Date().toISOString(),
         },
       },
-      {status: 401}
+      { status: 401 },
     );
   }
 
   try {
-    const {id} = await params;
+    const { id } = await params;
 
     const endpoint = await getWebhookEndpoint(id, userId);
 
@@ -61,7 +58,7 @@ export async function GET(
             timestamp: new Date().toISOString(),
           },
         },
-        {status: 404}
+        { status: 404 },
       );
     }
 
@@ -74,7 +71,7 @@ export async function GET(
         ...endpoint,
         createdAt: endpoint.createdAt.toISOString(),
         updatedAt: endpoint.updatedAt.toISOString(),
-        recentDeliveries: deliveries.map(d => ({
+        recentDeliveries: deliveries.map((d) => ({
           id: d.id,
           eventType: d.eventType,
           status: d.status,
@@ -105,7 +102,7 @@ export async function GET(
           timestamp: new Date().toISOString(),
         },
       },
-      {status: 500}
+      { status: 500 },
     );
   }
 }
@@ -119,11 +116,8 @@ export async function GET(
  * - isActive: boolean (optional)
  * - metadata: object (optional)
  */
-export async function PATCH(
-  req: Request,
-  {params}: {params: Promise<{id: string}>}
-) {
-  const {userId} = await auth();
+export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { userId } = await auth();
 
   if (!userId) {
     return NextResponse.json(
@@ -138,12 +132,12 @@ export async function PATCH(
           timestamp: new Date().toISOString(),
         },
       },
-      {status: 401}
+      { status: 401 },
     );
   }
 
   try {
-    const {id} = await params;
+    const { id } = await params;
     const body = await req.json();
 
     const updated = await updateWebhookEndpoint(id, userId, body);
@@ -161,7 +155,7 @@ export async function PATCH(
             timestamp: new Date().toISOString(),
           },
         },
-        {status: 404}
+        { status: 404 },
       );
     }
 
@@ -192,7 +186,7 @@ export async function PATCH(
           timestamp: new Date().toISOString(),
         },
       },
-      {status: 500}
+      { status: 500 },
     );
   }
 }
@@ -200,11 +194,8 @@ export async function PATCH(
 /**
  * DELETE /api/webhooks/:id - Delete webhook endpoint
  */
-export async function DELETE(
-  _req: Request,
-  {params}: {params: Promise<{id: string}>}
-) {
-  const {userId} = await auth();
+export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { userId } = await auth();
 
   if (!userId) {
     return NextResponse.json(
@@ -219,12 +210,12 @@ export async function DELETE(
           timestamp: new Date().toISOString(),
         },
       },
-      {status: 401}
+      { status: 401 },
     );
   }
 
   try {
-    const {id} = await params;
+    const { id } = await params;
 
     const deleted = await deleteWebhookEndpoint(id, userId);
 
@@ -241,7 +232,7 @@ export async function DELETE(
             timestamp: new Date().toISOString(),
           },
         },
-        {status: 404}
+        { status: 404 },
       );
     }
 
@@ -271,7 +262,7 @@ export async function DELETE(
           timestamp: new Date().toISOString(),
         },
       },
-      {status: 500}
+      { status: 500 },
     );
   }
 }

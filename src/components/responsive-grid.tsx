@@ -63,11 +63,13 @@ export function ResponsiveGrid({
         'lg:grid-cols-3',
         'xl:grid-cols-4',
         // Orientation overrides via CSS custom property
-        className
+        className,
       )}
-      style={{
-        '--grid-cols': cols,
-      } as React.CSSProperties}
+      style={
+        {
+          '--grid-cols': cols,
+        } as React.CSSProperties
+      }
     >
       {children}
     </div>

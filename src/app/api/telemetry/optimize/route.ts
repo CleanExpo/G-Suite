@@ -31,9 +31,6 @@ export async function GET() {
     });
   } catch (error: any) {
     console.error('[Cost Optimize GET] Error:', error.message);
-    return NextResponse.json(
-      { success: false, error: error.message },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }

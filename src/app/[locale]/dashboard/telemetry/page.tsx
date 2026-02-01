@@ -24,7 +24,10 @@ interface RecentMission {
   id: string;
   status: string;
   totalCost: number;
-  agentCosts: Record<string, { agentName: string; tokens: number; cost: number; duration: number; success: boolean }> | null;
+  agentCosts: Record<
+    string,
+    { agentName: string; tokens: number; cost: number; duration: number; success: boolean }
+  > | null;
   createdAt: string;
 }
 
@@ -132,11 +135,7 @@ export default function TelemetryPage() {
             value={`${summary?.budgetUsage ?? 0}`}
             unit="%"
             icon={TrendingUp}
-            color={
-              (summary?.budgetUsage ?? 0) > 80
-                ? 'text-amber-500'
-                : 'text-emerald-500'
-            }
+            color={(summary?.budgetUsage ?? 0) > 80 ? 'text-amber-500' : 'text-emerald-500'}
             loading={loading}
           />
         </div>
@@ -154,13 +153,8 @@ export default function TelemetryPage() {
                 {costTrend.slice(-14).map((day) => {
                   const height = Math.max((day.totalCost / maxDailyCost) * 100, 4);
                   return (
-                    <div
-                      key={day.date}
-                      className="flex-1 flex flex-col items-center gap-2"
-                    >
-                      <span className="text-[9px] font-mono text-gray-400">
-                        {day.totalCost}
-                      </span>
+                    <div key={day.date} className="flex-1 flex flex-col items-center gap-2">
+                      <span className="text-[9px] font-mono text-gray-400">{day.totalCost}</span>
                       <div
                         className="w-full bg-blue-600 rounded-t-lg transition-all"
                         style={{ height: `${height}%` }}
@@ -271,9 +265,7 @@ export default function TelemetryPage() {
             </div>
             <div className="divide-y divide-gray-100 dark:divide-white/5">
               {recentMissions.map((mission) => {
-                const agentEntries = mission.agentCosts
-                  ? Object.values(mission.agentCosts)
-                  : [];
+                const agentEntries = mission.agentCosts ? Object.values(mission.agentCosts) : [];
                 return (
                   <div
                     key={mission.id}
@@ -289,8 +281,8 @@ export default function TelemetryPage() {
                             mission.status === 'COMPLETED'
                               ? 'text-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 border-emerald-100 dark:border-emerald-800'
                               : mission.status === 'FAILED'
-                              ? 'text-red-500 bg-red-50 dark:bg-red-900/20 border-red-100 dark:border-red-800'
-                              : 'text-blue-500 bg-blue-50 dark:bg-blue-900/20 border-blue-100 dark:border-blue-800'
+                                ? 'text-red-500 bg-red-50 dark:bg-red-900/20 border-red-100 dark:border-red-800'
+                                : 'text-blue-500 bg-blue-50 dark:bg-blue-900/20 border-blue-100 dark:border-blue-800'
                           }`}
                         >
                           {mission.status}
@@ -312,7 +304,8 @@ export default function TelemetryPage() {
                             key={entry.agentName}
                             className="text-[9px] font-mono px-2 py-1 rounded-lg bg-gray-50 dark:bg-white/5 text-gray-500 border border-gray-100 dark:border-white/10"
                           >
-                            {entry.agentName}: {entry.cost}pts / {entry.tokens}tok / {(entry.duration / 1000).toFixed(1)}s
+                            {entry.agentName}: {entry.cost}pts / {entry.tokens}tok /{' '}
+                            {(entry.duration / 1000).toFixed(1)}s
                           </span>
                         ))}
                       </div>
@@ -348,18 +341,16 @@ function SummaryCard({
   return (
     <div className="bg-white dark:bg-[#161b22] p-8 rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-sm">
       <div className="flex items-center justify-between mb-6">
-        <div className={`p-3 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 ${color}`}>
+        <div
+          className={`p-3 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 ${color}`}
+        >
           <Icon className="w-5 h-5" />
         </div>
       </div>
       <div className="space-y-1">
-        <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest">
-          {label}
-        </p>
+        <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest">{label}</p>
         {loading ? (
-          <p className="text-2xl font-black text-gray-300 dark:text-gray-600 animate-pulse">
-            ---
-          </p>
+          <p className="text-2xl font-black text-gray-300 dark:text-gray-600 animate-pulse">---</p>
         ) : (
           <p className="text-4xl font-black italic tracking-tighter text-gray-900 dark:text-white leading-none">
             {value}

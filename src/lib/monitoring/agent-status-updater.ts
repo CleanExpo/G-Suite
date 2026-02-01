@@ -14,7 +14,7 @@ export async function updateAgentStatus(
   agentName: string | undefined,
   status: 'idle' | 'active' | 'failed',
   jobId?: string,
-  userId?: string
+  userId?: string,
 ): Promise<void> {
   if (!agentName || !userId) return;
 
@@ -57,7 +57,7 @@ export async function updateAgentStatus(
  */
 export async function incrementAgentFailureCount(
   agentName: string | undefined,
-  userId?: string
+  userId?: string,
 ): Promise<void> {
   if (!agentName || !userId) return;
 
@@ -110,7 +110,7 @@ export async function incrementAgentFailureCount(
 export async function updateAgentPerformanceMetrics(
   agentName: string | undefined,
   userId: string | undefined,
-  duration: number
+  duration: number,
 ): Promise<void> {
   if (!agentName || !userId) return;
 

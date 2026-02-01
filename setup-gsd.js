@@ -18,7 +18,7 @@ class GSDInstaller {
       force: args.includes('--force') || args.includes('-f'),
       verbose: args.includes('--verbose') || args.includes('-v'),
       dryRun: args.includes('--dry-run'),
-      help: args.includes('--help') || args.includes('-h')
+      help: args.includes('--help') || args.includes('-h'),
     };
   }
 
@@ -51,7 +51,8 @@ Examples:
     try {
       // Detect project
       this.log('Detecting project...');
-      const isValidProject = fs.existsSync('package.json') || fs.existsSync('pyproject.toml') || fs.existsSync('.git');
+      const isValidProject =
+        fs.existsSync('package.json') || fs.existsSync('pyproject.toml') || fs.existsSync('.git');
       if (!isValidProject) {
         throw new Error('Not a valid project directory');
       }
@@ -66,7 +67,7 @@ Examples:
         '.planning/phases/00-example',
         '.planning/codebase',
         '.planning/deferred-issues',
-        'docs'
+        'docs',
       ];
 
       for (const dir of dirs) {
@@ -117,7 +118,6 @@ Examples:
       console.log('  - .planning/README.md - Directory structure guide');
       console.log('  - .planning/phases/README.md - Phase management guide');
       console.log('  - .planning/phases/00-example/README.md - Template guide\n');
-
     } catch (error) {
       console.error('\n❌ Installation failed:', error.message);
       if (this.flags.verbose) {
@@ -135,7 +135,7 @@ Examples:
       '.planning/phases/00-example/PHASE-REQUIREMENTS.md': this.getPhaseTemplate(),
       '.planning/codebase/README.md': this.getCodebaseReadme(),
       '.planning/deferred-issues/README.md': this.getDeferredReadme(),
-      'docs/GSD-FRAMEWORK.md': this.getFrameworkDoc()
+      'docs/GSD-FRAMEWORK.md': this.getFrameworkDoc(),
     };
   }
 

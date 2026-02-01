@@ -5,9 +5,9 @@
  * GET    /api/keys - List user's API keys
  */
 
-import {NextResponse} from 'next/server';
-import {auth} from '@clerk/nextjs/server';
-import {generateApiKey} from '@/lib/gateway/api-key-auth';
+import { NextResponse } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
+import { generateApiKey } from '@/lib/gateway/api-key-auth';
 import prisma from '@/prisma';
 
 export const dynamic = 'force-dynamic';
@@ -22,7 +22,7 @@ export const dynamic = 'force-dynamic';
  * - expiresInDays: number (optional) - Expiry in days (null = no expiry)
  */
 export async function POST(req: Request) {
-  const {userId} = await auth();
+  const { userId } = await auth();
 
   if (!userId) {
     return NextResponse.json(
@@ -37,7 +37,7 @@ export async function POST(req: Request) {
           timestamp: new Date().toISOString(),
         },
       },
-      {status: 401}
+      { status: 401 },
     );
   }
 
@@ -64,12 +64,12 @@ export async function POST(req: Request) {
             timestamp: new Date().toISOString(),
           },
         },
-        {status: 400}
+        { status: 400 },
       );
     }
 
     // Generate API key
-    const {key, hash, prefix} = generateApiKey();
+    const { key, hash, prefix } = generateApiKey();
 
     // Calculate expiry date
     const expiresAt = expiresInDays
@@ -109,7 +109,7 @@ export async function POST(req: Request) {
           warning: 'Save this key securely. It will not be shown again.',
         },
       },
-      {status: 201}
+      { status: 201 },
     );
   } catch (error: any) {
     console.error('[API Keys] Error creating key:', error);
@@ -126,7 +126,7 @@ export async function POST(req: Request) {
           timestamp: new Date().toISOString(),
         },
       },
-      {status: 500}
+      { status: 500 },
     );
   }
 }
@@ -137,7 +137,7 @@ export async function POST(req: Request) {
  * Returns all API keys for the authenticated user (without plaintext keys).
  */
 export async function GET() {
-  const {userId} = await auth();
+  const { userId } = await auth();
 
   if (!userId) {
     return NextResponse.json(
@@ -152,13 +152,13 @@ export async function GET() {
           timestamp: new Date().toISOString(),
         },
       },
-      {status: 401}
+      { status: 401 },
     );
   }
 
   try {
     const keys = await prisma.apiKey.findMany({
-      where: {userId},
+      where: { userId },
       select: {
         id: true,
         name: true,
@@ -171,13 +171,13 @@ export async function GET() {
         createdAt: true,
         updatedAt: true,
       },
-      orderBy: {createdAt: 'desc'},
+      orderBy: { createdAt: 'desc' },
     });
 
     return NextResponse.json({
       success: true,
       data: {
-        keys: keys.map(key => ({
+        keys: keys.map((key) => ({
           ...key,
           lastUsedAt: key.lastUsedAt?.toISOString() || null,
           expiresAt: key.expiresAt?.toISOString() || null,
@@ -206,7 +206,7 @@ export async function GET() {
           timestamp: new Date().toISOString(),
         },
       },
-      {status: 500}
+      { status: 500 },
     );
   }
 }

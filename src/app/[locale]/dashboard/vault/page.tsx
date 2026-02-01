@@ -24,7 +24,9 @@ interface VaultData {
 }
 
 export default function VaultPage() {
-  const [rotationStatus, setRotationStatus] = useState<'idle' | 'rotating' | 'success' | 'error'>('idle');
+  const [rotationStatus, setRotationStatus] = useState<'idle' | 'rotating' | 'success' | 'error'>(
+    'idle',
+  );
   const [vault, setVault] = useState<VaultData | null>(null);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState('');
@@ -87,7 +89,8 @@ export default function VaultPage() {
               The Vault
             </h1>
             <p className="text-gray-500 font-medium mt-2">
-              Military-Grade Encryption ({vault?.encryptionStandard || 'AES-256-GCM'}) • Zero-Knowledge Architecture
+              Military-Grade Encryption ({vault?.encryptionStandard || 'AES-256-GCM'}) •
+              Zero-Knowledge Architecture
             </p>
           </div>
         </div>
@@ -96,7 +99,9 @@ export default function VaultPage() {
           {/* Status Card */}
           <div className="bg-white dark:bg-[#161b22] p-8 rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-sm">
             <div className="flex items-center justify-between mb-8">
-              <h3 className="text-gray-400 text-[10px] font-black uppercase tracking-[0.3em]">Security Status</h3>
+              <h3 className="text-gray-400 text-[10px] font-black uppercase tracking-[0.3em]">
+                Security Status
+              </h3>
               <span className="px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-500 text-[10px] font-black uppercase tracking-widest border border-emerald-100 dark:border-emerald-800">
                 System Secure
               </span>
@@ -117,7 +122,9 @@ export default function VaultPage() {
                 </div>
                 <div>
                   <p className="font-bold text-gray-900 dark:text-white">Encryption Layer</p>
-                  <p className="text-xs text-gray-500">{vault?.encryptionStandard || 'AES-256-GCM'}</p>
+                  <p className="text-xs text-gray-500">
+                    {vault?.encryptionStandard || 'AES-256-GCM'}
+                  </p>
                 </div>
               </div>
             </div>
@@ -130,10 +137,15 @@ export default function VaultPage() {
             </div>
 
             <div className="relative z-10 space-y-4">
-              <h3 className="text-blue-200 text-[10px] font-black uppercase tracking-[0.3em]">Emergency Protocol</h3>
-              <h2 className="text-3xl font-black italic uppercase tracking-tighter leading-none">Rotate All Secrets</h2>
+              <h3 className="text-blue-200 text-[10px] font-black uppercase tracking-[0.3em]">
+                Emergency Protocol
+              </h3>
+              <h2 className="text-3xl font-black italic uppercase tracking-tighter leading-none">
+                Rotate All Secrets
+              </h2>
               <p className="text-blue-100/80 text-sm max-w-xs">
-                Initiate global key rotation. Re-encrypts all secrets with AES-256-GCM and fresh initialization vectors.
+                Initiate global key rotation. Re-encrypts all secrets with AES-256-GCM and fresh
+                initialization vectors.
               </p>
             </div>
 
@@ -176,18 +188,27 @@ export default function VaultPage() {
         {/* Active Credentials */}
         <div className="bg-white dark:bg-[#161b22] rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-sm overflow-hidden">
           <div className="px-8 py-6 border-b border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.01]">
-            <h3 className="text-gray-900 dark:text-white font-black italic uppercase tracking-tighter text-xl">Active Credentials</h3>
+            <h3 className="text-gray-900 dark:text-white font-black italic uppercase tracking-tighter text-xl">
+              Active Credentials
+            </h3>
           </div>
           <div className="divide-y divide-gray-100 dark:divide-white/5">
             {loading ? (
               <div className="px-8 py-6 text-gray-400 text-sm">Loading vault...</div>
             ) : credentials.length === 0 ? (
-              <div className="px-8 py-6 text-gray-400 text-sm">No credentials stored. Complete onboarding to add API keys.</div>
+              <div className="px-8 py-6 text-gray-400 text-sm">
+                No credentials stored. Complete onboarding to add API keys.
+              </div>
             ) : (
               credentials.map((cred) => (
-                <div key={cred.name} className="px-8 py-6 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-white/[0.02] transition-colors">
+                <div
+                  key={cred.name}
+                  className="px-8 py-6 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-white/[0.02] transition-colors"
+                >
                   <div className="flex items-center gap-4">
-                    <div className={`w-2 h-2 rounded-full ${cred.active ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]' : 'bg-gray-400'}`} />
+                    <div
+                      className={`w-2 h-2 rounded-full ${cred.active ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]' : 'bg-gray-400'}`}
+                    />
                     <span className="font-bold text-gray-900 dark:text-white">{cred.name}</span>
                   </div>
                   <div className="flex items-center gap-4">
@@ -212,14 +233,23 @@ export default function VaultPage() {
           <div className="bg-white dark:bg-[#161b22] rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-sm overflow-hidden">
             <div className="px-8 py-6 border-b border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.01] flex items-center gap-3">
               <History className="w-5 h-5 text-gray-400" />
-              <h3 className="text-gray-900 dark:text-white font-black italic uppercase tracking-tighter text-xl">Rotation History</h3>
+              <h3 className="text-gray-900 dark:text-white font-black italic uppercase tracking-tighter text-xl">
+                Rotation History
+              </h3>
             </div>
             <div className="divide-y divide-gray-100 dark:divide-white/5">
               {[...rotationHistory].reverse().map((entry, i) => (
-                <div key={i} className="px-8 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-white/[0.02] transition-colors">
+                <div
+                  key={i}
+                  className="px-8 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-white/[0.02] transition-colors"
+                >
                   <div className="flex items-center gap-4">
-                    <span className="text-xs font-mono font-bold text-gray-900 dark:text-white">v{entry.version}</span>
-                    <span className="text-xs text-gray-500">{entry.keysRotated} key{entry.keysRotated !== 1 ? 's' : ''} rotated</span>
+                    <span className="text-xs font-mono font-bold text-gray-900 dark:text-white">
+                      v{entry.version}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      {entry.keysRotated} key{entry.keysRotated !== 1 ? 's' : ''} rotated
+                    </span>
                   </div>
                   <span className="text-xs font-mono text-gray-400">
                     {new Date(entry.rotatedAt).toLocaleString()}

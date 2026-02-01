@@ -8,8 +8,8 @@
  */
 
 import prisma from '@/prisma';
-import {taskQueue} from '@/lib/queue';
-import {auth} from '@clerk/nextjs/server';
+import { taskQueue } from '@/lib/queue';
+import { auth } from '@clerk/nextjs/server';
 
 export interface GraphQLContext {
   prisma: typeof prisma;
@@ -23,7 +23,7 @@ export interface GraphQLContext {
  * @returns GraphQL context with Prisma, task queue, and user ID
  */
 export async function createContext(): Promise<GraphQLContext> {
-  const {userId} = await auth();
+  const { userId } = await auth();
 
   return {
     prisma,

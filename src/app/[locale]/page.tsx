@@ -9,34 +9,61 @@ import { useRef, Suspense } from 'react';
 import { useTranslations } from 'next-intl';
 
 // Dynamic imports for below-the-fold heavy components - significantly improves initial load
-const MissionShowcase = dynamic(() => import('@/components/mission-showcase').then(mod => ({ default: mod.MissionShowcase })), {
-  loading: () => <div className="w-full h-96 bg-gray-100 dark:bg-gray-900/20 rounded-[4rem] animate-pulse" />,
-  ssr: false,
-});
+const MissionShowcase = dynamic(
+  () => import('@/components/mission-showcase').then((mod) => ({ default: mod.MissionShowcase })),
+  {
+    loading: () => (
+      <div className="w-full h-96 bg-gray-100 dark:bg-gray-900/20 rounded-[4rem] animate-pulse" />
+    ),
+    ssr: false,
+  },
+);
 
-const TacticalBox = dynamic(() => import('@/components/ui/tactical-box').then(mod => ({ default: mod.TacticalBox })), {
-  ssr: true,
-});
+const TacticalBox = dynamic(
+  () => import('@/components/ui/tactical-box').then((mod) => ({ default: mod.TacticalBox })),
+  {
+    ssr: true,
+  },
+);
 
-const TacticalTabs = dynamic(() => import('@/components/ui/tactical-tabs').then(mod => ({ default: mod.TacticalTabs })), {
-  loading: () => <div className="w-full h-96 bg-gray-100 dark:bg-gray-900/20 rounded-3xl animate-pulse" />,
-  ssr: false,
-});
+const TacticalTabs = dynamic(
+  () => import('@/components/ui/tactical-tabs').then((mod) => ({ default: mod.TacticalTabs })),
+  {
+    loading: () => (
+      <div className="w-full h-96 bg-gray-100 dark:bg-gray-900/20 rounded-3xl animate-pulse" />
+    ),
+    ssr: false,
+  },
+);
 
-const CommandCTA = dynamic(() => import('@/components/ui/command-cta').then(mod => ({ default: mod.CommandCTA })), {
-  ssr: true,
-});
+const CommandCTA = dynamic(
+  () => import('@/components/ui/command-cta').then((mod) => ({ default: mod.CommandCTA })),
+  {
+    ssr: true,
+  },
+);
 
-const EcosystemVisual = dynamic(() => import('@/components/ui/ecosystem-visual').then(mod => ({ default: mod.EcosystemVisual })), {
-  loading: () => <div className="w-full h-full flex items-center justify-center"><div className="w-60 h-60 bg-gray-100 dark:bg-gray-900/20 rounded-full animate-pulse" /></div>,
-  ssr: false,
-});
+const EcosystemVisual = dynamic(
+  () =>
+    import('@/components/ui/ecosystem-visual').then((mod) => ({ default: mod.EcosystemVisual })),
+  {
+    loading: () => (
+      <div className="w-full h-full flex items-center justify-center">
+        <div className="w-60 h-60 bg-gray-100 dark:bg-gray-900/20 rounded-full animate-pulse" />
+      </div>
+    ),
+    ssr: false,
+  },
+);
 
-const MissionSimulator = dynamic(() => import('@/components/ui/mission-simulator').then(mod => ({ default: mod.MissionSimulator })), {
-  loading: () => <div className="w-full h-64 bg-gray-900 rounded-[4rem] animate-pulse" />,
-  ssr: false,
-});
-
+const MissionSimulator = dynamic(
+  () =>
+    import('@/components/ui/mission-simulator').then((mod) => ({ default: mod.MissionSimulator })),
+  {
+    loading: () => <div className="w-full h-64 bg-gray-900 rounded-[4rem] animate-pulse" />,
+    ssr: false,
+  },
+);
 
 export default function LandingPage({ params }: { params: Promise<{ locale: string }> }) {
   const t = useTranslations('Landing');
@@ -119,7 +146,10 @@ export default function LandingPage({ params }: { params: Promise<{ locale: stri
       </section>
 
       {/* 2. Trusted By Sector (3D Depth) */}
-      <section id="partners" className="scroll-mt-32 py-24 md:py-32 px-6 border-y border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.02] backdrop-blur-xl">
+      <section
+        id="partners"
+        className="scroll-mt-32 py-24 md:py-32 px-6 border-y border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.02] backdrop-blur-xl"
+      >
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <div className="space-y-6 md:space-y-8">
             <h3 className="text-sm font-black uppercase tracking-[0.5em] text-blue-600 dark:text-blue-400">

@@ -29,7 +29,7 @@ export async function POST(req: Request) {
     if (!queue || !name) {
       return NextResponse.json(
         { message: 'Fields "queue" and "name" are required' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -43,7 +43,7 @@ export async function POST(req: Request) {
     if (!result.success) {
       return NextResponse.json(
         { message: result.error ?? 'Failed to submit job' },
-        { status: 503 }
+        { status: 503 },
       );
     }
 

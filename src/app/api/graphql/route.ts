@@ -5,8 +5,8 @@
  * POST /api/graphql - GraphQL queries and mutations
  */
 
-import {yoga} from '@/lib/graphql';
+import { yoga } from '@/lib/graphql';
 
 export const dynamic = 'force-dynamic';
 
-export {yoga as GET, yoga as POST};
+export { yoga as GET, yoga as POST };

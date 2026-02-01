@@ -26,7 +26,7 @@ export class DeadLetterQueue {
     payload: Record<string, unknown>,
     error: string,
     attempts: number,
-    userId: string
+    userId: string,
   ): Promise<string> {
     try {
       const prisma = (await import('@/prisma')).default;
@@ -113,7 +113,7 @@ export class DeadLetterQueue {
         {
           userId: entry.userId,
           attempts: 3, // Fresh retry budget
-        }
+        },
       );
 
       if (result.success) {

@@ -20,13 +20,16 @@ export class TokenTracker {
    * Record token usage from a Gemini API response.
    * Gemini returns `response.usageMetadata` with token counts.
    */
-  recordGemini(response: {
-    usageMetadata?: {
-      promptTokenCount?: number;
-      candidatesTokenCount?: number;
-      totalTokenCount?: number;
-    };
-  }, modelName?: string): void {
+  recordGemini(
+    response: {
+      usageMetadata?: {
+        promptTokenCount?: number;
+        candidatesTokenCount?: number;
+        totalTokenCount?: number;
+      };
+    },
+    modelName?: string,
+  ): void {
     const meta = response.usageMetadata;
     if (meta) {
       this.promptTokens += meta.promptTokenCount ?? 0;
@@ -41,13 +44,16 @@ export class TokenTracker {
    * Record token usage from an OpenAI-compatible API response.
    * OpenAI returns `response.usage` with prompt_tokens, completion_tokens, total_tokens.
    */
-  recordOpenAI(response: {
-    usage?: {
-      prompt_tokens?: number;
-      completion_tokens?: number;
-      total_tokens?: number;
-    };
-  }, modelName?: string): void {
+  recordOpenAI(
+    response: {
+      usage?: {
+        prompt_tokens?: number;
+        completion_tokens?: number;
+        total_tokens?: number;
+      };
+    },
+    modelName?: string,
+  ): void {
     const usage = response.usage;
     if (usage) {
       this.promptTokens += usage.prompt_tokens ?? 0;
@@ -112,9 +118,11 @@ export class TokenTracker {
  * // tracker now has accumulated token usage
  * ```
  */
-export function wrapGeminiModel<T extends {
-  generateContent: (...args: any[]) => Promise<any>;
-}>(model: T, tracker: TokenTracker, modelName?: string): T {
+export function wrapGeminiModel<
+  T extends {
+    generateContent: (...args: any[]) => Promise<any>;
+  },
+>(model: T, tracker: TokenTracker, modelName?: string): T {
   const originalGenerate = model.generateContent.bind(model);
 
   const wrappedGenerate = async (...args: any[]) => {
@@ -135,7 +143,7 @@ export function wrapGeminiModel<T extends {
 export function recordGeminiTokens(
   tracker: TokenTracker,
   result: { response: { usageMetadata?: any } },
-  modelName?: string
+  modelName?: string,
 ): void {
   tracker.recordGemini(result.response, modelName);
 }

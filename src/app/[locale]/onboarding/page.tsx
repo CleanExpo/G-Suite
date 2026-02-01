@@ -3,15 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/components/auth/auth-provider';
-import {
-  ArrowRight,
-  Globe,
-  Lock,
-  Loader2,
-  Link as LinkIcon,
-  Shield,
-  Cpu,
-} from 'lucide-react';
+import { ArrowRight, Globe, Lock, Loader2, Link as LinkIcon, Shield, Cpu } from 'lucide-react';
 import { completeOnboarding } from '@/actions/onboarding.actions';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -163,7 +155,6 @@ export default function OnboardingPage() {
           )}
         </AnimatePresence>
       </motion.div>
-
     </div>
   );
 }

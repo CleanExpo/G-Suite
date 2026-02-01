@@ -14,8 +14,8 @@ import type { BackoffStrategy } from './types';
 /** Default backoff strategy used when none is specified */
 export const DEFAULT_BACKOFF: BackoffStrategy = {
   type: 'exponential',
-  delay: 1_000,       // 1 second base
-  maxDelay: 60_000,   // 1 minute cap
+  delay: 1_000, // 1 second base
+  maxDelay: 60_000, // 1 minute cap
   jitter: true,
 };
 
@@ -34,7 +34,7 @@ export const DEFAULT_BACKOFF: BackoffStrategy = {
  */
 export function computeBackoffDelay(
   attempt: number,
-  strategy: BackoffStrategy = DEFAULT_BACKOFF
+  strategy: BackoffStrategy = DEFAULT_BACKOFF,
 ): number {
   const { type, delay, maxDelay = 60_000, jitter = true } = strategy;
 

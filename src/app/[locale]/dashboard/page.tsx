@@ -29,28 +29,48 @@ import { useTranslations } from 'next-intl';
 
 // Dynamic imports for code splitting - heavy components loaded on demand
 const MissionModal = dynamic(() => import('@/components/MissionModal'), {
-  loading: () => <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-    <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
-  </div>,
+  loading: () => (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+    </div>
+  ),
   ssr: false,
 });
 
-const CreditDialog = dynamic(() => import('@/components/credit-dialog').then(mod => ({ default: mod.default || mod.CreditDialog })), {
-  loading: () => null,
-  ssr: false,
-});
+const CreditDialog = dynamic(
+  () =>
+    import('@/components/credit-dialog').then((mod) => ({
+      default: mod.default || mod.CreditDialog,
+    })),
+  {
+    loading: () => null,
+    ssr: false,
+  },
+);
 
-const TelemetryPanel = dynamic(() => import('@/components/telemetry-panel').then(mod => ({ default: mod.TelemetryPanel })), {
-  loading: () => <div className="h-64 bg-gray-100 dark:bg-gray-800 rounded-3xl animate-pulse" />,
-});
+const TelemetryPanel = dynamic(
+  () => import('@/components/telemetry-panel').then((mod) => ({ default: mod.TelemetryPanel })),
+  {
+    loading: () => <div className="h-64 bg-gray-100 dark:bg-gray-800 rounded-3xl animate-pulse" />,
+  },
+);
 
-const FleetStatus = dynamic(() => import('@/components/fleet-status').then(mod => ({ default: mod.FleetStatus })), {
-  loading: () => <div className="h-48 bg-gray-100 dark:bg-gray-800 rounded-3xl animate-pulse" />,
-});
+const FleetStatus = dynamic(
+  () => import('@/components/fleet-status').then((mod) => ({ default: mod.FleetStatus })),
+  {
+    loading: () => <div className="h-48 bg-gray-100 dark:bg-gray-800 rounded-3xl animate-pulse" />,
+  },
+);
 
-const IntelligenceDossier = dynamic(() => import('@/components/intelligence-dossier').then(mod => ({ default: mod.IntelligenceDossier })), {
-  loading: () => <div className="h-64 bg-gray-100 dark:bg-gray-800 rounded-3xl animate-pulse" />,
-});
+const IntelligenceDossier = dynamic(
+  () =>
+    import('@/components/intelligence-dossier').then((mod) => ({
+      default: mod.IntelligenceDossier,
+    })),
+  {
+    loading: () => <div className="h-64 bg-gray-100 dark:bg-gray-800 rounded-3xl animate-pulse" />,
+  },
+);
 
 function AuthenticatedDashboard({
   onOpenModal,
@@ -69,8 +89,8 @@ function AuthenticatedDashboard({
     try {
       const [walletData, missionData, reportData] = await Promise.all([
         getWalletData(),
-        import('@/actions/mission-history').then(mod => mod.getMissionHistory()),
-        getLatestReport()
+        import('@/actions/mission-history').then((mod) => mod.getMissionHistory()),
+        getLatestReport(),
       ]);
       setWallet(walletData);
       setMissions(missionData);
@@ -224,7 +244,9 @@ function AuthenticatedDashboard({
             </div>
             <h2 className="text-4xl md:text-6xl lg:text-[7rem] font-black italic uppercase text-white tracking-tighter leading-[0.8]">
               {t('deployMission').split(' ')[0]} <br className="hidden md:block" />
-              <span className="text-blue-200">{t('deployMission').split(' ').slice(1).join(' ')}.</span>
+              <span className="text-blue-200">
+                {t('deployMission').split(' ').slice(1).join(' ')}.
+              </span>
             </h2>
             <p className="text-blue-100/70 text-lg md:text-2xl font-medium max-w-xl leading-relaxed italic">
               "{t('description')}"
@@ -307,7 +329,9 @@ function AuthenticatedDashboard({
                       </div>
                       <div className="min-w-0">
                         <p className="font-black text-gray-900 dark:text-white text-lg md:text-2xl italic tracking-tighter uppercase leading-none mb-1 md:mb-2 truncate">
-                          {mission.result?.data?.missionId ? `Mission: ${mission.result.data.missionId.slice(0, 8)}` : 'Mission Execution'}
+                          {mission.result?.data?.missionId
+                            ? `Mission: ${mission.result.data.missionId.slice(0, 8)}`
+                            : 'Mission Execution'}
                         </p>
                         <div className="flex items-center gap-2 md:gap-3">
                           <span className="text-[8px] md:text-[10px] uppercase font-black tracking-widest text-gray-400">
@@ -323,7 +347,9 @@ function AuthenticatedDashboard({
                   </td>
                   <td className={'px-6 md:px-12 py-6 md:py-10 text-center'}>
                     <div
-                      className={`inline-flex items-center justify-center h-12 md:h-16 px-4 md:px-8 rounded-xl md:rounded-[1.5rem] font-black text-xl md:text-3xl font-mono tracking-tighter text-gray-900 dark:text-white bg-gray-50 dark:bg-white/10`}
+                      className={
+                        'inline-flex items-center justify-center h-12 md:h-16 px-4 md:px-8 rounded-xl md:rounded-[1.5rem] font-black text-xl md:text-3xl font-mono tracking-tighter text-gray-900 dark:text-white bg-gray-50 dark:bg-white/10'
+                      }
                     >
                       {mission.cost} PTS
                     </div>
@@ -411,10 +437,11 @@ function DashboardContent() {
             className="fixed top-0 left-1/2 z-[300] w-full max-w-md px-6"
           >
             <div
-              className={`p-6 rounded-[2rem] border shadow-[0_30px_60px_rgba(0,0,0,0.1)] flex items-center gap-6 ${notification.type === 'success'
-                ? 'bg-emerald-600 text-white border-emerald-500'
-                : 'bg-blue-600 text-white border-blue-500'
-                }`}
+              className={`p-6 rounded-[2rem] border shadow-[0_30px_60px_rgba(0,0,0,0.1)] flex items-center gap-6 ${
+                notification.type === 'success'
+                  ? 'bg-emerald-600 text-white border-emerald-500'
+                  : 'bg-blue-600 text-white border-blue-500'
+              }`}
             >
               <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center border border-white/30 backdrop-blur-md">
                 <CheckCircle2 className="w-6 h-6" />

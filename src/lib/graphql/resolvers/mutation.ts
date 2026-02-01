@@ -4,19 +4,19 @@
  * Handles all write operations for the GraphQL API.
  */
 
-import {AgentRegistry, initializeAgents} from '@/agents/registry';
-import {encrypt} from '@/lib/encryption';
-import type {GraphQLContext} from '../context';
+import { AgentRegistry, initializeAgents } from '@/agents/registry';
+import { encrypt } from '@/lib/encryption';
+import type { GraphQLContext } from '../context';
 
 export const Mutation = {
   // ─── Agent Execution ──────────────────────────────────────────────────────
 
   invokeAgent: async (
     _parent: any,
-    args: {agentName: string; mission: string; config?: any},
-    ctx: GraphQLContext
+    args: { agentName: string; mission: string; config?: any },
+    ctx: GraphQLContext,
   ) => {
-    const {userId} = ctx;
+    const { userId } = ctx;
 
     if (!userId) {
       throw new Error('Unauthorized: Authentication required');
@@ -83,25 +83,20 @@ export const Mutation = {
       priority?: number;
       delay?: number;
     },
-    ctx: GraphQLContext
+    ctx: GraphQLContext,
   ) => {
-    const {taskQueue, userId} = ctx;
+    const { taskQueue, userId } = ctx;
 
     if (!userId) {
       throw new Error('Unauthorized: Authentication required');
     }
 
     try {
-      const result = await taskQueue.addJob(
-        args.queue,
-        args.name,
-        args.payload,
-        {
-          userId,
-          priority: args.priority,
-          delay: args.delay,
-        }
-      );
+      const result = await taskQueue.addJob(args.queue, args.name, args.payload, {
+        userId,
+        priority: args.priority,
+        delay: args.delay,
+      });
 
       return {
         success: result.success,
@@ -124,10 +119,10 @@ export const Mutation = {
 
   createWebhook: async (
     _parent: any,
-    args: {url: string; events: string[]; secret: string},
-    ctx: GraphQLContext
+    args: { url: string; events: string[]; secret: string },
+    ctx: GraphQLContext,
   ) => {
-    const {prisma, userId} = ctx;
+    const { prisma, userId } = ctx;
 
     if (!userId) {
       throw new Error('Unauthorized: Authentication required');

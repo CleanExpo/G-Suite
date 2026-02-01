@@ -48,9 +48,10 @@ export function OrientationHandler({
     setShowPrompt(wrongOrientation && showOrientationPrompt);
   }, [orientation, preferredOrientation, showOrientationPrompt, isMobile, isTablet]);
 
-  const defaultMessage = preferredOrientation === 'portrait'
-    ? 'Please rotate your device to portrait mode'
-    : 'Please rotate your device to landscape mode';
+  const defaultMessage =
+    preferredOrientation === 'portrait'
+      ? 'Please rotate your device to portrait mode'
+      : 'Please rotate your device to landscape mode';
 
   return (
     <>
@@ -96,12 +97,8 @@ export function OrientationHandler({
                     Rotate Device
                   </span>
                 </div>
-                <p className="text-white text-lg font-medium">
-                  {promptMessage || defaultMessage}
-                </p>
-                <p className="text-white/50 text-sm">
-                  For the best experience
-                </p>
+                <p className="text-white text-lg font-medium">{promptMessage || defaultMessage}</p>
+                <p className="text-white/50 text-sm">For the best experience</p>
               </div>
 
               <button

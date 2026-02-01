@@ -23,10 +23,14 @@ export default function MissionModal({
   const t = useTranslations('Mission');
   const [input, setInput] = useState('');
 
-  const transport = useMemo(() => new DefaultChatTransport({
-    api: '/api/agents',
-    body: { agentName: 'mission-overseer' },
-  }), []);
+  const transport = useMemo(
+    () =>
+      new DefaultChatTransport({
+        api: '/api/agents',
+        body: { agentName: 'mission-overseer' },
+      }),
+    [],
+  );
 
   const { messages, sendMessage, status, error, setMessages } = useChat({
     transport,
@@ -55,12 +59,12 @@ export default function MissionModal({
 
   // Derive log lines from the last assistant message
   const logs = useMemo(() => {
-    const lastAssistant = [...messages].reverse().find(m => m.role === 'assistant');
+    const lastAssistant = [...messages].reverse().find((m) => m.role === 'assistant');
     if (!lastAssistant?.parts) return [];
 
     const text = lastAssistant.parts
       .filter((p): p is { type: 'text'; text: string } => p.type === 'text')
-      .map(p => p.text)
+      .map((p) => p.text)
       .join('');
 
     return text.split('\n').filter(Boolean);
@@ -97,7 +101,10 @@ export default function MissionModal({
                 </div>
                 <div>
                   <h2 className="text-2xl font-black italic uppercase tracking-tighter dark:text-white">
-                    {t('title').split(' ')[0]} <span className="text-blue-600">{t('title').split(' ').slice(1).join(' ')}</span>
+                    {t('title').split(' ')[0]}{' '}
+                    <span className="text-blue-600">
+                      {t('title').split(' ').slice(1).join(' ')}
+                    </span>
                   </h2>
                   <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest mt-1">
                     {t('version')}

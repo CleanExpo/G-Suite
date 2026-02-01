@@ -24,7 +24,8 @@ export class LocalKMSProvider implements KMSProvider {
 
   constructor(initialKey?: string) {
     // Initialize with the provided key or environment variable
-    const baseKey = initialKey || process.env.ENCRYPTION_KEY || 'default-dev-key-32-chars-exactly!!';
+    const baseKey =
+      initialKey || process.env.ENCRYPTION_KEY || 'default-dev-key-32-chars-exactly!!';
 
     // Ensure key is exactly 32 bytes for AES-256
     const keyBuffer = this.normalizeKey(baseKey);

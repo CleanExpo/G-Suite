@@ -76,7 +76,7 @@ export class VaultRotationScheduler {
       'default',
       'vault:rotate-all-keys',
       { type: 'full-rotation' },
-      SYSTEM_USER_ID
+      SYSTEM_USER_ID,
     );
 
     if (!result.success) {
@@ -92,7 +92,7 @@ export class VaultRotationScheduler {
    */
   async unscheduleRotation(): Promise<void> {
     const schedules = await cronScheduler.listSchedules(SYSTEM_USER_ID);
-    const rotationSchedule = schedules.find(s => s.name === 'vault-key-rotation');
+    const rotationSchedule = schedules.find((s) => s.name === 'vault-key-rotation');
 
     if (rotationSchedule) {
       await cronScheduler.removeCronJob(rotationSchedule.id);
@@ -309,7 +309,7 @@ export class VaultRotationScheduler {
     lastRunAt: string | null;
   }> {
     const schedules = await cronScheduler.listSchedules(SYSTEM_USER_ID);
-    const rotationSchedule = schedules.find(s => s.name === 'vault-key-rotation');
+    const rotationSchedule = schedules.find((s) => s.name === 'vault-key-rotation');
 
     return {
       enabled: rotationSchedule?.isActive ?? false,
@@ -353,7 +353,7 @@ export const vaultRotationScheduler = new VaultRotationScheduler();
  * Register this with the job processor.
  */
 export async function handleVaultRotationJob(
-  _payload: Record<string, unknown>
+  _payload: Record<string, unknown>,
 ): Promise<{ success: boolean; result: RotationResult }> {
   const result = await vaultRotationScheduler.executeFullRotation();
   return { success: result.success, result };

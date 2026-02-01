@@ -34,7 +34,7 @@ export class CronScheduler {
     queueName: string,
     jobName: string,
     payload: Record<string, unknown>,
-    userId: string
+    userId: string,
   ): Promise<{ success: boolean; scheduleId?: string; error?: string }> {
     // Validate cron pattern
     if (!CronScheduler.isValidPattern(pattern)) {
@@ -60,7 +60,7 @@ export class CronScheduler {
           repeat: { pattern },
           removeOnComplete: { count: 100 },
           removeOnFail: { count: 500 },
-        }
+        },
       );
 
       // Persist to Prisma
@@ -141,16 +141,18 @@ export class CronScheduler {
   /**
    * List cron schedules, optionally filtered by userId.
    */
-  async listSchedules(userId?: string): Promise<Array<{
-    id: string;
-    name: string;
-    pattern: string;
-    queue: string;
-    jobName: string;
-    isActive: boolean;
-    nextRunAt: string | null;
-    lastRunAt: string | null;
-  }>> {
+  async listSchedules(userId?: string): Promise<
+    Array<{
+      id: string;
+      name: string;
+      pattern: string;
+      queue: string;
+      jobName: string;
+      isActive: boolean;
+      nextRunAt: string | null;
+      lastRunAt: string | null;
+    }>
+  > {
     try {
       const prisma = (await import('@/prisma')).default;
       const schedules = await prisma.cronSchedule.findMany({
@@ -207,7 +209,7 @@ export class CronScheduler {
             repeat: { pattern: schedule.pattern },
             removeOnComplete: { count: 100 },
             removeOnFail: { count: 500 },
-          }
+          },
         );
       }
 
@@ -219,7 +221,9 @@ export class CronScheduler {
         },
       });
 
-      console.log(`[CronScheduler] Schedule ${scheduleId} ${isActive ? 'activated' : 'deactivated'}`);
+      console.log(
+        `[CronScheduler] Schedule ${scheduleId} ${isActive ? 'activated' : 'deactivated'}`,
+      );
     } catch (err: any) {
       console.error('[CronScheduler] Toggle failed:', err.message);
     }
@@ -242,10 +246,7 @@ export class CronScheduler {
     return true;
   }
 
-  private static isValidField(
-    field: string,
-    range: (typeof CRON_FIELD_RANGES)[number]
-  ): boolean {
+  private static isValidField(field: string, range: (typeof CRON_FIELD_RANGES)[number]): boolean {
     // Wildcard
     if (field === '*') return true;
 
@@ -260,21 +261,13 @@ export class CronScheduler {
 
     // List: 1,3,5
     if (field.includes(',')) {
-      return field.split(',').every((part) =>
-        CronScheduler.isValidField(part.trim(), range)
-      );
+      return field.split(',').every((part) => CronScheduler.isValidField(part.trim(), range));
     }
 
     // Range: 1-5
     if (field.includes('-')) {
       const [start, end] = field.split('-').map(Number);
-      return (
-        !isNaN(start) &&
-        !isNaN(end) &&
-        start >= range.min &&
-        end <= range.max &&
-        start <= end
-      );
+      return !isNaN(start) && !isNaN(end) && start >= range.min && end <= range.max && start <= end;
     }
 
     // Single number

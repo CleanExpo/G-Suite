@@ -4,9 +4,9 @@
  * Combines Query and Mutation resolvers into a single root resolver.
  */
 
-import {Query} from './query';
-import {Mutation} from './mutation';
-import {GraphQLScalarType, Kind} from 'graphql';
+import { Query } from './query';
+import { Mutation } from './mutation';
+import { GraphQLScalarType, Kind } from 'graphql';
 
 // ─── Custom Scalars ─────────────────────────────────────────────────────────
 

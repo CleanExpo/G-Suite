@@ -66,11 +66,6 @@ const nextConfig = {
         ignoreBuildErrors: true,
     },
 
-    // Skip ESLint during builds (run separately)
-    eslint: {
-        ignoreDuringBuilds: true,
-    },
-
     // Image optimization for performance
     images: {
         // Enable modern formats

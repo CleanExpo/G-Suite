@@ -4,8 +4,8 @@
  * Handles all read operations for the GraphQL API.
  */
 
-import {AgentRegistry, initializeAgents} from '@/agents/registry';
-import type {GraphQLContext} from '../context';
+import { AgentRegistry, initializeAgents } from '@/agents/registry';
+import type { GraphQLContext } from '../context';
 
 const startTime = Date.now();
 
@@ -16,7 +16,7 @@ export const Query = {
     await initializeAgents();
     const agentNames = AgentRegistry.getAvailableAgents();
 
-    return agentNames.map(name => {
+    return agentNames.map((name) => {
       const agent = AgentRegistry.get(name);
       return {
         name,
@@ -28,7 +28,7 @@ export const Query = {
     });
   },
 
-  agent: async (_parent: any, args: {name: string}) => {
+  agent: async (_parent: any, args: { name: string }) => {
     await initializeAgents();
     const agent = AgentRegistry.get(args.name);
 
@@ -49,10 +49,10 @@ export const Query = {
 
   missions: async (
     _parent: any,
-    args: {limit?: number; status?: string},
-    ctx: GraphQLContext
+    args: { limit?: number; status?: string },
+    ctx: GraphQLContext,
   ) => {
-    const {prisma, userId} = ctx;
+    const { prisma, userId } = ctx;
 
     if (!userId) {
       throw new Error('Unauthorized: Authentication required');
@@ -61,19 +61,15 @@ export const Query = {
     return await prisma.mission.findMany({
       where: {
         userId,
-        ...(args.status ? {status: args.status} : {}),
+        ...(args.status ? { status: args.status } : {}),
       },
       take: args.limit || 25,
-      orderBy: {createdAt: 'desc'},
+      orderBy: { createdAt: 'desc' },
     });
   },
 
-  mission: async (
-    _parent: any,
-    args: {id: string},
-    ctx: GraphQLContext
-  ) => {
-    const {prisma, userId} = ctx;
+  mission: async (_parent: any, args: { id: string }, ctx: GraphQLContext) => {
+    const { prisma, userId } = ctx;
 
     if (!userId) {
       throw new Error('Unauthorized: Authentication required');
@@ -97,10 +93,10 @@ export const Query = {
 
   jobs: async (
     _parent: any,
-    args: {queue?: string; status?: string; limit?: number},
-    ctx: GraphQLContext
+    args: { queue?: string; status?: string; limit?: number },
+    ctx: GraphQLContext,
   ) => {
-    const {prisma, userId} = ctx;
+    const { prisma, userId } = ctx;
 
     if (!userId) {
       throw new Error('Unauthorized: Authentication required');
@@ -109,20 +105,16 @@ export const Query = {
     return await prisma.queueJob.findMany({
       where: {
         userId,
-        ...(args.queue ? {queue: args.queue} : {}),
-        ...(args.status ? {status: args.status} : {}),
+        ...(args.queue ? { queue: args.queue } : {}),
+        ...(args.status ? { status: args.status } : {}),
       },
       take: args.limit || 25,
-      orderBy: {createdAt: 'desc'},
+      orderBy: { createdAt: 'desc' },
     });
   },
 
-  job: async (
-    _parent: any,
-    args: {id: string},
-    ctx: GraphQLContext
-  ) => {
-    const {prisma, userId} = ctx;
+  job: async (_parent: any, args: { id: string }, ctx: GraphQLContext) => {
+    const { prisma, userId } = ctx;
 
     if (!userId) {
       throw new Error('Unauthorized: Authentication required');
@@ -159,21 +151,15 @@ export const Query = {
       },
       {
         name: 'Google Slides',
-        status: process.env.GOOGLE_CLIENT_EMAIL
-          ? 'connected'
-          : 'disconnected',
+        status: process.env.GOOGLE_CLIENT_EMAIL ? 'connected' : 'disconnected',
       },
       {
         name: 'Google Sheets',
-        status: process.env.GOOGLE_CLIENT_EMAIL
-          ? 'connected'
-          : 'disconnected',
+        status: process.env.GOOGLE_CLIENT_EMAIL ? 'connected' : 'disconnected',
       },
       {
         name: 'Gmail',
-        status: process.env.GOOGLE_CLIENT_EMAIL
-          ? 'connected'
-          : 'disconnected',
+        status: process.env.GOOGLE_CLIENT_EMAIL ? 'connected' : 'disconnected',
       },
       {
         name: 'Firebase',

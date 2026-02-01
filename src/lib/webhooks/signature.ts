@@ -35,7 +35,7 @@ export function generateWebhookSecret(): string {
 export function generateWebhookSignature(
   payload: string,
   secret: string,
-  timestamp?: number
+  timestamp?: number,
 ): string {
   const ts = timestamp || Date.now();
   const signedPayload = `${ts}.${payload}`;
@@ -52,10 +52,7 @@ export function generateWebhookSignature(
  * @param secret - Webhook secret
  * @returns Signature header value
  */
-export function generateSignatureHeader(
-  payload: string,
-  secret: string
-): string {
+export function generateSignatureHeader(payload: string, secret: string): string {
   const timestamp = Date.now();
   const signature = generateWebhookSignature(payload, secret, timestamp);
 
@@ -91,7 +88,7 @@ export function parseSignatureHeader(header: string): {
     return null;
   }
 
-  return {timestamp, signature};
+  return { timestamp, signature };
 }
 
 /**
@@ -107,7 +104,7 @@ export function verifyWebhookSignature(
   payload: string,
   signatureHeader: string,
   secret: string,
-  toleranceMs: number = 300_000 // 5 minutes
+  toleranceMs: number = 300_000, // 5 minutes
 ): boolean {
   // Parse signature header
   const parsed = parseSignatureHeader(signatureHeader);
@@ -116,7 +113,7 @@ export function verifyWebhookSignature(
     return false;
   }
 
-  const {timestamp, signature} = parsed;
+  const { timestamp, signature } = parsed;
 
   // Check timestamp tolerance (prevent replay attacks)
   const now = Date.now();
@@ -130,10 +127,7 @@ export function verifyWebhookSignature(
 
   // Timing-safe comparison to prevent timing attacks
   try {
-    return crypto.timingSafeEqual(
-      Buffer.from(signature),
-      Buffer.from(expectedSignature)
-    );
+    return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature));
   } catch (error) {
     console.error('[Webhook] Signature comparison error:', error);
     return false;

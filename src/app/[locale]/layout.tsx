@@ -23,8 +23,7 @@ const appUrl = 'https://g-pilot.app';
 
 // Check if Supabase is configured
 const isSupabaseConfigured = !!(
-  process.env.NEXT_PUBLIC_SUPABASE_URL &&
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 );
 
 export const metadata: Metadata = {
@@ -130,14 +129,15 @@ import { PWAInstallPrompt } from '@/components/pwa-install-prompt';
 function DevModeBanner() {
   return (
     <div className="fixed top-0 left-0 right-0 z-[9999] bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white text-center py-2 px-4 text-sm font-bold shadow-lg">
-      ⚠️ DEV MODE - Authentication Bypassed | <span className="font-mono">Set SUPABASE keys in .env to enable auth</span>
+      ⚠️ DEV MODE - Authentication Bypassed |{' '}
+      <span className="font-mono">Set SUPABASE keys in .env to enable auth</span>
     </div>
   );
 }
 
 export default async function RootLayout({
   children,
-  params
+  params,
 }: {
   children: React.ReactNode;
   params: Promise<{ locale: string }>;

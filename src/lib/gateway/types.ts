@@ -7,17 +7,17 @@
 // ─── Rate Limiting ──────────────────────────────────────────────────────────
 
 export interface RateLimitConfig {
-  windowMs: number;      // Time window in milliseconds (e.g., 60000 = 1 minute)
-  maxRequests: number;   // Maximum requests allowed in window
-  identifier: string;    // Unique identifier (userId, IP, or API key hash)
-  endpoint?: string;     // Specific endpoint or "*" for global
+  windowMs: number; // Time window in milliseconds (e.g., 60000 = 1 minute)
+  maxRequests: number; // Maximum requests allowed in window
+  identifier: string; // Unique identifier (userId, IP, or API key hash)
+  endpoint?: string; // Specific endpoint or "*" for global
 }
 
 export interface RateLimitResult {
-  allowed: boolean;      // Whether the request is allowed
-  remaining: number;     // Requests remaining in current window
-  resetAt: Date;         // When the rate limit resets
-  limit: number;         // Total limit for this tier
+  allowed: boolean; // Whether the request is allowed
+  remaining: number; // Requests remaining in current window
+  resetAt: Date; // When the rate limit resets
+  limit: number; // Total limit for this tier
 }
 
 export type RateLimitTier = 'standard' | 'premium' | 'enterprise';
@@ -38,8 +38,8 @@ export interface ApiKeyValidation {
 }
 
 export interface ApiKeyScope {
-  resource: string;      // e.g., "missions", "agents", "webhooks"
-  action: string;        // e.g., "read", "write", "execute"
+  resource: string; // e.g., "missions", "agents", "webhooks"
+  action: string; // e.g., "read", "write", "execute"
 }
 
 // ─── Request/Response ───────────────────────────────────────────────────────
