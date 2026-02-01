@@ -92,7 +92,7 @@ export class CostOptimizer {
 
     for (const mission of missions) {
       if (!mission.agentCosts || typeof mission.agentCosts !== 'object') continue;
-      const costs = mission.agentCosts as Record<string, AgentCostEntry>;
+      const costs = mission.agentCosts as unknown as Record<string, AgentCostEntry>;
       const hour = new Date(mission.createdAt).getHours();
 
       for (const [agentName, entry] of Object.entries(costs)) {
@@ -391,7 +391,7 @@ Return JSON array:
     const agentCosts: Record<string, number> = {};
     for (const mission of recentMissions) {
       if (!mission.agentCosts || typeof mission.agentCosts !== 'object') continue;
-      const costs = mission.agentCosts as Record<string, AgentCostEntry>;
+      const costs = mission.agentCosts as unknown as Record<string, AgentCostEntry>;
       for (const [name, entry] of Object.entries(costs)) {
         agentCosts[name] = (agentCosts[name] || 0) + (entry.cost || 0);
       }

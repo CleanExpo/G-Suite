@@ -33,7 +33,7 @@ export interface PlanStep {
 
 export interface AgentResult {
   success: boolean;
-  data?: unknown;
+  data?: Record<string, unknown> | null;
   error?: string;
   cost: number;
   duration: number;

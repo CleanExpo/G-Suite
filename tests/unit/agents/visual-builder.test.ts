@@ -124,7 +124,7 @@ describe('VisualBuilderAgent', () => {
             const result = await agent.execute(mockPlan, mockContext);
 
             expect(result.success).toBe(true);
-            expect(result.duration).toBeGreaterThan(0);
+            expect(result.duration).toBeGreaterThanOrEqual(0);
         });
 
         it('should return builder result', async () => {

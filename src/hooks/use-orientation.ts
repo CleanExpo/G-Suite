@@ -4,6 +4,28 @@ import { useState, useEffect, useCallback } from 'react';
 
 export type Orientation = 'portrait' | 'landscape';
 
+/**
+ * Screen Orientation Lock Types
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/ScreenOrientation/lock
+ */
+export type OrientationLockType =
+  | 'any'
+  | 'natural'
+  | 'landscape'
+  | 'portrait'
+  | 'portrait-primary'
+  | 'portrait-secondary'
+  | 'landscape-primary'
+  | 'landscape-secondary';
+
+// Extend ScreenOrientation interface for experimental lock/unlock API
+declare global {
+  interface ScreenOrientation {
+    lock(orientation: OrientationLockType): Promise<void>;
+    unlock(): void;
+  }
+}
+
 export interface OrientationState {
   /** Current device orientation */
   orientation: Orientation;

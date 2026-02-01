@@ -65,6 +65,7 @@ export function TouchModal({
         document.body.style.overflow = originalStyle;
       };
     }
+    return undefined;
   }, [isOpen]);
 
   // Handle escape key

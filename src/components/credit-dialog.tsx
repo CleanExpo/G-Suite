@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { createCheckoutSession } from '@/actions/stripe.actions';
 import { useTranslations } from 'next-intl';
 
-export default function CreditDialog({
+function CreditDialog({
   isOpen,
   onClose,
 }: {
@@ -196,3 +196,6 @@ export default function CreditDialog({
     </AnimatePresence>
   );
 }
+
+export { CreditDialog };
+export default CreditDialog;

@@ -460,7 +460,7 @@ export class MetricsCollector {
         userId,
         updatedAt: { gte: oneHourAgo },
         status: 'COMPLETED',
-        cost: { not: null },
+        cost: { not: undefined },
       },
       select: { cost: true },
     });

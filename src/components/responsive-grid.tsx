@@ -44,7 +44,7 @@ export function ResponsiveGrid({
   const { isPortrait, isMobile, isTablet } = useOrientation();
 
   // Determine column count based on device and orientation
-  let cols = desktop;
+  let cols: number = desktop;
   if (isMobile) {
     cols = isPortrait ? mobilePortrait : mobileLandscape;
   } else if (isTablet) {
