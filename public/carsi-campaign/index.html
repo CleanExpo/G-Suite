@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CARSI Australia - Marketing Campaign Visuals</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --carsi-primary: #1E3A5F;
+            --carsi-secondary: #2E7D32;
+            --carsi-accent: #FF6B35;
+            --carsi-gold: #FFB800;
+            --bg-dark: #050505;
+            --bg-card: #0A0A0A;
+            --text-primary: #FFFFFF;
+            --text-secondary: rgba(255,255,255,0.7);
+            --border-subtle: rgba(255,255,255,0.06);
+            --cyan: #00F5FF;
+            --emerald: #00FF88;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* Header */
+        .campaign-header {
+            text-align: center;
+            padding: 60px 20px;
+            background: linear-gradient(135deg, var(--carsi-primary) 0%, #0D2137 100%);
+            border-bottom: 1px solid var(--border-subtle);
+            margin-bottom: 60px;
+        }
+
+        .campaign-header h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 16px;
+            background: linear-gradient(90deg, var(--cyan), var(--emerald));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .campaign-header .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .campaign-header .badge {
+            display: inline-block;
+            background: var(--carsi-accent);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 4px;
+            font-weight: 600;
+            margin-top: 20px;
+            font-size: 0.875rem;
+        }
+
+        /* Section Headers */
+        .section-header {
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .section-header h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--cyan);
+            margin-bottom: 8px;
+        }
+
+        .section-header p {
+            color: var(--text-secondary);
+        }
+
+        /* Grid Layout */
+        .visual-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        /* Card Styles */
+        .visual-card {
+            background: var(--bg-card);
+            border: 0.5px solid var(--border-subtle);
+            border-radius: 4px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .visual-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 245, 255, 0.1);
+        }
+
+        .card-label {
+            background: rgba(0, 245, 255, 0.1);
+            color: var(--cyan);
+            padding: 12px 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            border-bottom: 0.5px solid var(--border-subtle);
+        }
+
+        .card-content {
+            padding: 0;
+        }
+
+        /* Hero Banner */
+        .hero-banner {
+            background: linear-gradient(135deg, var(--carsi-primary) 0%, #0D2137 60%, var(--carsi-secondary) 100%);
+            padding: 60px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .hero-banner::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(0, 245, 255, 0.15) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero-banner::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -10%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(0, 255, 136, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero-logo {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-logo span {
+            color: var(--carsi-accent);
+        }
+
+        .hero-tagline {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-subtitle {
+            font-size: 1rem;
+            color: rgba(255,255,255,0.8);
+            max-width: 500px;
+            margin: 0 auto 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-cta {
+            display: inline-block;
+            background: var(--carsi-accent);
+            color: white;
+            padding: 16px 40px;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 1rem;
+            text-decoration: none;
+            position: relative;
+            z-index: 1;
+            transition: transform 0.2s ease;
+        }
+
+        .hero-cta:hover {
+            transform: scale(1.05);
+        }
+
+        .hero-features {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 30px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-feature {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255,255,255,0.9);
+            font-size: 0.875rem;
+        }
+
+        .hero-feature .icon {
+            width: 20px;
+            height: 20px;
+            background: var(--emerald);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        /* Social Media Posts */
+        .social-post {
+            background: white;
+            color: #1a1a1a;
+        }
+
+        .social-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .social-avatar {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--carsi-primary), var(--carsi-secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        .social-meta {
+            flex: 1;
+        }
+
+        .social-name {
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .social-handle {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .social-image {
+            width: 100%;
+            aspect-ratio: 1.91/1;
+            background: linear-gradient(135deg, var(--carsi-primary) 0%, #0D2137 50%, var(--carsi-secondary) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .social-image.instagram {
+            aspect-ratio: 1/1;
+            background: linear-gradient(45deg, #405DE6, #5851DB, #833AB4, #C13584, #E1306C, #FD1D1D);
+        }
+
+        .social-image.facebook {
+            background: linear-gradient(135deg, #1877F2 0%, #0D47A1 100%);
+        }
+
+        .social-image h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            z-index: 1;
+        }
+
+        .social-image p {
+            font-size: 0.95rem;
+            opacity: 0.9;
+            max-width: 90%;
+            z-index: 1;
+        }
+
+        .social-image .overlay-icon {
+            position: absolute;
+            font-size: 120px;
+            opacity: 0.1;
+            right: -20px;
+            bottom: -20px;
+        }
+
+        .social-body {
+            padding: 16px;
+        }
+
+        .social-body p {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: #333;
+        }
+
+        .social-hashtags {
+            color: #0066cc;
+            margin-top: 8px;
+            font-size: 0.85rem;
+        }
+
+        .social-actions {
+            display: flex;
+            gap: 20px;
+            padding: 12px 16px;
+            border-top: 1px solid #eee;
+            color: #666;
+            font-size: 0.85rem;
+        }
+
+        .social-action {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        /* Email Templates */
+        .email-preview {
+            background: white;
+            color: #333;
+        }
+
+        .email-header {
+            background: linear-gradient(135deg, var(--carsi-primary), var(--carsi-secondary));
+            padding: 30px;
+            text-align: center;
+        }
+
+        .email-logo {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 8px;
+        }
+
+        .email-logo span {
+            color: var(--carsi-accent);
+        }
+
+        .email-subject {
+            background: #f5f5f5;
+            padding: 12px 20px;
+            font-size: 0.85rem;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .email-subject strong {
+            color: var(--carsi-primary);
+        }
+
+        .email-body {
+            padding: 30px;
+        }
+
+        .email-body h3 {
+            color: var(--carsi-primary);
+            margin-bottom: 16px;
+        }
+
+        .email-body p {
+            margin-bottom: 16px;
+            line-height: 1.6;
+        }
+
+        .email-cta {
+            display: inline-block;
+            background: var(--carsi-accent);
+            color: white;
+            padding: 14px 30px;
+            border-radius: 4px;
+            font-weight: 600;
+            text-decoration: none;
+            margin: 20px 0;
+        }
+
+        .email-footer {
+            background: #f5f5f5;
+            padding: 20px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        /* Infographic */
+        .infographic {
+            background: linear-gradient(180deg, var(--carsi-primary) 0%, #0D2137 100%);
+            padding: 40px 30px;
+            color: white;
+        }
+
+        .infographic h3 {
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--cyan);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.8);
+            margin-top: 8px;
+        }
+
+        /* Comparison Visual */
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .comparison-side {
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .comparison-side.old {
+            background: #7f1d1d;
+        }
+
+        .comparison-side.new {
+            background: var(--carsi-secondary);
+        }
+
+        .comparison-side h4 {
+            font-size: 1.25rem;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+
+        .comparison-side .icon {
+            font-size: 4rem;
+            margin-bottom: 16px;
+        }
+
+        .comparison-side ul {
+            list-style: none;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        .comparison-side ul li {
+            padding: 8px 0;
+            opacity: 0.9;
+        }
+
+        /* Pillars Visual */
+        .pillars {
+            background: linear-gradient(135deg, #0D2137 0%, var(--carsi-primary) 100%);
+            padding: 40px 30px;
+        }
+
+        .pillars h3 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.25rem;
+        }
+
+        .pillar-items {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .pillar-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 4px;
+            border-left: 4px solid var(--cyan);
+        }
+
+        .pillar-number {
+            width: 40px;
+            height: 40px;
+            background: var(--cyan);
+            color: var(--bg-dark);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .pillar-text h4 {
+            font-size: 1rem;
+            margin-bottom: 4px;
+        }
+
+        .pillar-text p {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        /* Map Visual */
+        .australia-map {
+            background: var(--carsi-primary);
+            padding: 40px;
+            text-align: center;
+            position: relative;
+        }
+
+        .australia-map h3 {
+            margin-bottom: 20px;
+        }
+
+        .map-container {
+            font-size: 8rem;
+            opacity: 0.3;
+            margin: 20px 0;
+        }
+
+        .map-tagline {
+            font-size: 1.1rem;
+            color: var(--cyan);
+            font-weight: 600;
+        }
+
+        .map-subtitle {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 8px;
+        }
+
+        /* Certificate Visual */
+        .certificate-preview {
+            background: linear-gradient(135deg, #f5f0e6, #fff9ed);
+            padding: 40px;
+            text-align: center;
+            color: var(--carsi-primary);
+            border: 8px double var(--carsi-gold);
+        }
+
+        .certificate-preview .cert-title {
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--carsi-secondary);
+            margin-bottom: 8px;
+        }
+
+        .certificate-preview h3 {
+            font-size: 1.75rem;
+            margin-bottom: 8px;
+            color: var(--carsi-primary);
+        }
+
+        .certificate-preview .cert-type {
+            font-size: 1.1rem;
+            color: var(--carsi-secondary);
+            margin-bottom: 20px;
+        }
+
+        .certificate-preview .cert-name {
+            font-size: 1.5rem;
+            font-style: italic;
+            margin: 20px 0;
+            color: #333;
+        }
+
+        .certificate-preview .cert-footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            font-size: 0.8rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .visual-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .campaign-header h1 {
+                font-size: 2rem;
+            }
+
+            .hero-features {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .comparison {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Download Notice */
+        .download-notice {
+            background: rgba(0, 245, 255, 0.1);
+            border: 1px solid var(--cyan);
+            border-radius: 4px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .download-notice p {
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .download-btn {
+            display: inline-block;
+            background: var(--cyan);
+            color: var(--bg-dark);
+            padding: 12px 30px;
+            border-radius: 4px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <!-- Campaign Header -->
+    <header class="campaign-header">
+        <h1>CARSI Australia Campaign</h1>
+        <p class="subtitle">Complete Marketing Visual Assets for "The Restoration Edge" Campaign</p>
+        <span class="badge">G-PILOT GENERATED</span>
+    </header>
+
+    <div class="container">
+        <!-- Download Notice -->
+        <div class="download-notice">
+            <p>All visuals are ready for export. Right-click any visual to save as image, or use browser print (Ctrl+P) to export as PDF.</p>
+        </div>
+
+        <!-- Hero Banners Section -->
+        <section>
+            <div class="section-header">
+                <h2>01 / Hero Banners</h2>
+                <p>Primary campaign banners for website, ads, and landing pages</p>
+            </div>
+
+            <div class="visual-grid">
+                <div class="visual-card">
+                    <div class="card-label">Website Hero / 1920x600</div>
+                    <div class="card-content">
+                        <div class="hero-banner">
+                            <div class="hero-logo">CARSI <span>Australia</span></div>
+                            <div class="hero-tagline">Master the Science of Restoration</div>
+                            <div class="hero-subtitle">Australia's Premier 100% Online Restoration Training. Expert Certification. Zero Travel Costs.</div>
+                            <a href="#" class="hero-cta">Start Your Journey Today</a>
+                            <div class="hero-features">
+                                <div class="hero-feature">
+                                    <span class="icon">✓</span>
+                                    100% Online
+                                </div>
+                                <div class="hero-feature">
+                                    <span class="icon">✓</span>
+                                    Industry Certified
+                                </div>
+                                <div class="hero-feature">
+                                    <span class="icon">✓</span>
+                                    Learn Anywhere
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="visual-card">
+                    <div class="card-label">Campaign Pillars / Infographic</div>
+                    <div class="card-content">
+                        <div class="pillars">
+                            <h3>The Restoration Edge: 3 Strategic Pillars</h3>
+                            <div class="pillar-items">
+                                <div class="pillar-item">
+                                    <div class="pillar-number">1</div>
+                                    <div class="pillar-text">
+                                        <h4>Authority & Accreditation</h4>
+                                        <p>Industry-standard certifications from qualified experts</p>
+                                    </div>
+                                </div>
+                                <div class="pillar-item">
+                                    <div class="pillar-number">2</div>
+                                    <div class="pillar-text">
+                                        <h4>Barrier-Free Learning</h4>
+                                        <p>100% online, accessible anywhere in Australia</p>
+                                    </div>
+                                </div>
+                                <div class="pillar-item">
+                                    <div class="pillar-number">3</div>
+                                    <div class="pillar-text">
+                                        <h4>Career Transformation</h4>
+                                        <p>Higher pay, bigger contracts, proven ROI</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Infographic -->
+        <section>
+            <div class="section-header">
+                <h2>02 / Statistics & Infographics</h2>
+                <p>Data-driven visuals for credibility and social proof</p>
+            </div>
+
+            <div class="visual-grid">
+                <div class="visual-card">
+                    <div class="card-label">Key Statistics / Social Proof</div>
+                    <div class="card-content">
+                        <div class="infographic">
+                            <h3>Why Professionals Choose CARSI</h3>
+                            <div class="stat-grid">
+                                <div class="stat-item">
+                                    <div class="stat-number">40%</div>
+                                    <div class="stat-label">Enrollment Growth Target</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-number">100%</div>
+                                    <div class="stat-label">Online Delivery</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-number">$2K+</div>
+                                    <div class="stat-label">Saved on Travel Costs</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-number">25%</div>
+                                    <div class="stat-label">Higher Earnings</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="visual-card">
+                    <div class="card-label">Comparison Visual / Before & After</div>
+                    <div class="card-content">
+                        <div class="comparison">
+                            <div class="comparison-side old">
+                                <h4>The Old Way</h4>
+                                <div class="icon">✈️</div>
+                                <ul>
+                                    <li>❌ Expensive flights</li>
+                                    <li>❌ Hotel costs</li>
+                                    <li>❌ Lost work days</li>
+                                    <li>❌ Limited schedules</li>
+                                </ul>
+                            </div>
+                            <div class="comparison-side new">
+                                <h4>The CARSI Way</h4>
+                                <div class="icon">💻</div>
+                                <ul>
+                                    <li>✅ Zero travel</li>
+                                    <li>✅ Learn from home</li>
+                                    <li>✅ Flexible timing</li>
+                                    <li>✅ Same certification</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Social Media Posts -->
+        <section>
+            <div class="section-header">
+                <h2>03 / Social Media Posts</h2>
+                <p>Ready-to-publish content for LinkedIn, Facebook, and Instagram</p>
+            </div>
+
+            <div class="visual-grid">
+                <!-- LinkedIn Post -->
+                <div class="visual-card">
+                    <div class="card-label">LinkedIn / Business Owners</div>
+                    <div class="card-content">
+                        <div class="social-post">
+                            <div class="social-header">
+                                <div class="social-avatar">CA</div>
+                                <div class="social-meta">
+                                    <div class="social-name">CARSI Australia</div>
+                                    <div class="social-handle">1,247 followers • Education</div>
+                                </div>
+                            </div>
+                            <div class="social-image">
+                                <h3>Stop Paying for<br>Your Team's Flights</h3>
+                                <p>Professional restoration training<br>without leaving the job site</p>
+                                <div class="overlay-icon">🎓</div>
+                            </div>
+                            <div class="social-body">
+                                <p>Upskilling your team shouldn't cost you a week of lost productivity and $2k in travel expenses.</p>
+                                <p style="margin-top: 12px;">With CARSI, your staff gets top-tier restoration certification from the warehouse or home. 🏠</p>
+                                <p style="margin-top: 12px; font-weight: 600;">See our corporate packages →</p>
+                            </div>
+                            <div class="social-actions">
+                                <span class="social-action">👍 Like</span>
+                                <span class="social-action">💬 Comment</span>
+                                <span class="social-action">🔄 Repost</span>
+                                <span class="social-action">📤 Send</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Facebook Post -->
+                <div class="visual-card">
+                    <div class="card-label">Facebook / Tradies & Career Changers</div>
+                    <div class="card-content">
+                        <div class="social-post">
+                            <div class="social-header">
+                                <div class="social-avatar">CA</div>
+                                <div class="social-meta">
+                                    <div class="social-name">CARSI Australia</div>
+                                    <div class="social-handle">Sponsored • 🌏</div>
+                                </div>
+                            </div>
+                            <div class="social-image facebook">
+                                <h3>Why Travel for Training?</h3>
+                                <p>The training comes to you 🚛💻</p>
+                                <div class="overlay-icon">🔧</div>
+                            </div>
+                            <div class="social-body">
+                                <p>Master Water Damage & Mould Remediation 100% online.</p>
+                                <p style="margin-top: 8px;">Get certified ✅ Get more insurance work ✅ Get paid more ✅</p>
+                                <p class="social-hashtags">#RestorationLife #Tradie #OnlineLearning #MouldRemoval #AusTrade</p>
+                            </div>
+                            <div class="social-actions">
+                                <span class="social-action">👍 Like</span>
+                                <span class="social-action">💬 Comment</span>
+                                <span class="social-action">↗️ Share</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Instagram Post -->
+                <div class="visual-card">
+                    <div class="card-label">Instagram / Visual Awareness</div>
+                    <div class="card-content">
+                        <div class="social-post">
+                            <div class="social-header">
+                                <div class="social-avatar">CA</div>
+                                <div class="social-meta">
+                                    <div class="social-name">carsi_australia</div>
+                                    <div class="social-handle">Restoration Training</div>
+                                </div>
+                            </div>
+                            <div class="social-image instagram">
+                                <h3>3 Deadliest Mould Types<br>in Aussie Homes</h3>
+                                <p>Swipe to learn the science 🦠</p>
+                                <div class="overlay-icon">🏠</div>
+                            </div>
+                            <div class="social-body">
+                                <p>Think it's just a bit of black gunk? Think again. 🦠</p>
+                                <p style="margin-top: 8px;">Identifying the risk is step one of the job. Learn the science behind the clean with CARSI.</p>
+                                <p style="margin-top: 8px; color: #0066cc;">🔗 Link in bio to start your free trial module</p>
+                            </div>
+                            <div class="social-actions">
+                                <span class="social-action">❤️ 847</span>
+                                <span class="social-action">💬 23</span>
+                                <span class="social-action">📤</span>
+                                <span class="social-action" style="margin-left: auto;">🔖</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Email Templates -->
+        <section>
+            <div class="section-header">
+                <h2>04 / Email Templates</h2>
+                <p>Nurture sequence emails for lead conversion</p>
+            </div>
+
+            <div class="visual-grid">
+                <div class="visual-card">
+                    <div class="card-label">Email 1 / Cost Barrier</div>
+                    <div class="card-content">
+                        <div class="email-preview">
+                            <div class="email-header">
+                                <div class="email-logo">CARSI <span>Australia</span></div>
+                            </div>
+                            <div class="email-subject">
+                                <strong>Subject:</strong> ✈️ Why pay for flights? (Training shouldn't cost this much)
+                            </div>
+                            <div class="email-body">
+                                <h3>There's a better way to get certified</h3>
+                                <p>Hey there,</p>
+                                <p>We know what you're thinking: "Quality restoration training requires flying to Sydney or Melbourne."</p>
+                                <p>Not anymore. CARSI delivers the same industry-standard certifications—100% online, from anywhere in Australia.</p>
+                                <p><strong>No flights. No hotels. No lost workdays.</strong></p>
+                                <a href="#" class="email-cta">Calculate Your Savings →</a>
+                            </div>
+                            <div class="email-footer">
+                                CARSI Australia • Professional Restoration Training<br>
+                                Unsubscribe | Privacy Policy
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="visual-card">
+                    <div class="card-label">Email 2 / Knowledge Gap</div>
+                    <div class="card-content">
+                        <div class="email-preview">
+                            <div class="email-header">
+                                <div class="email-logo">CARSI <span>Australia</span></div>
+                            </div>
+                            <div class="email-subject">
+                                <strong>Subject:</strong> Is your restoration knowledge up to code? [Quiz Inside]
+                            </div>
+                            <div class="email-body">
+                                <h3>Quick Quiz: Test Your Expertise</h3>
+                                <p>Can you answer these 3 questions?</p>
+                                <p>1. What's the ideal relative humidity for structural drying?<br>
+                                2. At what moisture content is wood considered "dry"?<br>
+                                3. Name the IICRC standard for mould remediation.</p>
+                                <p>If you hesitated on any... there's a gap in your training.</p>
+                                <a href="#" class="email-cta">Fill the Gap with CARSI →</a>
+                            </div>
+                            <div class="email-footer">
+                                CARSI Australia • Professional Restoration Training<br>
+                                Unsubscribe | Privacy Policy
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="visual-card">
+                    <div class="card-label">Email 3 / Social Proof</div>
+                    <div class="card-content">
+                        <div class="email-preview">
+                            <div class="email-header">
+                                <div class="email-logo">CARSI <span>Australia</span></div>
+                            </div>
+                            <div class="email-subject">
+                                <strong>Subject:</strong> 🎓 Case Study: How Sarah doubled her charge-out rate
+                            </div>
+                            <div class="email-body">
+                                <h3>From $65/hr to $130/hr in 6 months</h3>
+                                <p>Sarah runs a small restoration business in regional Queensland.</p>
+                                <p>After completing CARSI's Water Damage Restoration course, she got certified for insurance work—and doubled her rates overnight.</p>
+                                <p><em>"The best part? I studied between jobs. Never had to leave town."</em></p>
+                                <a href="#" class="email-cta">Read Sarah's Full Story →</a>
+                            </div>
+                            <div class="email-footer">
+                                CARSI Australia • Professional Restoration Training<br>
+                                Unsubscribe | Privacy Policy
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Additional Assets -->
+        <section>
+            <div class="section-header">
+                <h2>05 / Additional Assets</h2>
+                <p>Supporting visuals for the campaign</p>
+            </div>
+
+            <div class="visual-grid">
+                <div class="visual-card">
+                    <div class="card-label">Geographic Reach / Australia Map</div>
+                    <div class="card-content">
+                        <div class="australia-map">
+                            <h3>Training Without Borders</h3>
+                            <div class="map-container">🗺️</div>
+                            <div class="map-tagline">"From the Pilbara to Parramatta"</div>
+                            <div class="map-subtitle">Same world-class training, wherever you are</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="visual-card">
+                    <div class="card-label">Certificate Preview / Credibility</div>
+                    <div class="card-content">
+                        <div class="certificate-preview">
+                            <div class="cert-title">Certificate of Completion</div>
+                            <h3>CARSI Australia</h3>
+                            <div class="cert-type">Water Damage Restoration</div>
+                            <div class="cert-name">[Your Name Here]</div>
+                            <p style="font-size: 0.85rem; color: #666;">Has successfully completed the requirements for professional certification in Water Damage Restoration as established by CARSI Australia.</p>
+                            <div class="cert-footer">
+                                <div>Date: DD/MM/YYYY</div>
+                                <div>Certificate ID: CARSI-WDR-XXXX</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer style="text-align: center; padding: 60px 20px; border-top: 1px solid var(--border-subtle); margin-top: 40px;">
+            <p style="color: var(--text-secondary); font-size: 0.9rem;">Generated by G-Pilot Marketing Strategist Agent</p>
+            <p style="color: var(--cyan); font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; margin-top: 8px;">Campaign: The Restoration Edge • CARSI Australia</p>
+        </footer>
+    </div>
+
+    <script>
+        // Add subtle animation on scroll
+        const cards = document.querySelectorAll('.visual-card');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+
+        cards.forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(card);
+        });
+    </script>
+</body>
+</html>
