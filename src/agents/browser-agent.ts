@@ -213,14 +213,15 @@ export class BrowserAgent extends BaseAgent {
           this.log(`Typing into: ${operation.target?.value}`);
           return { success: true, data: { typed: operation.value } };
 
-        case 'scroll':
+        case 'scroll': {
           // In production: await page.evaluate() with scroll
           const direction = (operation.options?.direction as string) || 'down';
           const amount = (operation.options?.amount as number) || 500;
           this.log(`Scrolling ${direction} by ${amount}px`);
           return { success: true, data: { scrolled: { direction, amount } } };
+        }
 
-        case 'screenshot':
+        case 'screenshot': {
           // In production: const buffer = await page.screenshot()
           const fullPage = (operation.options?.fullPage as boolean) || false;
           this.log(`Capturing screenshot (fullPage: ${fullPage})`);
@@ -230,8 +231,9 @@ export class BrowserAgent extends BaseAgent {
             this.session.pageStates[this.session.pageStates.length - 1].screenshot = screenshotPath;
           }
           return { success: true, data: { screenshot: screenshotPath } };
+        }
 
-        case 'extract':
+        case 'extract': {
           // In production: await page.$eval(selector, el => el.textContent)
           const extractType = (operation.options?.extractType as string) || 'text';
           this.log(`Extracting ${extractType} from: ${operation.target?.value || 'page'}`);
@@ -247,19 +249,22 @@ export class BrowserAgent extends BaseAgent {
               extractedData;
           }
           return { success: true, data: extractedData };
+        }
 
-        case 'wait':
+        case 'wait': {
           // In production: await page.waitForSelector() or page.waitForTimeout()
           const duration = (operation.options?.duration as number) || 1000;
           this.log(`Waiting ${duration}ms`);
           await new Promise((resolve) => setTimeout(resolve, Math.min(duration, 5000)));
           return { success: true, data: { waited: duration } };
+        }
 
-        case 'assert':
+        case 'assert': {
           // In production: verify element exists/visible/contains
           const condition = (operation.options?.condition as string) || 'exists';
           this.log(`Asserting: ${operation.target?.value} ${condition}`);
           return { success: true, data: { assertion: condition, passed: true } };
+        }
 
         default:
           return { success: false, error: `Unknown action: ${operation.action}` };
