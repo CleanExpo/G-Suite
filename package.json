@@ -23,7 +23,8 @@
     "fix": "gts fix",
     "check": "gts check",
     "compile": "tsc",
-    "type-check": "tsc --noEmit --incremental"
+    "type-check": "tsc --noEmit --incremental",
+    "type-check:mem": "node --max-old-space-size=8192 node_modules/typescript/bin/tsc --noEmit --incremental"
   },
   "keywords": [
     "AI Orchestration",

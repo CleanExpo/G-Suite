@@ -51,8 +51,36 @@ export interface TokenUsage {
   model?: string; // Model used for this call
 }
 
+export type ArtifactType =
+  | 'url'
+  | 'file'
+  | 'data'
+  | 'code'
+  | 'report'
+  | 'analysis'
+  | 'design'
+  | 'test'
+  | 'documentation'
+  | 'review'
+  | 'summary'
+  | 'config'
+  | 'deployment'
+  | 'metrics'
+  | 'dashboard'
+  | 'session'
+  | 'result'
+  | 'intelligence'
+  | 'calendar'
+  | 'campaign'
+  | 'template'
+  | 'workflow'
+  | 'visualization'
+  | 'audio'
+  | 'notification'
+  | string; // Allow custom types for flexibility
+
 export interface AgentArtifact {
-  type: 'url' | 'file' | 'data';
+  type: ArtifactType;
   name: string;
   value: string | Record<string, unknown>;
 }

@@ -18,19 +18,31 @@ export class TokenTracker {
 
   /**
    * Record token usage from a Gemini API response.
-   * Gemini returns `response.usageMetadata` with token counts.
+   * Accepts either:
+   * - GenerateContentResult (has .response.usageMetadata)
+   * - EnhancedGenerateContentResponse (has .usageMetadata directly)
    */
   recordGemini(
-    response: {
-      usageMetadata?: {
-        promptTokenCount?: number;
-        candidatesTokenCount?: number;
-        totalTokenCount?: number;
-      };
-    },
+    result:
+      | {
+          response?: {
+            usageMetadata?: {
+              promptTokenCount?: number;
+              candidatesTokenCount?: number;
+              totalTokenCount?: number;
+            };
+          };
+          usageMetadata?: {
+            promptTokenCount?: number;
+            candidatesTokenCount?: number;
+            totalTokenCount?: number;
+          };
+        }
+      | any, // Allow any for flexibility with different SDK versions
     modelName?: string,
   ): void {
-    const meta = response.usageMetadata;
+    // Try to get usageMetadata from either location
+    const meta = result?.response?.usageMetadata ?? result?.usageMetadata;
     if (meta) {
       this.promptTokens += meta.promptTokenCount ?? 0;
       this.completionTokens += meta.candidatesTokenCount ?? 0;
