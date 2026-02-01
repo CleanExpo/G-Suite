@@ -12,18 +12,21 @@ import sys
 
 
 def check_git_status() -> tuple[bool, str]:
-    """Check for uncommitted changes."""
+    """Check for uncommitted changes (excludes gitignored files)."""
     try:
         result = subprocess.run(
-            ["git", "status", "--porcelain"],
+            ["git", "status", "--porcelain", "-uno"],  # -uno ignores untracked files
             capture_output=True,
             text=True,
             timeout=10
         )
         if result.stdout.strip():
             lines = result.stdout.strip().split("\n")
-            count = len(lines)
-            return False, f"Git: {count} uncommitted changes"
+            # Filter out any empty lines
+            lines = [l for l in lines if l.strip()]
+            if lines:
+                count = len(lines)
+                return False, f"Git: {count} uncommitted changes"
         return True, "Git: clean"
     except Exception:
         return True, "Git: check skipped"
